@@ -1,0 +1,20 @@
+.game-canvas {
+    border: 1px solid black;
+    width: 400px;
+    max-height: 100%;
+    display: block;
+}
+
+.game-over {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.game-over button {
+    margin: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
