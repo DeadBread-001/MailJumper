@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: './src/index.js', // Точка входа
@@ -23,6 +24,12 @@ module.exports = {
         test: /\.css$/, // Поддержка CSS (если понадобится)
         use: ['style-loader', 'css-loader'],
       },
+      {
+        test: /\.(png|svg|jpg|gif)$/,
+        use: [
+          'file-loader',
+        ],
+      },
     ],
   },
   resolve: {
@@ -31,6 +38,11 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './public/index.html', // Шаблон HTML
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "./public/images/", to: "./images" },
+      ],
     }),
   ],
   devServer: {
