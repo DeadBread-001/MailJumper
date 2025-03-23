@@ -1,12 +1,13 @@
 import React from 'react';
 import GameCanvas from './components/GameCanvas';
+import Navbar from "./components/Navbar";
 
 const App = () => {
   return (
-      <div style={{ textAlign: 'center' }}>
-        <h1>Mail Jump</h1>
+      <><Navbar />
+      <div>
         <GameCanvas />
-      </div>
+      </div></>
   );
 };
 

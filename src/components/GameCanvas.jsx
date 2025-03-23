@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
-import { Background } from "../utils/background";
-import { Player } from "../utils/player";
-import { InputHandler } from "../utils/input";
-import { Enemy } from "../utils/enemy";
-import { Platform } from "../utils/platform";
+import {useEffect} from 'react';
+import {Background} from "../utils/background";
+import {Player} from "../utils/player";
+import {InputHandler} from "../utils/input";
+import {Enemy} from "../utils/enemy";
+import {Platform} from "../utils/platform";
 
 export default function GameCanvas() {
   useEffect(() => {
@@ -146,14 +146,6 @@ export default function GameCanvas() {
   }, []);
 
   return (
-      <canvas id='canvas1' style={{
-        border: '5px solid black',
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        maxWidth: '100%',
-        maxHeight: '100%'
-      }}></canvas>
+      <canvas id='canvas1'></canvas>
   );
 }
