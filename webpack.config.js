@@ -16,7 +16,7 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env', '@babel/preset-react'],
+            presets: ['@babel/preset-env', ["@babel/preset-react", {"runtime": "automatic"}]],
           },
         },
       },
@@ -37,7 +37,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './public/index.html', // Шаблон HTML
+      template: './src/index.html', // Шаблон HTML
     }),
     new CopyWebpackPlugin({
       patterns: [

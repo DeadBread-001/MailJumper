@@ -3,7 +3,8 @@ export class Background {
         this.game = game
         this.width = this.game.width
         this.height = this.game.height
-        this.image = document.querySelector('#bg')
+        this.image = new Image()
+        this.image.src = '/images/background.png'
         this.x = 0
         this.y = 0
     }
@@ -18,7 +19,7 @@ export class Background {
             if(Math.random() < this.game.enemyChance/100){
                 this.game.add_enemy()
             }
-        } 
+        }
         else{
             this.y += this.game.vy
             this.game.score += Math.trunc(this.game.vy * 0.1)

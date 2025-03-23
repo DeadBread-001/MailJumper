@@ -6,14 +6,15 @@ export class Player {
         this.sizeModifier = 0.2
         this.width = 395 * this.sizeModifier
         this.height = 488 * this.sizeModifier
-        this.x = this.game.platforms.filter(platform => platform.type=='green').slice(-1)[0].x + 6
-        this.y = this.game.platforms.filter(platform => platform.type=='green').slice(-1)[0].y - this.height
+        this.x = this.game.platforms.filter(platform => platform.type==='green').slice(-1)[0].x + 6
+        this.y = this.game.platforms.filter(platform => platform.type==='green').slice(-1)[0].y - this.height
         this.min_y = (this.game.height/2)-30
         this.min_vy = -18
         this.max_vy = this.game.platforms[0].height
         this.vy = this.min_vy
         this.weight = 0.5
-        this.image = document.querySelector('#android')
+        this.image = new Image()
+        this.image.src = '/images/player.png'
         this.vx = 0
         this.max_vx = 8
         this.bullets = []
@@ -37,7 +38,7 @@ export class Player {
         // vertical movement
         if(this.vy > this.weight){
             let platformType = this.onPlatform()
-            if(platformType=='white' || platformType=='blue' || platformType=='green') this.vy = this.min_vy
+            if(platformType==='white' || platformType==='blue' || platformType==='green') this.vy = this.min_vy
 
         }
 
@@ -92,7 +93,7 @@ export class Player {
 
             if(X_test && Y_test){
                 type = platform.type
-                platform.markedForDeletion = (type == 'brown' || type == 'white') ? true : false
+                platform.markedForDeletion = (type === 'brown' || type === 'white')
             }
         })
 

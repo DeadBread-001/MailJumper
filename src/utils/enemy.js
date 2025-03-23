@@ -4,9 +4,10 @@ export class Enemy {
         this.sizeModifier = 0.35
         this.width = 238 * this.sizeModifier
         this.height = 240 * this.sizeModifier
-        this.x = Math.floor(Math.random() * ((this.game.width-this.width) - 0 + 1)) + 0
+        this.x = Math.floor(Math.random() * ((this.game.width - this.width) + 1))
         this.y = Math.floor(Math.random() * ((-this.height) - (-this.game.height) + 1)) + (-this.game.height)
-        this.image = document.querySelector('#virus')
+        this.image = new Image()
+        this.image.src = '/images/virus.png'
         this.vx = this.game.object_vx
         this.markedForDeletion = false
     }
