@@ -8,11 +8,9 @@
 }
 
 #canvas1{
+    display: block;
+    justify-self: center;
     border: 5px solid black;
-    position: absolute;
-    top:50%;
-    left:50%;
-    transform: translate(-50%,-50%);
-    max-width: 100%;
-    max-height: 100%;
+    width: 500px;
+    height: 765px;
 }

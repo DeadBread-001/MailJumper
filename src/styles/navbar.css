@@ -1,16 +1,11 @@
-/* Основной стиль навбара */
 .navbar {
-    position: fixed;
     width: 100%;
-    top: 0;
-    left: 0;
     background: rgba(0, 0, 0, 0.8);
     padding: 15px 30px;
     color: white;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 1000; /* Поверх всего */
 }
 
 /* Логотип */

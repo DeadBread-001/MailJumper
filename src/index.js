@@ -1,6 +1,10 @@
 import ReactDOM from 'react-dom/client'
 import App from './App';
 import './styles/index.css';
+import {BrowserRouter} from "react-router-dom";
 
-const root = document.querySelector('#root')
-ReactDOM.createRoot(root).render(<App />)
+ReactDOM.createRoot(document.getElementById('root')).render(
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+);

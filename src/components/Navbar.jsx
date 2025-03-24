@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link} from "react-router-dom";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -13,20 +14,20 @@ export default function Navbar() {
           </svg>
           <span className="logo-text">джампер</span>
         </div>
+          <ul className={menuOpen ? "nav-links open" : "nav-links"}>
+            <li><Link to="/">Играть</Link></li>
+            <li><Link to="/rating">Рейтинг</Link></li>
+            <li><Link to="/tasks">Задания</Link></li>
+            <li><Link to="/shop">Магазин</Link></li>
+          </ul>
 
-        <ul className={menuOpen ? "nav-links open" : "nav-links"}>
-          <li><a href="#">Рейтинг</a></li>
-          <li><a href="#">Задания</a></li>
-          <li><a href="#">Магазин</a></li>
-        </ul>
+          <button className="auth-button">Войти</button>
 
-        <button className="auth-button">Войти</button>
-
-        <div className="burger" onClick={() => setMenuOpen(!menuOpen)}>
-          <div className="line"></div>
-          <div className="line"></div>
-          <div className="line"></div>
-        </div>
+          <div className="burger" onClick={() => setMenuOpen(!menuOpen)}>
+            <div className="line"></div>
+            <div className="line"></div>
+            <div className="line"></div>
+          </div>
       </nav>
   );
 }
