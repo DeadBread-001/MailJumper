@@ -27,6 +27,7 @@
 }
 
 .nav-links a {
+    align-self: center;
     text-decoration: none;
     color: white;
     font-weight: bold;
@@ -53,20 +54,6 @@
     background: #2483e4;
 }
 
-/* Бургер-меню (скрыто на десктопе) */
-.burger {
-    display: none;
-    flex-direction: column;
-    cursor: pointer;
-}
-
-.line {
-    width: 25px;
-    height: 3px;
-    background: white;
-    margin: 4px;
-}
-
 .logo-text {
     width: 100%;
     align-self: center;
@@ -74,30 +61,18 @@
     margin-bottom: 4px;
 }
 
+.auth-button {
+    background-color: #007bff; /* Синий цвет кнопки, как на фото */
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
 
-/*@media screen and (max-width: 768px) {*/
-/*    .burger {*/
-/*        display: flex;*/
-/*    }*/
-
-/*    .nav-links {*/
-/*        position: absolute;*/
-/*        top: 60px;*/
-/*        right: 0;*/
-/*        background: rgba(0, 0, 0, 0.9);*/
-/*        flex-direction: column;*/
-/*        width: 100%;*/
-/*        text-align: center;*/
-/*        padding: 20px 0;*/
-/*        display: none;*/
-
-/*    }*/
-/*    .nav-links.open {*/
-/*        display: flex;*/
-
-/*    }*/
-/*    .nav-links li {*/
-/*        margin: 10px 0;*/
-/*    }*/
-
-/*}*/
+.auth-button:hover {
+    background-color: #0056b3; /* Темнее при наведении */
+}

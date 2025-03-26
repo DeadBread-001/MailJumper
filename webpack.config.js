@@ -41,7 +41,7 @@ module.exports = {
     }),
     new CopyWebpackPlugin({
       patterns: [
-        { from: "./public/images/", to: "./images" },
+        {from: "./public/images/", to: "./images"},
       ],
     }),
   ],
@@ -49,7 +49,7 @@ module.exports = {
     static: path.join(__dirname, 'dist'),
     compress: true,
     port: 3000, // Локальный сервер на порту 3000
-    historyApiFallback: true, // Перенаправляет все запросы на index.html
+    historyApiFallback: true,
   },
   mode: 'development', // Режим разработки
 };
