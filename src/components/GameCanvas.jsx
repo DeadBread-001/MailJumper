@@ -38,6 +38,38 @@ export default function GameCanvas() {
         this.background = new Background(this);
         this.player = new Player(this);
         this.inputHandler = new InputHandler(this);
+        this.playerName = this.askForPlayerName();
+      }
+
+      askForPlayerName() {
+        let name = "";
+        while (!name) {
+          name = prompt("Введите ваше имя:")?.trim();
+        }
+        return name;
+      }
+
+      async sendScore() {
+        try {
+          const response = await fetch(`http://localhost:80/api/v1/profile/${this.playerName}/rating`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              score: this.score,
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Ошибка отправки счета");
+          }
+
+          const data = await response.json();
+          console.log("Счет успешно отправлен:", data);
+        } catch (error) {
+          console.error("Ошибка при отправке счета:", error.message);
+        }
       }
 
       update() {
@@ -86,6 +118,7 @@ export default function GameCanvas() {
             context.fillStyle = "red";
             context.textAlign = 'center';
             context.fillText(`GAME OVER`, this.width * 0.5, this.height * 0.5);
+            this.sendScore();
           }
         }
       }

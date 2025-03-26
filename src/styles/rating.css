@@ -1,0 +1,56 @@
+.rating-container {
+    padding: 16px;
+    background-color: white;
+    border-radius: 8px;
+}
+
+.rating-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.rating-table {
+    width: 60%;
+    margin: auto;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #ccc;
+
+}
+
+.rating-table th,
+.rating-table td {
+    padding: 8px;
+    text-align: center;
+    margin: auto;
+}
+
+/* Заголовок таблицы */
+.rating-table thead {
+    background: #0077ff;
+    color: white;
+}
+
+/* Медаль для 1-го места */
+.rating-table tbody tr:nth-child(1) .medal {
+    width: 10%;
+    background-color: gold;
+}
+
+/* Медаль для 2-го места */
+.rating-table tbody tr:nth-child(2) .medal {
+    background-color: silver;
+}
+
+/* Медаль для 3-го места */
+.rating-table tbody tr:nth-child(3) .medal {
+    background-color: sandybrown;
+}
+
+.rating-table thead {
+    background: #0077ff;
+    color: white;
+}
