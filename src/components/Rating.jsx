@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import {getTopPlayers} from "../api/rating";
 
 export default function Rating() {
   const [users, setUsers] = useState([]);
@@ -8,24 +9,8 @@ export default function Rating() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:80/api/v1/game/rating/top", {
-          method: "GET",
-          mode: "cors",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Ошибка загрузки данных");
-        }
-
-        const data = await response.json();
-        if (data.Status === 200 && data.Data?.users) {
-          setUsers(data.Data.users);
-        } else {
-          throw new Error("Некорректный формат данных");
-        }
+        const usersData = await getTopPlayers();
+        setUsers(usersData);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -39,6 +24,7 @@ export default function Rating() {
   if (loading) return <p>Загрузка...</p>;
   if (error) return <p>Ошибка: {error}</p>;
 
+  if (users.length === 0) {return (<div>Пока никто не сыграл!</div>)}
   return (
     <div className="rating-container">
       <h2 className="rating-title">Таблица лидеров</h2>

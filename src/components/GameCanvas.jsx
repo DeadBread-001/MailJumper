@@ -4,6 +4,7 @@ import {Player} from "../utils/player";
 import {InputHandler} from "../utils/input";
 import {Enemy} from "../utils/enemy";
 import {Platform} from "../utils/platform";
+import {sendScore} from "../api/game";
 
 export default function GameCanvas() {
   useEffect(() => {
@@ -49,28 +50,6 @@ export default function GameCanvas() {
         return name;
       }
 
-      async sendScore() {
-        try {
-          const response = await fetch(`http://localhost:80/api/v1/profile/${this.playerName}/rating`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              score: this.score,
-            }),
-          });
-
-          if (!response.ok) {
-            throw new Error("Ошибка отправки счета");
-          }
-
-          const data = await response.json();
-          console.log("Счет успешно отправлен:", data);
-        } catch (error) {
-          console.error("Ошибка при отправке счета:", error.message);
-        }
-      }
 
       update() {
         this.background.update();
@@ -118,7 +97,7 @@ export default function GameCanvas() {
             context.fillStyle = "red";
             context.textAlign = 'center';
             context.fillText(`GAME OVER`, this.width * 0.5, this.height * 0.5);
-            this.sendScore();
+            sendScore({name: this.playerName, score: this.score});
           }
         }
       }
