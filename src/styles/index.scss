@@ -1,5 +1,6 @@
-@import "navbar.css";
-@import "shop.css";
+@use "navbar";
+@use "shop";
+@use "rating";
 
 * {
     margin: 0;

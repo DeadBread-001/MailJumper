@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "../styles/rating.css";
 
 export default function Rating() {
   const [users, setUsers] = useState([]);

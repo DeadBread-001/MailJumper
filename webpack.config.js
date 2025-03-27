@@ -1,9 +1,10 @@
 const path = require('path');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
-  entry: './src/index.js', // Точка входа
+  entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
@@ -11,7 +12,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/, // Обрабатываем .js и .jsx файлы
+        test: /\.jsx?$/,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
@@ -21,8 +22,13 @@ module.exports = {
         },
       },
       {
-        test: /\.css$/, // Поддержка CSS (если понадобится)
-        use: ['style-loader', 'css-loader'],
+        test: /\.s[ac]ss$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader",
+          "sass-loader",
+          "postcss-loader",
+        ],
       },
       {
         test: /\.(png|svg|jpg|gif)$/,
@@ -33,11 +39,12 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.js', '.jsx'], // Поддержка .js и .jsx
+    extensions: ['.js', '.jsx'],
   },
   plugins: [
+    new MiniCssExtractPlugin(),
     new HtmlWebpackPlugin({
-      template: './src/index.html', // Шаблон HTML
+      template: './src/index.html',
     }),
     new CopyWebpackPlugin({
       patterns: [
@@ -48,8 +55,8 @@ module.exports = {
   devServer: {
     static: path.join(__dirname, 'dist'),
     compress: true,
-    port: 3000, // Локальный сервер на порту 3000
+    port: 3000,
     historyApiFallback: true,
   },
-  mode: 'development', // Режим разработки
+  mode: 'development',
 };
