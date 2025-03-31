@@ -1,0 +1,18 @@
+@use "navbar";
+@use "shop";
+@use "rating";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "VKSansDisplay", -apple-system, system-ui, "Helvetica Neue", Roboto, sans-serif;
+}
+
+#canvas1 {
+    display: block;
+    justify-self: center;
+    border: 5px solid black;
+    width: 500px;
+    height: 765px;
+}

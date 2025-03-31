@@ -4,6 +4,7 @@ import {Player} from "../utils/player";
 import {InputHandler} from "../utils/input";
 import {Enemy} from "../utils/enemy";
 import {Platform} from "../utils/platform";
+import {sendScore} from "../api/game";
 
 export default function GameCanvas() {
   useEffect(() => {
@@ -38,7 +39,17 @@ export default function GameCanvas() {
         this.background = new Background(this);
         this.player = new Player(this);
         this.inputHandler = new InputHandler(this);
+        this.playerName = this.askForPlayerName();
       }
+
+      askForPlayerName() {
+        let name = "";
+        while (!name) {
+          name = prompt("Введите ваше имя:")?.trim();
+        }
+        return name;
+      }
+
 
       update() {
         this.background.update();
@@ -86,6 +97,7 @@ export default function GameCanvas() {
             context.fillStyle = "red";
             context.textAlign = 'center';
             context.fillText(`GAME OVER`, this.width * 0.5, this.height * 0.5);
+            sendScore({name: this.playerName, score: this.score});
           }
         }
       }

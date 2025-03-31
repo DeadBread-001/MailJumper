@@ -21,7 +21,6 @@ export class Player {
     }
 
     update(inputHandler) {
-        // horizontal movement
         this.x += this.vx
         if(inputHandler.keys.includes('ArrowLeft')){
             this.vx = -this.max_vx
@@ -31,11 +30,9 @@ export class Player {
         }
         else this.vx = 0
 
-        // horizontal boundary
         if(this.x < -this.width/2) this.x = this.game.width - (this.width/2)
         if(this.x + (this.width/2) > this.game.width) this.x = - this.width/2
 
-        // vertical movement
         if(this.vy > this.weight){
             let platformType = this.onPlatform()
             if(platformType==='white' || platformType==='blue' || platformType==='green') this.vy = this.min_vy
@@ -48,7 +45,6 @@ export class Player {
         if(this.y <= this.min_y && this.vy < this.weight) this.game.vy = -this.vy
         else this.game.vy = 0
 
-        // game over
         if(this.collision()){
             this.game.gameOver = true
         }
@@ -57,7 +53,6 @@ export class Player {
             this.game.gameOver = true
         }
 
-        // bullet
         if(inputHandler.bulletKeyCount>0){
             inputHandler.bulletKeyCount--
             this.bullets.push(new Bullet(this))
