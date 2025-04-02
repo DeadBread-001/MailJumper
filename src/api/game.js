@@ -7,4 +7,4 @@ export async function sendScore(params) {
   if (data.Status !== 200) {
     throw new Error("Ошибка при отправке результата");
   }
-};
+}

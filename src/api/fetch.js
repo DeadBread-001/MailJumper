@@ -1,16 +1,16 @@
 export const IP = "http://127.0.0.1:80";
 
 export const fetchRequest = async (
-  url,
-  method = "GET",
-  body = null,
-  headers = {},
-  contentType = "application/json"
+    url,
+    method = "GET",
+    body = null,
+    headers = {},
+    contentType = "application/json"
 ) => {
   try {
     const options = {
       method,
-      headers: { ...headers },
+      headers: {...headers},
       credentials: "include",
     };
 
@@ -32,4 +32,4 @@ export const fetchRequest = async (
     console.error("Произошла ошибка:", error.message);
     throw error;
   }
-};
+}

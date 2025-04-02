@@ -4,6 +4,7 @@ import {Player} from "../utils/player";
 import {InputHandler} from "../utils/input";
 import {Enemy} from "../utils/enemy";
 import {Platform} from "../utils/platform";
+import {Money} from "../utils/money";
 import {sendScore} from "../api/game";
 
 export default function GameCanvas() {
@@ -22,10 +23,14 @@ export default function GameCanvas() {
         this.gameStart = false;
         this.platforms = [];
         this.enemies = [];
+        this.money = [];
         this.level = 0;
         this.score = 0;
+        this.coins = 0;
         this.enemyChance = 0;
         this.enemyMaxChance = 50;
+        this.moneyChance = 15;
+        this.moneyMaxChance = 30;
         this.object_vx = 3;
         this.object_max_vx = 6;
         this.platform_gap = 85;
@@ -50,7 +55,6 @@ export default function GameCanvas() {
         return name;
       }
 
-
       update() {
         this.background.update();
 
@@ -64,8 +68,20 @@ export default function GameCanvas() {
           enemy.update();
         });
 
+        this.money.forEach(coin => {
+          coin.update();
+          if (this.player.x < coin.x + coin.width &&
+              this.player.x + this.player.width > coin.x &&
+              this.player.y < coin.y + coin.height &&
+              this.player.y + this.player.height > coin.y) {
+            coin.markedForDeletion = true;
+            this.coins++;
+          }
+        });
+
         this.platforms = this.platforms.filter(platform => !platform.markedForDeletion);
         this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);
+        this.money = this.money.filter(coin => !coin.markedForDeletion);
       }
 
       draw(context) {
@@ -81,6 +97,10 @@ export default function GameCanvas() {
             platform.draw(context);
           });
 
+          this.money.forEach(coin => {
+            coin.draw(context);
+          });
+
           this.player.draw(context);
 
           this.enemies.forEach(enemy => {
@@ -91,13 +111,14 @@ export default function GameCanvas() {
           context.font = '20px Arial';
           context.textAlign = 'start';
           context.fillText(`Score: ${this.score}`, 20, 40);
+          context.fillText(`Coins: ${this.coins}`, 20, 70);
 
           if (this.gameOver) {
             context.font = 'bold 25px Helvetica';
             context.fillStyle = "red";
             context.textAlign = 'center';
             context.fillText(`GAME OVER`, this.width * 0.5, this.height * 0.5);
-            sendScore({name: this.playerName, score: this.score});
+            sendScore({name: this.playerName, score: this.score, money: this.coins});
           }
         }
       }
@@ -113,7 +134,16 @@ export default function GameCanvas() {
             type = (Math.random() < 0.5) ? 'blue' : 'white';
           }
 
-          this.platforms.unshift(new Platform(this, lowerY, upperY, type));
+          const platform = new Platform(this, lowerY, upperY, type);
+          this.platforms.unshift(platform);
+
+          if (Math.random() < (this.moneyChance / 100)) {
+            const coinX = Math.random() * (this.width - 40);
+            const offsetY = Math.random() * 20 - 80;
+            const coinY = platform.y + offsetY;
+            const coin = new Money(this, coinX, coinY);
+            this.money.push(coin);
+          }
         } while (this.platforms[0].y >= lowerY);
       }
 
@@ -121,7 +151,16 @@ export default function GameCanvas() {
         let num = Math.floor(Math.random() * (5 + 1));
 
         for (let i = 0; i < num; i++) {
-          this.platforms.push(new Platform(this, lowerY, upperY, 'brown'));
+          const platform = new Platform(this, lowerY, upperY, 'brown');
+          this.platforms.push(platform);
+
+          if (Math.random() < (this.moneyChance / 200)) {
+            const coinX = Math.random() * (this.width - 40);
+            const offsetY = Math.random() * 20 - 80;
+            const coinY = platform.y + offsetY;
+            const coin = new Money(this, coinX, coinY);
+            this.money.push(coin);
+          }
         }
       }
 
@@ -138,6 +177,9 @@ export default function GameCanvas() {
         }
         if (this.level % 5 === 0 && this.enemyMaxChance > this.enemyChance) {
           this.enemyChance += 5;
+        }
+        if (this.level % 3 === 0 && this.moneyMaxChance > this.moneyChance) {
+          this.moneyChance += 2;
         }
       }
     }
