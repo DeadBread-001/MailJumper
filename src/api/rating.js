@@ -9,4 +9,4 @@ export async function getTopPlayers() {
   } else {
     throw new Error("Некорректный формат данных");
   }
-};
+}
