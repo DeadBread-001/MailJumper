@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import {Background} from "../utils/background";
 import {Player} from "../utils/player";
 import {InputHandler} from "../utils/input";
@@ -6,8 +6,45 @@ import {Enemy} from "../utils/enemy";
 import {Platform} from "../utils/platform";
 import {Money} from "../utils/money";
 import {sendScore} from "../api/game";
+import '../styles/gameCanvas.scss';
 
 export default function GameCanvas() {
+  const [gameState, setGameState] = useState({
+    isGameOver: false
+  });
+  const gameRef = useRef(null);
+  const animationRef = useRef(null);
+
+  const resetGame = () => {
+    setGameState({ isGameOver: false });
+    if (gameRef.current) {
+      gameRef.current.reset();
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      startAnimation();
+    }
+  };
+
+  const startAnimation = () => {
+    const canvas = document.querySelector('#canvas1');
+    const ctx = canvas.getContext('2d');
+    
+    function animate() {
+      const fps = 60;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (gameRef.current.gameStart) gameRef.current.update();
+      gameRef.current.draw(ctx);
+      if (!gameRef.current.gameOver) {
+        setTimeout(() => {
+          animationRef.current = requestAnimationFrame(animate);
+        }, 1000 / fps);
+      }
+    }
+
+    animate();
+  };
+
   useEffect(() => {
     const canvas = document.querySelector('#canvas1');
     const ctx = canvas.getContext('2d');
@@ -45,6 +82,28 @@ export default function GameCanvas() {
         this.player = new Player(this);
         this.inputHandler = new InputHandler(this);
         this.playerName = this.askForPlayerName();
+      }
+
+      reset() {
+        this.gameOver = false;
+        this.gameStart = false;
+        this.platforms = [];
+        this.enemies = [];
+        this.money = [];
+        this.level = 0;
+        this.score = 0;
+        this.coins = 0;
+        this.enemyChance = 0;
+        this.object_vx = 3;
+        this.blue_white_platform_chance = 0;
+        this.add_platforms(0, this.height - 15);
+        this.add_broken_platforms(0, this.height - 15);
+        this.add_platforms(-this.height, -15);
+        this.add_broken_platforms(-this.height, -15);
+        this.background = new Background(this);
+        this.player = new Player(this);
+        this.inputHandler = new InputHandler(this);
+        setGameState({ isGameOver: false });
       }
 
       askForPlayerName() {
@@ -118,6 +177,7 @@ export default function GameCanvas() {
             context.fillStyle = "red";
             context.textAlign = 'center';
             context.fillText(`GAME OVER`, this.width * 0.5, this.height * 0.5);
+            setGameState({ isGameOver: true });
             sendScore({name: this.playerName, score: this.score, money: this.coins});
           }
         }
@@ -185,21 +245,24 @@ export default function GameCanvas() {
     }
 
     const game = new Game(canvas.width, canvas.height);
+    gameRef.current = game;
+    startAnimation();
 
-    function animate() {
-      const fps = 60;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (game.gameStart) game.update();
-      game.draw(ctx);
-      if (!game.gameOver) setTimeout(() => {
-        requestAnimationFrame(animate);
-      }, 1000 / fps);
-    }
-
-    animate();
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
   }, []);
 
   return (
+    <div className="game-container">
       <canvas id='canvas1'></canvas>
+      {gameState.isGameOver && (
+        <button className="restart-button" onClick={resetGame}>
+          Играть снова
+        </button>
+      )}
+    </div>
   );
 }
