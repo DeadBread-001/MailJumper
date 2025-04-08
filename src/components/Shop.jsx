@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
+import '../styles/shop.scss';
 
 const Shop = () => {
-  const prizes = [
+  const [prizes] = useState([
     {
       id: 1,
       name: 'Скидка 20% где-то',
@@ -14,7 +15,7 @@ const Shop = () => {
     {
       id: 2,
       name: 'Фирменная футболка',
-      description: 'Мерч с логотипом Mail. Очень длинное описание, чтобы проверить, как будет выглядеть карточка с большим количеством текста и как кнопка останется внизу.',
+      description: 'Мерч с логотипом Mail. Очень длинное описание, чтобы проверить, как будет выглядеть карточка с большим количеством текста.',
       cost: 500,
       type: 'merch',
     },
@@ -25,40 +26,56 @@ const Shop = () => {
       cost: 50,
       type: 'booster',
     },
-  ];
+  ]);
+
+  const [userCoins] = useState(1200);
 
   return (
-      <div className="shop-container">
-        <h1 className="shop-title">Магазин</h1>
-        <div className="currency-info">
-          <span>Ваши монеты: </span>
-          <span className="coin-amount">1200</span>
-          <img src="https://images.icon-icons.com/651/PNG/96/Icon_Business_Set_00003_A_icon-icons.com_59841.png"
-               alt="coin" className="coin-icon"/>
-        </div>
-        <div className="prizes-grid">
-          {prizes.map((prize) => (
-              <div key={prize.id} className="prize-card">
-                <h3 className="prize-name">{prize.name}</h3>
-                <p className="prize-description">{prize.description}</p>
-                <div className="prize-cost">
-                  <span>{prize.cost}</span>
-                  <img src="https://images.icon-icons.com/651/PNG/96/Icon_Business_Set_00003_A_icon-icons.com_59841.png"
-                       alt="coin" className="coin-icon"/>
-                </div>
-                {prize.type === 'promo' && (
-                    <div className="promo-details">
-                      <p>Срок действия: {prize.expires}</p>
-                      <a href={prize.activationLink} className="activation-link">
-                        Подробнее
-                      </a>
-                    </div>
-                )}
-                <button className="buy-button">Купить</button>
-              </div>
-          ))}
+    <div className="shop-container">
+      <div className="shop-header">
+        <h1>Магазин</h1>
+        <div className="user-stats">
+          <div className="stat-item">
+            <img src="/images/coin.webp" alt="Монеты" className="coins-icon" />
+            <span>{userCoins}</span>
+          </div>
         </div>
       </div>
+
+      <div className="prizes-grid">
+        {prizes.map((prize) => (
+          <div key={prize.id} className={`prize-card ${userCoins >= prize.cost ? 'available' : 'locked'}`}>
+            <div className="prize-header">
+              <h3>{prize.name}</h3>
+              <span className="prize-type">{prize.type}</span>
+            </div>
+            <p className="prize-description">{prize.description}</p>
+            <div className="prize-details">
+              {prize.type === 'promo' && (
+                <div className="promo-info">
+                  <span className="expiry-date">Срок действия: {prize.expires}</span>
+                  <a href={prize.activationLink} className="info-link">
+                    Подробнее
+                  </a>
+                </div>
+              )}
+            </div>
+            <div className="prize-cost">
+              <div className="cost-item">
+                <img src="/images/coin.webp" alt="Монеты" className="coins-icon" />
+                <span>{prize.cost}</span>
+              </div>
+            </div>
+            <button
+              className={`buy-button ${userCoins >= prize.cost ? 'available' : 'locked'}`}
+              disabled={userCoins < prize.cost}
+            >
+              {userCoins >= prize.cost ? 'Купить' : 'Недостаточно монет'}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 
