@@ -6,7 +6,7 @@ export async function getTopPlayers() {
   const data = await fetchRequest(url, "GET");
   if (data.Status === 200 && data.Data?.users) {
     const transformedData = {};
-    data.Data.users.reverse().forEach(({ league, users }) => {
+    data.Data.users.forEach(({ league, users }) => {
       transformedData[league] = users;
     });
     return transformedData;
