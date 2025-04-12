@@ -16,6 +16,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import AddProductModal from "../AddProductModal";
+import {deleteProduct} from "../../api/admin";
 
 const AdminShop = () => {
     const [items, setItems] = useState([]);
@@ -53,7 +54,11 @@ const AdminShop = () => {
     };
 
     const handleDelete = (itemId) => {
-        console.log('Delete item:', itemId);
+        const item = items.find(i => i.id === itemId);
+        const confirmed = window.confirm("Вы уверены, что хотите удалить этот товар?");
+        if (confirmed) {
+            deleteProduct(itemId, item);
+        }
     };
 
     const handleAdd = () => {

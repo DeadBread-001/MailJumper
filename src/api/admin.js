@@ -17,3 +17,15 @@ export const saveProduct = async (productData, isEdit, productType) => {
   }
 };
 
+export const deleteProduct = async (id, productType) => {
+  const endpoint = productType === "promocode" ? "promocode" : "product";
+
+
+  const url = IP + `/api/v1/shop/${endpoint}/delete`;
+  const data = await fetchRequest(url, "POST",  {id: id});
+
+  if (data.Status !== 200) {
+    throw new Error("Ошибка при отправке результата");
+  }
+
+};
