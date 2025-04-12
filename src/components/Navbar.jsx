@@ -1,6 +1,12 @@
 import {useState} from "react";
 import {Link} from "react-router-dom";
 
+// Временная функция для проверки прав доступа
+const isAdmin = () => {
+    // TODO: Реализовать реальную проверку прав доступа
+    return true;
+};
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -19,6 +25,7 @@ export default function Navbar() {
           <li><Link to="/rating">Рейтинг</Link></li>
           <li><Link to="/tasks">Задания</Link></li>
           <li><Link to="/shop">Магазин</Link></li>
+          {isAdmin() && <li><Link to="/admin">Админ-панель</Link></li>}
         </ul>
 
         <div className="nav-links">
