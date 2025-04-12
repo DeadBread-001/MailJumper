@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../styles/addProductModal.scss";
+import {saveProduct} from "../api/admin";
 
 const ExtraFields = ({ productType, form, handleChange }) => {
   if (productType === "promocode") {
@@ -8,7 +9,7 @@ const ExtraFields = ({ productType, form, handleChange }) => {
         <div className="form-group">
           <label>Компания</label>
           <input
-            type="number"
+            type="text"
             name="company"
             value={form.company}
             onChange={handleChange}
@@ -26,7 +27,7 @@ const ExtraFields = ({ productType, form, handleChange }) => {
         <div className="form-group">
           <label>Активен до</label>
           <input
-            type="text"
+            type="date"
             name="active_to"
             value={form.active_to}
             onChange={handleChange}
@@ -43,7 +44,6 @@ const AddProductModal = ({ isOpen, onClose, productToEdit }) => {
   const [productType, setProductType] = useState("basic");
   const [form, setForm] = useState({
     id: "",
-    action: "add",
     name: "",
     photo_link: "",
     description: "",
@@ -60,7 +60,6 @@ const AddProductModal = ({ isOpen, onClose, productToEdit }) => {
   const resetForm = () => {
     setForm({
       id: "",
-      action: "add",
       name: "",
       photo_link: "",
       description: "",
@@ -78,7 +77,6 @@ const AddProductModal = ({ isOpen, onClose, productToEdit }) => {
     if (productToEdit) {
       setForm({
         id: productToEdit.id || "",
-        action: "update",
         name: productToEdit.name || "",
         photo_link: productToEdit.photo_link || "",
         description: productToEdit.description || "",
@@ -101,7 +99,7 @@ const AddProductModal = ({ isOpen, onClose, productToEdit }) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!form.name || !form.description || !form.price) {
@@ -109,8 +107,9 @@ const AddProductModal = ({ isOpen, onClose, productToEdit }) => {
       return;
     }
 
-    let dataToSend = {
-      action: form.action,
+    const isEdit = !!productToEdit;
+
+    const dataToSend = {
       name: form.name,
       description: form.description,
       price: form.price,
@@ -120,7 +119,7 @@ const AddProductModal = ({ isOpen, onClose, productToEdit }) => {
       productType,
     };
 
-    if (form.action === "update" && form.id) {
+    if (isEdit && form.id) {
       dataToSend.id = form.id;
     }
 
@@ -130,8 +129,12 @@ const AddProductModal = ({ isOpen, onClose, productToEdit }) => {
       dataToSend.company = form.company;
     }
 
-    console.log("Отправка формы:", dataToSend);
-    onClose();
+    try {
+      await saveProduct(dataToSend, isEdit, productType);
+      onClose();
+    } catch (err) {
+      console.error("Ошибка при сохранении:", err.message);
+    }
   };
 
 
