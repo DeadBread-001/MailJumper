@@ -5,7 +5,7 @@ import {Route, Routes, Navigate} from "react-router-dom";
 import Rating from "./components/Rating";
 import Tasks from "./components/Tasks";
 import Shop from "./components/Shop";
-import AdminPanel from "./components/AdminPanel";
+import AdminPanel from "./components/admin/AdminPanel";
 
 // Временная функция для проверки прав доступа
 const isAdmin = () => {
