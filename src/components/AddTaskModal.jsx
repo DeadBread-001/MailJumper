@@ -130,7 +130,7 @@ const AddTaskModal = ({ isOpen, onClose, taskToEdit }) => {
               <button
                   type="submit"
                   className="submit-button"
-                  disabled={!form.title || !form.description || !form.reward || !form.link}
+                  disabled={!form.name || !form.description || !form.reward || !form.link}
               >
                 Сохранить
               </button>

@@ -2,13 +2,12 @@ import React, {useState, useMemo, useEffect} from 'react';
 import {getTasks} from "../api/tasks";
 
 const Tasks = () => {
-  // Заглушка для данных
   const [tasks, setTasks] = useState([
     {
       id: 1,
       title: 'Включить автозагрузку в Облаке',
       description: 'Настройте автоматическую загрузку файлов в Облако Mail.ru',
-      bonus: 100,
+      reward: 100,
       link: "#",
       status: 'completed',
     },
@@ -16,7 +15,7 @@ const Tasks = () => {
       id: 2,
       title: 'Включить push-уведомления',
       description: 'Получайте уведомления о важных событиях',
-      bonus: 50,
+      reward: 50,
       link: "#",
       status: 'active',
     },
@@ -24,7 +23,7 @@ const Tasks = () => {
       id: 3,
       title: 'Скачать суперапп',
       description: 'Установите приложение Mail.ru на свой телефон',
-      bonus: 200,
+      reward: 200,
       link: "#",
       status: 'locked',
     },
@@ -32,7 +31,7 @@ const Tasks = () => {
       id: 4,
       title: 'Посмотреть сторис в Облаке',
       description: 'Просмотрите 3 сторис в Облаке Mail.ru',
-      bonus: 75,
+      reward: 75,
       link: "#",
       status: 'active',
     },
@@ -40,7 +39,7 @@ const Tasks = () => {
       id: 5,
       title: 'Посмотреть сторис в супераппе',
       description: 'Просмотрите 3 сторис в приложении Mail.ru',
-      bonus: 75,
+      reward: 75,
       link: "#",
       status: 'active',
     },
@@ -48,7 +47,7 @@ const Tasks = () => {
       id: 6,
       title: 'Пригласить друга',
       description: 'Пригласите друга в игру и получите бонус',
-      bonus: 150,
+      reward: 150,
       link: "#",
       status: 'active',
     }
@@ -59,12 +58,16 @@ const Tasks = () => {
   });
 
   useEffect(() => {
-    // const fetchData = async () => {
-    //   const [tasksData] = await getTasks();
-    //   setTasks(tasksData);
-    // };
-    //
-    // fetchData();
+    const fetchData = async () => {
+      try {
+        const tasksData = await getTasks();
+        setTasks(tasksData);
+      } catch (err) {
+        console.error("Ошибка при получении данных:", err);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const progress = useMemo(() => {
@@ -109,15 +112,15 @@ const Tasks = () => {
 
         <div className="tasks-grid">
           {tasks.map(task => (
-              <div key={task.id} className={`task-card ${task.status}`}>
+              <div key={task.id} className={`task-card ${task.status?task.status:'active'}`}>
                 <div className="task-header">
-                  <h3>{task.title}</h3>
+                  <h3>{task.name}</h3>
                 </div>
                 <p className="task-description">{task.description}</p>
                 <div className="task-rewards">
                   <div className="reward-item">
                     <img src="/images/coin.webp" alt="Монеты" className="coins-icon"/>
-                    <span>{task.bonus}</span>
+                    <span>{task.reward}</span>
                   </div>
                 </div>
                 <button
@@ -125,8 +128,9 @@ const Tasks = () => {
                     disabled={task.status === 'locked'}
                     onClick={() => handleTaskClick(task)}
                 >
-                  {task.status === 'completed' ? 'Выполнено' :
-                      task.status === 'active' ? 'Выполнить' : 'Заблокировано'}
+                  {/*{task.status === 'completed' ? 'Выполнено' :*/}
+                  {/*    task.status === 'active' ? 'Выполнить' : 'Заблокировано'}*/}
+                  Выполнить
                 </button>
               </div>
           ))}

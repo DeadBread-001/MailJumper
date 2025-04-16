@@ -17,6 +17,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import {deleteTask} from "../../api/admin";
 import AddTaskModal from "../AddTaskModal";
+import {getTasks} from "../../api/tasks";
 
 const AdminTasks = () => {
     const [tasks, setTasks] = useState([]);
@@ -24,12 +25,16 @@ const AdminTasks = () => {
     const [taskToEdit, setTaskToEdit] = useState(null);
 
     useEffect(() => {
-        // TODO: Загрузка задач с сервера
-        // Пример данных
-        setTasks([
-            { id: 1, name: 'Задача 1', link: 'ytfytf', description: 'Описание задачи 1', reward: 100 },
-            { id: 2, name: 'Задача 2', link: 'ytfytf', description: 'Описание задачи 2', reward: 200 },
-        ]);
+        const fetchData = async () => {
+            try {
+                const tasksData = await getTasks();
+                setTasks(tasksData);
+            } catch (err) {
+                console.error("Ошибка при получении данных:", err);
+            }
+        };
+
+        fetchData();
     }, []);
 
     const handleEdit = (taskId) => {
