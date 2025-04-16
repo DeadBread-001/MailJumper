@@ -74,15 +74,6 @@
                     flex: 1;
                     padding-right: 10px;
                 }
-
-                .prize-type {
-                    background: #e0e0e0;
-                    padding: 4px 8px;
-                    border-radius: 4px;
-                    font-size: 0.8rem;
-                    color: #666;
-                    white-space: nowrap;
-                }
             }
 
             .prize-description {
@@ -159,5 +150,18 @@
                 }
             }
         }
+    }
+
+    .loading, .error {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+        font-size: 1.2rem;
+        color: #fff;
+    }
+
+    .error {
+        color: #ff4444;
     }
 }

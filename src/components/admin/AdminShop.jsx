@@ -17,6 +17,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import AddProductModal from "../AddProductModal";
 import {deleteProduct} from "../../api/admin";
+import {getProducts, getPromocodes} from "../../api/shop";
 
 const AdminShop = () => {
     const [items, setItems] = useState([]);
@@ -24,25 +25,19 @@ const AdminShop = () => {
     const [productToEdit, setProductToEdit] = useState(null);
 
     useEffect(() => {
-        setItems([
-            {
-                id: 1,
-                name: 'Скин 1',
-                price: 100,
-                description: 'Описание скина 1',
-                productType: 'merch'
-            },
-            {
-                id: 2,
-                name: 'Промокод 123',
-                price: 0,
-                description: 'Скидка 10%',
-                code: 'SALE10',
-                active_to: '2025-12-31',
-                company: '123',
-                productType: 'promocode'
-            },
-        ]);
+        const fetchData = async () => {
+            try {
+                const [productsData, promocodesData] = await Promise.all([
+                    getProducts(),
+                    getPromocodes()
+                ]);
+                setItems([...productsData, ...promocodesData]);
+            } catch (err) {
+                console.error("Ошибка при получении данных:", err);
+            }
+        };
+
+        fetchData();
     }, []);
 
     const handleEdit = (itemId) => {

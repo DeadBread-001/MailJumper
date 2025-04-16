@@ -1,14 +1,19 @@
 import {useState} from "react";
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 
 // Временная функция для проверки прав доступа
 const isAdmin = () => {
     // TODO: Реализовать реальную проверку прав доступа
-    return true;
+    return true; // Временно разрешаем доступ всем
 };
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
 
   return (
       <nav className="navbar">
@@ -21,15 +26,14 @@ export default function Navbar() {
           <span className="logo-text">джампер</span>
         </div>
         <ul className={menuOpen ? "nav-links open" : "nav-links"}>
-          <li><Link to="/">Играть</Link></li>
-          <li><Link to="/rating">Рейтинг</Link></li>
-          <li><Link to="/tasks">Задания</Link></li>
-          <li><Link to="/shop">Магазин</Link></li>
-          {isAdmin() && <li><Link to="/admin">Админ-панель</Link></li>}
+          <li><Link to="/" className={isActive('/') ? 'active' : ''}>Играть</Link></li>
+          <li><Link to="/rating" className={isActive('/rating') ? 'active' : ''}>Рейтинг</Link></li>
+          <li><Link to="/tasks" className={isActive('/tasks') ? 'active' : ''}>Задания</Link></li>
+          <li><Link to="/shop" className={isActive('/shop') ? 'active' : ''}>Магазин</Link></li>
+          {isAdmin() && <li><Link to="/admin" className={isActive('/admin') ? 'active' : ''}>Админ-панель</Link></li>}
         </ul>
 
-        <div className="nav-links">
-          <a href="#">Регистрация</a>
+        <div className="auth-section">
           <button className="auth-button">Войти</button>
         </div>
       </nav>

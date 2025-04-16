@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import "../styles/addProductModal.scss";
 import {saveProduct} from "../api/admin";
 
 const ExtraFields = ({ productType, form, handleChange }) => {
@@ -112,11 +111,10 @@ const AddProductModal = ({ isOpen, onClose, productToEdit }) => {
     const dataToSend = {
       name: form.name,
       description: form.description,
-      price: form.price,
-      count: form.count,
+      price: Number(form.price),
+      count: Number(form.count),
       activation_link: form.activation_link,
       photo_link: form.photo_link,
-      productType,
     };
 
     if (isEdit && form.id) {
@@ -125,13 +123,14 @@ const AddProductModal = ({ isOpen, onClose, productToEdit }) => {
 
     if (productType === "promocode") {
       dataToSend.code = form.code;
-      dataToSend.active_to = form.active_to;
+      dataToSend.active_to = new Date(form.active_to).toISOString();
       dataToSend.company = form.company;
     }
 
     try {
       await saveProduct(dataToSend, isEdit, productType);
       onClose();
+      location.reload();
     } catch (err) {
       console.error("Ошибка при сохранении:", err.message);
     }

@@ -15,33 +15,48 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import {deleteTask} from "../../api/admin";
+import AddTaskModal from "../AddTaskModal";
 
 const AdminTasks = () => {
     const [tasks, setTasks] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [taskToEdit, setTaskToEdit] = useState(null);
 
     useEffect(() => {
         // TODO: Загрузка задач с сервера
         // Пример данных
         setTasks([
-            { id: 1, title: 'Задача 1', description: 'Описание задачи 1', reward: 100 },
-            { id: 2, title: 'Задача 2', description: 'Описание задачи 2', reward: 200 },
+            { id: 1, name: 'Задача 1', link: 'ytfytf', description: 'Описание задачи 1', reward: 100 },
+            { id: 2, name: 'Задача 2', link: 'ytfytf', description: 'Описание задачи 2', reward: 200 },
         ]);
     }, []);
 
     const handleEdit = (taskId) => {
-        // TODO: Реализация редактирования задачи
-        console.log('Edit task:', taskId);
+        const task = tasks.find(i => i.id === taskId);
+        if (task) {
+            setTaskToEdit(task);
+            setShowModal(true);
+        }
     };
 
     const handleDelete = (taskId) => {
-        // TODO: Реализация удаления задачи
-        console.log('Delete task:', taskId);
+        const task = tasks.find(i => i.id === taskId);
+        const confirmed = window.confirm("Вы уверены, что хотите удалить эту задачу?");
+        if (confirmed) {
+            deleteTask(taskId, task);
+        }
     };
 
     const handleAdd = () => {
-        // TODO: Реализация добавления задачи
-        console.log('Add new task');
+        setTaskToEdit(null);
+        setShowModal(true);
     };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setTaskToEdit(null);
+    }
 
     return (
         <Box>
@@ -72,7 +87,7 @@ const AdminTasks = () => {
                         {tasks.map((task) => (
                             <TableRow key={task.id}>
                                 <TableCell>{task.id}</TableCell>
-                                <TableCell>{task.title}</TableCell>
+                                <TableCell>{task.name}</TableCell>
                                 <TableCell>{task.description}</TableCell>
                                 <TableCell>{task.reward}</TableCell>
                                 <TableCell>
@@ -88,8 +103,14 @@ const AdminTasks = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            <AddTaskModal
+                isOpen={showModal}
+                onClose={handleCloseModal}
+                taskToEdit={taskToEdit}
+            />
         </Box>
     );
 };
 
-export default AdminTasks; 
+export default AdminTasks;

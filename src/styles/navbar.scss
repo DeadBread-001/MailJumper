@@ -21,6 +21,7 @@
 
     & li {
         display: inline;
+        position: relative;
     }
 
     & a {
@@ -29,12 +30,26 @@
         color: white;
         font-weight: bold;
         transition: 0.3s;
+        padding: 8px 16px;
+        border-radius: 6px;
 
         &:hover {
-            color: #2483e4;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        &.active {
+            background: rgba(0, 119, 255, 0.2);
+            color: #0077ff;
+            position: relative;
         }
     }
+}
 
+.auth-section {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
 }
 
 .auth-button {
