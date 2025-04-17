@@ -1,5 +1,5 @@
 export const IP = "http://127.0.0.1:80/api/v1/";
-// export const IP = "http://mail-jumper.ru/api/v1/"
+// export const IP = "https://mail-jumper.ru/api/v1/"
 
 export const fetchRequest = async (
     url,
