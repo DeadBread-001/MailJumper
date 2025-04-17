@@ -2,7 +2,7 @@ import {fetchRequest, IP} from "./fetch";
 
 
 export async function getProducts() {
-  const url = IP + "/api/v1/shop/products";
+  const url = IP + "shop/products";
   const data = await fetchRequest(url, "GET");
   if (data.Status === 200) {
     return data.Data.products;
@@ -12,7 +12,7 @@ export async function getProducts() {
 }
 
 export async function getPromocodes() {
-  const url = IP + "/api/v1/shop/promocodes";
+  const url = IP + "shop/promocodes";
   const data = await fetchRequest(url, "GET");
   if (data.Status === 200) {
     return data.Data.promocodes;
