@@ -25,7 +25,7 @@
                 gap: 8px;
                 font-size: 1.2rem;
                 font-weight: bold;
-                color: #2196F3;
+                color: #2196f3;
 
                 .coins-icon {
                     width: 24px;
@@ -45,7 +45,7 @@
             background: white;
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s ease;
             display: flex;
             flex-direction: column;
@@ -74,15 +74,6 @@
                     flex: 1;
                     padding-right: 10px;
                 }
-
-                .prize-type {
-                    background: #e0e0e0;
-                    padding: 4px 8px;
-                    border-radius: 4px;
-                    font-size: 0.8rem;
-                    color: #666;
-                    white-space: nowrap;
-                }
             }
 
             .prize-description {
@@ -106,7 +97,7 @@
                     }
 
                     .info-link {
-                        color: #2196F3;
+                        color: #2196f3;
                         text-decoration: none;
                         font-size: 0.9rem;
 
@@ -126,7 +117,7 @@
                     display: flex;
                     align-items: center;
                     gap: 5px;
-                    color: #2196F3;
+                    color: #2196f3;
                     font-weight: 500;
 
                     .coins-icon {
@@ -142,7 +133,7 @@
                 padding: 10px;
                 border: none;
                 border-radius: 5px;
-                background: #2196F3;
+                background: #2196f3;
                 color: white;
                 cursor: pointer;
                 transition: background 0.2s ease;
@@ -150,7 +141,7 @@
                 margin-top: auto;
 
                 &:hover {
-                    background: #1976D2;
+                    background: #1976d2;
                 }
 
                 &.locked {
@@ -159,5 +150,19 @@
                 }
             }
         }
+    }
+
+    .loading,
+    .error {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+        font-size: 1.2rem;
+        color: #fff;
+    }
+
+    .error {
+        color: #ff4444;
     }
 }

@@ -1,13 +1,20 @@
-@use "navbar";
-@use "shop";
-@use "rating";
-@use "tasks";
+@use 'navbar';
+@use 'shop';
+@use 'rating';
+@use 'tasks';
+@use 'addProductModal';
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "VKSansDisplay", -apple-system, system-ui, "Helvetica Neue", Roboto, sans-serif;
+    font-family:
+        'VKSansDisplay',
+        -apple-system,
+        system-ui,
+        'Helvetica Neue',
+        Roboto,
+        sans-serif;
 }
 
 #canvas1 {
