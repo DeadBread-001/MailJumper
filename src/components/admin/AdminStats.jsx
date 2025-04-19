@@ -1,11 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import {
-    Box,
-    Typography,
-    Grid,
-    Card,
-    CardContent
-} from '@mui/material';
+import { useState, useEffect } from 'react';
 import {
     Assignment as AssignmentIcon,
     ShoppingCart as ShoppingCartIcon,
@@ -37,9 +30,7 @@ const AdminStats = () => {
                         {title}
                     </Typography>
                 </Box>
-                <Typography variant="h4">
-                    {value}
-                </Typography>
+                <Typography variant="h4">{value}</Typography>
             </CardContent>
         </Card>
     );

@@ -1,8 +1,4 @@
-import React, { useState } from 'react';
-import { Box, Tabs, Tab } from '@mui/material';
-import AdminTasks from './AdminTasks';
-import AdminShop from './AdminShop';
-import AdminStats from './AdminStats';
+import { useState } from 'react';
 
 const AdminPanel = () => {
     const [currentTab, setCurrentTab] = useState(0);

@@ -1,23 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
-    IconButton,
-    Typography,
-    Box,
-    Button
-} from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
-import {deleteTask} from "../../api/admin";
-import AddTaskModal from "../AddTaskModal";
-import {getTasks} from "../../api/tasks";
+import { useState, useEffect } from 'react';
+import { Paper } from '@mui/material';
+import { deleteTask } from '../../api/admin';
+import { getTasks } from '../../api/tasks';
 
 const AdminTasks = () => {
     const [tasks, setTasks] = useState([]);
@@ -30,7 +14,7 @@ const AdminTasks = () => {
                 const tasksData = await getTasks();
                 setTasks(tasksData);
             } catch (err) {
-                console.error("Ошибка при получении данных:", err);
+                console.error('Ошибка при получении данных:', err);
             }
         };
 
@@ -38,7 +22,7 @@ const AdminTasks = () => {
     }, []);
 
     const handleEdit = (taskId) => {
-        const task = tasks.find(i => i.id === taskId);
+        const task = tasks.find((i) => i.id === taskId);
         if (task) {
             setTaskToEdit(task);
             setShowModal(true);
@@ -46,8 +30,10 @@ const AdminTasks = () => {
     };
 
     const handleDelete = (taskId) => {
-        const task = tasks.find(i => i.id === taskId);
-        const confirmed = window.confirm("Вы уверены, что хотите удалить эту задачу?");
+        const task = tasks.find((i) => i.id === taskId);
+        const confirmed = window.confirm(
+            'Вы уверены, что хотите удалить эту задачу?'
+        );
         if (confirmed) {
             deleteTask(taskId, task);
         }
@@ -61,14 +47,19 @@ const AdminTasks = () => {
     const handleCloseModal = () => {
         setShowModal(false);
         setTaskToEdit(null);
-    }
+    };
 
     return (
         <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h5">
-                    Управление задачами
-                </Typography>
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 2,
+                }}
+            >
+                <Typography variant="h5">Управление задачами</Typography>
                 <Button
                     variant="contained"
                     startIcon={<AddIcon />}
@@ -96,10 +87,14 @@ const AdminTasks = () => {
                                 <TableCell>{task.description}</TableCell>
                                 <TableCell>{task.reward}</TableCell>
                                 <TableCell>
-                                    <IconButton onClick={() => handleEdit(task.id)}>
+                                    <IconButton
+                                        onClick={() => handleEdit(task.id)}
+                                    >
                                         <EditIcon />
                                     </IconButton>
-                                    <IconButton onClick={() => handleDelete(task.id)}>
+                                    <IconButton
+                                        onClick={() => handleDelete(task.id)}
+                                    >
                                         <DeleteIcon />
                                     </IconButton>
                                 </TableCell>

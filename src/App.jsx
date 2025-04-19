@@ -1,11 +1,11 @@
 import React from 'react';
 import GameCanvas from './components/GameCanvas';
-import Navbar from "./components/Navbar";
-import {Route, Routes, Navigate} from "react-router-dom";
-import Rating from "./components/Rating";
-import Tasks from "./components/Tasks";
-import Shop from "./components/Shop";
-import AdminPanel from "./components/admin/AdminPanel";
+import Navbar from './components/Navbar';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import Rating from './components/Rating';
+import Tasks from './components/Tasks';
+import Shop from './components/Shop';
+import AdminPanel from './components/admin/AdminPanel';
 
 // Временная функция для проверки прав доступа
 const isAdmin = () => {
@@ -23,7 +23,7 @@ const ProtectedRoute = ({ children }) => {
 const App = () => {
     return (
         <>
-            <Navbar/>
+            <Navbar />
             <Routes>
                 <Route path="/" element={<GameCanvas />} />
                 <Route path="/rating" element={<Rating />} />
