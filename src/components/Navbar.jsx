@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router-dom';
+import AuthVKID from './AuthVKID';
 
 // Временная функция для проверки прав доступа
 const isAdmin = () => {
@@ -8,7 +8,7 @@ const isAdmin = () => {
     return true; // Временно разрешаем доступ всем
 };
 
-export default function Navbar() {
+const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const location = useLocation();
 
@@ -76,9 +76,9 @@ export default function Navbar() {
                 )}
             </ul>
 
-            <div className="auth-section">
-                <button className="auth-button">Войти</button>
-            </div>
+            <AuthVKID />
         </nav>
     );
-}
+};
+
+export default Navbar;

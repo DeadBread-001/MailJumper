@@ -7,7 +7,7 @@ import { Platform } from '../utils/platform';
 import { Money } from '../utils/money';
 import { sendScore } from '../api/game';
 
-export default function GameCanvas() {
+const GameCanvas = () => {
     useEffect(() => {
         const canvas = document.querySelector('#canvas1');
         const ctx = canvas.getContext('2d');
@@ -238,4 +238,6 @@ export default function GameCanvas() {
     }, []);
 
     return <canvas id="canvas1"></canvas>;
-}
+};
+
+export default GameCanvas;

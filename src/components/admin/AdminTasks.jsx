@@ -1,6 +1,22 @@
-import { useState, useEffect } from 'react';
-import { Paper } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    IconButton,
+    Typography,
+    Box,
+    Button,
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import { deleteTask } from '../../api/admin';
+import AddTaskModal from '../AddTaskModal';
 import { getTasks } from '../../api/tasks';
 
 const AdminTasks = () => {
