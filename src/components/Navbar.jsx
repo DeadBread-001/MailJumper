@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router'
 
 // Временная функция для проверки прав доступа
 const isAdmin = () => {
