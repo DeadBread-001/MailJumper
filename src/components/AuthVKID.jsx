@@ -71,6 +71,8 @@ const AuthVKID = ({ onLoginSuccess }) => {
                         document.cookie = `vkid=${userData.vkid}; max-age=${maxAge}; path=/`;
 
                         if (onLoginSuccess) onLoginSuccess();
+
+                        window.dispatchEvent(new Event('auth_success'));
                     }
                 );
         };

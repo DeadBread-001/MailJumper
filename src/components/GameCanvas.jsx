@@ -47,7 +47,13 @@ const GameCanvas = () => {
                 this.background = new Background(this);
                 this.player = new Player(this);
                 this.inputHandler = new InputHandler(this);
-                this.playerName = this.askForPlayerName();
+                this.isAuthenticated = false;
+                this.checkingAuth = true;
+                this.askForPlayerName();
+
+                window.addEventListener('auth_success', () => {
+                    this.askForPlayerName();
+                });
             }
 
             async askForPlayerName() {
@@ -58,10 +64,12 @@ const GameCanvas = () => {
                         state: generateState(),
                     };
                     const userData = await check(ifUserData);
-                    this.playerName = userData.name;
+                    this.playerName = userData.vkid;
                     this.isAuthenticated = true;
                 } catch (error) {
                     this.isAuthenticated = false;
+                } finally {
+                    this.checkingAuth = false;
                 }
             }
 
@@ -112,7 +120,13 @@ const GameCanvas = () => {
                     context.fillStyle = 'black';
                     context.textAlign = 'center';
 
-                    if (!this.isAuthenticated) {
+                    if (this.checkingAuth) {
+                        context.fillText(
+                            'ЗАГРУЗКА...',
+                            this.width * 0.5,
+                            this.height * 0.5
+                        );
+                    } else if (!this.isAuthenticated) {
                         context.fillText(
                             'НЕОБХОДИМА АВТОРИЗАЦИЯ',
                             this.width * 0.5,
@@ -261,6 +275,10 @@ const GameCanvas = () => {
         }
 
         animate();
+
+        return () => {
+            window.removeEventListener('auth_success', game.askForPlayerName);
+        };
     }, []);
 
     return <canvas id="canvas1"></canvas>;
