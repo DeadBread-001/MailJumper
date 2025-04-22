@@ -1,7 +1,6 @@
 import { fetchRequest, IP } from './fetch';
 
 export async function signin(userData) {
-    console.log(userData);
     const url = IP + `auth/signin`;
     const data = await fetchRequest(url, 'POST', userData);
     if (data.Status === 200) {
