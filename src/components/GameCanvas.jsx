@@ -6,9 +6,9 @@ import { Enemy } from '../utils/enemy';
 import { Platform } from '../utils/platform';
 import { Money } from '../utils/money';
 import { sendScore } from '../api/game';
-import {getCookie} from "../index";
-import {generateState} from "./AuthVKID";
-import {check} from "../api/auth";
+import { getCookie } from '../index';
+import { generateState } from './AuthVKID';
+import { check } from '../api/auth';
 
 const GameCanvas = () => {
     useEffect(() => {
@@ -67,7 +67,7 @@ const GameCanvas = () => {
 
             update() {
                 if (!this.isAuthenticated) return;
-                
+
                 this.background.update();
 
                 this.platforms.forEach((platform) => {
@@ -111,7 +111,7 @@ const GameCanvas = () => {
                     context.font = 'bold 25px Helvetica';
                     context.fillStyle = 'black';
                     context.textAlign = 'center';
-                    
+
                     if (!this.isAuthenticated) {
                         context.fillText(
                             'НЕОБХОДИМА АВТОРИЗАЦИЯ',
