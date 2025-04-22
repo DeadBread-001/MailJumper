@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
+import { signin } from '../api/auth';
 
 const generateCodeVerifier = (length = 64) => {
     const possible =
@@ -12,17 +13,7 @@ const generateCodeVerifier = (length = 64) => {
     return verifier;
 };
 
-async function generateCodeChallenge(codeVerifier) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(codeVerifier);
-    const digest = await crypto.subtle.digest('SHA-256', data);
-    return btoa(String.fromCharCode(...new Uint8Array(digest)))
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '');
-}
-
-function generateState(length = 32) {
+export function generateState(length = 32) {
     const possible =
         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
     let state = '';
@@ -32,7 +23,7 @@ function generateState(length = 32) {
     return state;
 }
 
-const AuthVKID = () => {
+const AuthVKID = ({ onLoginSuccess }) => {
     useEffect(() => {
         const script = document.createElement('script');
         script.src = 'https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js';
@@ -43,12 +34,7 @@ const AuthVKID = () => {
                 const VKID = window.VKIDSDK;
 
                 const codeVerifier = generateCodeVerifier();
-                const codeChallenge = await generateCodeChallenge(codeVerifier);
                 const state = generateState();
-                console.log('state', state);
-                console.log('codeVerifier', codeVerifier);
-                console.log('codeChallenge', codeChallenge);
-
 
                 VKID.Config.init({
                     app: 53445034,
@@ -74,35 +60,35 @@ const AuthVKID = () => {
                             width: 220,
                         },
                     })
-                    .on(VKID.WidgetEvents.ERROR, vkidOnError)
                     .on(
                         VKID.OneTapInternalEvents.LOGIN_SUCCESS,
-                        function (payload) {
+                        async function (payload) {
                             const code = payload.code;
                             const deviceId = payload.device_id;
-                            console.log('payload', payload);
-                            VKID.Auth.exchangeCode(code, deviceId)
-                                .then(vkidOnSuccess)
-                                .catch(vkidOnError);
+
+                            const loginData = {
+                                code_verifier: codeVerifier,
+                                redirect_uri: 'https://mail-jumper.ru',
+                                code: code,
+                                device_id: deviceId,
+                                state: state,
+                            };
+
+                            const userData = await signin(loginData);
+                            const maxAge = 60 * 60 * 24 * 7; // 7 дней
+                            document.cookie = `device_id=${deviceId}; max-age=${maxAge}; path=/`;
+                            document.cookie = `vkid=${userData.vkid}; max-age=${maxAge}; path=/`;
+
+                            if (onLoginSuccess) {
+                                onLoginSuccess();
+                            }
                         }
                     );
-
-                async function vkidOnSuccess(data) {
-                    console.log('vkiddata', data);
-                    const personalData = await VKID.Auth.userInfo(
-                        data.access_token
-                    );
-                    console.log('data', personalData);
-                }
-
-                function vkidOnError(error) {
-                    console.error('VKID error:', error);
-                }
             }
         };
 
         document.body.appendChild(script);
-    }, []);
+    }, [onLoginSuccess]);
 
     return <div id="VkIdSdkOneTap" />;
 };
