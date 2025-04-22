@@ -6,6 +6,9 @@ import { Enemy } from '../utils/enemy';
 import { Platform } from '../utils/platform';
 import { Money } from '../utils/money';
 import { sendScore } from '../api/game';
+import {getCookie} from "../index";
+import {generateState} from "./AuthVKID";
+import {check} from "../api/auth";
 
 const GameCanvas = () => {
     useEffect(() => {
@@ -47,15 +50,24 @@ const GameCanvas = () => {
                 this.playerName = this.askForPlayerName();
             }
 
-            askForPlayerName() {
-                let name = '';
-                while (!name) {
-                    name = prompt('Введите ваше имя:')?.trim();
+            async askForPlayerName() {
+                try {
+                    const ifUserData = {
+                        vkid: Number(getCookie('vkid')),
+                        device_id: getCookie('device_id'),
+                        state: generateState(),
+                    };
+                    const userData = await check(ifUserData);
+                    this.playerName = userData.name;
+                    this.isAuthenticated = true;
+                } catch (error) {
+                    this.isAuthenticated = false;
                 }
-                return name;
             }
 
             update() {
+                if (!this.isAuthenticated) return;
+                
                 this.background.update();
 
                 this.platforms.forEach((platform) => {
@@ -99,11 +111,25 @@ const GameCanvas = () => {
                     context.font = 'bold 25px Helvetica';
                     context.fillStyle = 'black';
                     context.textAlign = 'center';
-                    context.fillText(
-                        `PRESS ENTER TO START`,
-                        this.width * 0.5,
-                        this.height * 0.5
-                    );
+                    
+                    if (!this.isAuthenticated) {
+                        context.fillText(
+                            'НЕОБХОДИМА АВТОРИЗАЦИЯ',
+                            this.width * 0.5,
+                            this.height * 0.45
+                        );
+                        context.fillText(
+                            'ВОЙДИТЕ ЧЕРЕЗ VK ID',
+                            this.width * 0.5,
+                            this.height * 0.55
+                        );
+                    } else {
+                        context.fillText(
+                            'PRESS ENTER TO START',
+                            this.width * 0.5,
+                            this.height * 0.5
+                        );
+                    }
                 } else {
                     this.platforms.forEach((platform) => {
                         platform.draw(context);
