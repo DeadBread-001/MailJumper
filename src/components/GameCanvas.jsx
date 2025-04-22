@@ -54,6 +54,10 @@ const GameCanvas = () => {
                 window.addEventListener('auth_success', () => {
                     this.askForPlayerName();
                 });
+
+                window.addEventListener('logout', () => {
+                    this.askForPlayerName();
+                });
             }
 
             async askForPlayerName() {
@@ -278,6 +282,7 @@ const GameCanvas = () => {
 
         return () => {
             window.removeEventListener('auth_success', game.askForPlayerName);
+            window.removeEventListener('logout', game.askForPlayerName);
         };
     }, []);
 

@@ -68,6 +68,7 @@ const Navbar = () => {
 
             document.cookie = 'device_id=; max-age=0; path=/';
             document.cookie = 'vkid=; max-age=0; path=/';
+            window.dispatchEvent(new Event('logout'));
         } catch (error) {
             console.error('Ошибка при выходе:', error);
         }
