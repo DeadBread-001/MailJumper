@@ -9,6 +9,7 @@ import { sendScore } from '../api/game';
 import { getCookie } from '../index';
 import { generateState } from './AuthVKID';
 import { check } from '../api/auth';
+import CharacterSelection from './CharacterSelection';
 
 const GameCanvas = () => {
     useEffect(() => {
@@ -123,7 +124,6 @@ const GameCanvas = () => {
                     context.font = 'bold 25px Helvetica';
                     context.fillStyle = 'black';
                     context.textAlign = 'center';
-
                     if (this.checkingAuth) {
                         context.fillText(
                             'ЗАГРУЗКА...',
@@ -286,7 +286,14 @@ const GameCanvas = () => {
         };
     }, []);
 
-    return <canvas id="canvas1"></canvas>;
+    return (
+      <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
+          <canvas id="canvas1"></canvas>
+          <div>
+              <CharacterSelection />
+          </div>
+      </div>
+    );
 };
 
 export default GameCanvas;
