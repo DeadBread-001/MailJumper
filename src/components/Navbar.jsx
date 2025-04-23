@@ -1,5 +1,8 @@
-import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import AuthVKID, { generateState } from './AuthVKID';
+import { check, logout } from '../api/auth';
+import { getCookie } from '../index';
 
 // Временная функция для проверки прав доступа
 const isAdmin = () => {
@@ -7,9 +10,69 @@ const isAdmin = () => {
     return true; // Временно разрешаем доступ всем
 };
 
-export default function Navbar() {
+const UserProfile = ({ user, onLogout }) => {
+    return (
+        <div className="user-profile">
+            <div className="user-avatar">
+                <img
+                    src={user.avatar || '/images/default-avatar.png'}
+                    alt="Аватар"
+                />
+                <span className="username">{user.name}</span>
+            </div>
+            <div className="dropdown-menu">
+                <button onClick={onLogout}>Выход</button>
+            </div>
+        </div>
+    );
+};
+
+const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState(null);
     const location = useLocation();
+
+    const checkAuth = async () => {
+        try {
+            const ifUserData = {
+                vkid: Number(getCookie('vkid')),
+                device_id: getCookie('device_id'),
+                state: generateState(),
+            };
+            const userData = await check(ifUserData);
+            setUser(userData);
+            setIsAuthenticated(true);
+        } catch (error) {
+            setIsAuthenticated(false);
+            setUser(null);
+        }
+    };
+
+    useEffect(() => {
+        checkAuth();
+    }, []);
+
+    const handleLoginSuccess = () => {
+        checkAuth();
+    };
+
+    const handleLogout = async () => {
+        try {
+            const userData = {
+                vkid: Number(getCookie('vkid')),
+            };
+            await logout(userData);
+            setIsAuthenticated(false);
+            setUser(null);
+
+            document.cookie = 'device_id=; max-age=0; path=/';
+            document.cookie = 'vkid=; max-age=0; path=/';
+            window.dispatchEvent(new Event('logout'));
+        } catch (error) {
+            console.error('Ошибка при выходе:', error);
+        }
+    };
 
     const isActive = (path) => {
         return location.pathname === path;
@@ -75,9 +138,13 @@ export default function Navbar() {
                 )}
             </ul>
 
-            <div className="auth-section">
-                <button className="auth-button">Войти</button>
-            </div>
+            {isAuthenticated && user ? (
+                <UserProfile user={user} onLogout={handleLogout} />
+            ) : (
+                <AuthVKID onLoginSuccess={handleLoginSuccess} />
+            )}
         </nav>
     );
-}
+};
+
+export default Navbar;

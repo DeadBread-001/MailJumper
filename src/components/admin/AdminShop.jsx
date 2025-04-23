@@ -1,5 +1,21 @@
-import { useState, useEffect } from 'react';
-import { Paper } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    IconButton,
+    Typography,
+    Box,
+    Button,
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import AddProductModal from '../AddProductModal';
 import { deleteProduct } from '../../api/admin';
 import { getProducts, getPromocodes } from '../../api/shop';
 

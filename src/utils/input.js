@@ -11,7 +11,7 @@ export class InputHandler {
             ) {
                 this.keys.push(e.key);
             }
-            if (e.key == 'Enter') {
+            if (e.key == 'Enter' && game.isAuthenticated) {
                 this.game.gameStart = true;
             }
         });

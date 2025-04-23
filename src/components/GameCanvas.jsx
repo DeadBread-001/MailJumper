@@ -6,8 +6,12 @@ import { Enemy } from '../utils/enemy';
 import { Platform } from '../utils/platform';
 import { Money } from '../utils/money';
 import { sendScore } from '../api/game';
+import { getCookie } from '../index';
+import { generateState } from './AuthVKID';
+import { check } from '../api/auth';
+import CharacterSelection from './CharacterSelection';
 
-export default function GameCanvas() {
+const GameCanvas = () => {
     useEffect(() => {
         const canvas = document.querySelector('#canvas1');
         const ctx = canvas.getContext('2d');
@@ -44,18 +48,39 @@ export default function GameCanvas() {
                 this.background = new Background(this);
                 this.player = new Player(this);
                 this.inputHandler = new InputHandler(this);
-                this.playerName = this.askForPlayerName();
+                this.isAuthenticated = false;
+                this.checkingAuth = true;
+                this.askForPlayerName();
+
+                window.addEventListener('auth_success', () => {
+                    this.askForPlayerName();
+                });
+
+                window.addEventListener('logout', () => {
+                    this.askForPlayerName();
+                });
             }
 
-            askForPlayerName() {
-                let name = '';
-                while (!name) {
-                    name = prompt('Введите ваше имя:')?.trim();
+            async askForPlayerName() {
+                try {
+                    const ifUserData = {
+                        vkid: Number(getCookie('vkid')),
+                        device_id: getCookie('device_id'),
+                        state: generateState(),
+                    };
+                    const userData = await check(ifUserData);
+                    this.playerName = userData.vkid;
+                    this.isAuthenticated = true;
+                } catch (error) {
+                    this.isAuthenticated = false;
+                } finally {
+                    this.checkingAuth = false;
                 }
-                return name;
             }
 
             update() {
+                if (!this.isAuthenticated) return;
+
                 this.background.update();
 
                 this.platforms.forEach((platform) => {
@@ -99,11 +124,30 @@ export default function GameCanvas() {
                     context.font = 'bold 25px Helvetica';
                     context.fillStyle = 'black';
                     context.textAlign = 'center';
-                    context.fillText(
-                        `PRESS ENTER TO START`,
-                        this.width * 0.5,
-                        this.height * 0.5
-                    );
+                    if (this.checkingAuth) {
+                        context.fillText(
+                            'ЗАГРУЗКА...',
+                            this.width * 0.5,
+                            this.height * 0.5
+                        );
+                    } else if (!this.isAuthenticated) {
+                        context.fillText(
+                            'НЕОБХОДИМА АВТОРИЗАЦИЯ',
+                            this.width * 0.5,
+                            this.height * 0.45
+                        );
+                        context.fillText(
+                            'ВОЙДИТЕ ЧЕРЕЗ VK ID',
+                            this.width * 0.5,
+                            this.height * 0.55
+                        );
+                    } else {
+                        context.fillText(
+                            'PRESS ENTER TO START',
+                            this.width * 0.5,
+                            this.height * 0.5
+                        );
+                    }
                 } else {
                     this.platforms.forEach((platform) => {
                         platform.draw(context);
@@ -235,7 +279,21 @@ export default function GameCanvas() {
         }
 
         animate();
+
+        return () => {
+            window.removeEventListener('auth_success', game.askForPlayerName);
+            window.removeEventListener('logout', game.askForPlayerName);
+        };
     }, []);
 
-    return <canvas id="canvas1"></canvas>;
-}
+    return (
+      <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
+          <canvas id="canvas1"></canvas>
+          <div>
+              <CharacterSelection />
+          </div>
+      </div>
+    );
+};
+
+export default GameCanvas;

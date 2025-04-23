@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getTopPlayers } from '../api/rating';
 
-export default function Rating() {
+const Rating = () => {
     const [usersByLeague, setUsersByLeague] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -61,4 +61,6 @@ export default function Rating() {
             )}
         </div>
     );
-}
+};
+
+export default Rating;
