@@ -14,13 +14,13 @@ export class Player {
         this.width = this.bodyWidth;
         this.height = this.bodyHeight + this.hatHeight;
         this.x =
-          this.game.platforms
-            .filter((platform) => platform.type === 'green')
-            .slice(-1)[0].x + 6;
+            this.game.platforms
+                .filter((platform) => platform.type === 'green')
+                .slice(-1)[0].x + 6;
         this.y =
-          this.game.platforms
-            .filter((platform) => platform.type === 'green')
-            .slice(-1)[0].y - this.height;
+            this.game.platforms
+                .filter((platform) => platform.type === 'green')
+                .slice(-1)[0].y - this.height;
         this.min_y = this.game.height / 2 - 30;
         this.min_vy = -18;
         this.max_vy = this.game.platforms[0].height;
@@ -53,9 +53,9 @@ export class Player {
         if (this.vy > this.weight) {
             let platformType = this.onPlatform();
             if (
-              platformType === 'white' ||
-              platformType === 'blue' ||
-              platformType === 'green'
+                platformType === 'white' ||
+                platformType === 'blue' ||
+                platformType === 'green'
             )
                 this.vy = this.min_vy;
         }
@@ -82,16 +82,27 @@ export class Player {
 
         this.bullets.forEach((bullet) => bullet.update());
         this.bullets = this.bullets.filter(
-          (bullet) => !bullet.markedForDeletion
+            (bullet) => !bullet.markedForDeletion
         );
     }
 
     draw(context) {
         this.bullets.forEach((bullet) => bullet.draw(context));
-        context.drawImage(this.hatImage, this.x, this.y, this.hatWidth, this.hatHeight);
-        context.drawImage(this.bodyImage, this.x, this.y+this.hatHeight, this.bodyWidth, this.bodyHeight);
+        context.drawImage(
+            this.hatImage,
+            this.x,
+            this.y,
+            this.hatWidth,
+            this.hatHeight
+        );
+        context.drawImage(
+            this.bodyImage,
+            this.x,
+            this.y + this.hatHeight,
+            this.bodyWidth,
+            this.bodyHeight
+        );
     }
-
 
     collision() {
         let result = false;
@@ -103,10 +114,10 @@ export class Player {
         };
         this.game.enemies.forEach((enemy) => {
             if (
-              playerHitBox.x < enemy.x + enemy.width &&
-              playerHitBox.x + playerHitBox.width > enemy.x &&
-              playerHitBox.y < enemy.y + enemy.height &&
-              playerHitBox.height + playerHitBox.y > enemy.y
+                playerHitBox.x < enemy.x + enemy.width &&
+                playerHitBox.x + playerHitBox.width > enemy.x &&
+                playerHitBox.y < enemy.y + enemy.height &&
+                playerHitBox.height + playerHitBox.y > enemy.y
             ) {
                 result = true;
             }
@@ -125,20 +136,20 @@ export class Player {
 
         this.game.platforms.forEach((platform) => {
             const X_test =
-              (playerHitBox.x > platform.x &&
-                playerHitBox.x < platform.x + platform.width) ||
-              (playerHitBox.x + playerHitBox.width > platform.x &&
-                playerHitBox.x + playerHitBox.width <
-                platform.x + platform.width);
+                (playerHitBox.x > platform.x &&
+                    playerHitBox.x < platform.x + platform.width) ||
+                (playerHitBox.x + playerHitBox.width > platform.x &&
+                    playerHitBox.x + playerHitBox.width <
+                        platform.x + platform.width);
             const Y_test =
-              platform.y - (playerHitBox.y + playerHitBox.height) <= 0 &&
-              platform.y - (playerHitBox.y + playerHitBox.height) >=
-              -platform.height;
+                platform.y - (playerHitBox.y + playerHitBox.height) <= 0 &&
+                platform.y - (playerHitBox.y + playerHitBox.height) >=
+                    -platform.height;
 
             if (X_test && Y_test) {
                 type = platform.type;
                 platform.markedForDeletion =
-                  type === 'brown' || type === 'white';
+                    type === 'brown' || type === 'white';
             }
         });
 

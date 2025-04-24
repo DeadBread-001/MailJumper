@@ -10,9 +10,9 @@ export async function signin(userData) {
     }
 }
 
-export async function check(userData) {
+export async function check() {
     const url = IP + `auth/check`;
-    const data = await fetchRequest(url, 'POST', userData);
+    const data = await fetchRequest(url, 'POST');
     if (data.Status === 200) {
         return data.Data;
     } else {
