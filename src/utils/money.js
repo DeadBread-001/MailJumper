@@ -17,7 +17,7 @@ export class Money {
             this.imageLoaded = false;
         };
 
-        this.image.src = '/images/coin.webp';
+        this.image.src = '/images/coin.png';
     }
 
     update() {

@@ -98,7 +98,7 @@ const Tasks = () => {
                 <div className="user-stats">
                     <div className="stat-item">
                         <img
-                            src="/images/coin.webp"
+                            src="/images/coin.png"
                             alt="Монеты"
                             className="coins-icon"
                         />
@@ -130,7 +130,7 @@ const Tasks = () => {
                         <div className="task-rewards">
                             <div className="reward-item">
                                 <img
-                                    src="/images/coin.webp"
+                                    src="/images/coin.png"
                                     alt="Монеты"
                                     className="coins-icon"
                                 />

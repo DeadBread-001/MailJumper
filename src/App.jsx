@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import Rating from './components/Rating';
 import Tasks from './components/Tasks';
-import Shop from './components/Shop';
+// import Shop from './components/Shop';
 import AdminPanel from './components/admin/AdminPanel';
 
 // Временная функция для проверки прав доступа
@@ -28,7 +28,7 @@ const App = () => {
                 <Route path="/" element={<GameCanvas />} />
                 <Route path="/rating" element={<Rating />} />
                 <Route path="/tasks" element={<Tasks />} />
-                <Route path="/shop" element={<Shop />} />
+                {/*<Route path="/shop" element={<Shop />} />*/}
                 <Route
                     path="/admin"
                     element={

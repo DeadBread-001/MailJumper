@@ -287,12 +287,12 @@ const GameCanvas = () => {
     }, []);
 
     return (
-      <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-          <canvas id="canvas1"></canvas>
-          <div>
-              <CharacterSelection />
-          </div>
-      </div>
+        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
+            <canvas id="canvas1"></canvas>
+            <div>
+                <CharacterSelection />
+            </div>
+        </div>
     );
 };
 
