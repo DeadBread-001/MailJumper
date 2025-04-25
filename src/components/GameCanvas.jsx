@@ -286,6 +286,7 @@ const GameCanvas = () => {
         };
     }, []);
 
+    /*
     return (
         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
             <canvas id="canvas1"></canvas>
@@ -294,6 +295,14 @@ const GameCanvas = () => {
             </div>
         </div>
     );
+    */
+
+    return (
+      <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
+          <canvas id="canvas1"></canvas>
+      </div>
+    );
+
 };
 
 export default GameCanvas;
