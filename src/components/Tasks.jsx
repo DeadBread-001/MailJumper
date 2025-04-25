@@ -54,22 +54,18 @@ const Tasks = () => {
         },
     ]);
 
-    const [userProgress] = useState({
-        currentCoins: 150,
+    const [userProgress, setUserProgress] = useState(() => {
+        const savedCoins = localStorage.getItem('userCoins');
+        return {
+            currentCoins: savedCoins ? parseInt(savedCoins) : 150,
+        };
     });
 
+    const [showCoinAnimation, setShowCoinAnimation] = useState(false);
+
     useEffect(() => {
-        // const fetchData = async () => {
-        //     try {
-        //         const tasksData = await getTasks();
-        //         setTasks(tasksData);
-        //     } catch (err) {
-        //         console.error('Ошибка при получении данных:', err);
-        //     }
-        // };
-        //
-        // fetchData();
-    }, []);
+        localStorage.setItem('userCoins', userProgress.currentCoins.toString());
+    }, [userProgress.currentCoins]);
 
     const progress = useMemo(() => {
         const totalTasks = tasks.length;
@@ -92,6 +88,17 @@ const Tasks = () => {
                     t.id === 1 ? { ...t, status: 'completed' } : t
                 )
             );
+
+            setShowCoinAnimation(true);
+            setUserProgress((prev) => ({
+                ...prev,
+                currentCoins: prev.currentCoins + task.reward,
+            }));
+
+            setTimeout(() => {
+                setShowCoinAnimation(false);
+            }, 2000);
+
             return;
         }
         if (task.status === 'active' && task.link) {
@@ -108,9 +115,15 @@ const Tasks = () => {
                         <img
                             src="/images/coin.png"
                             alt="Монеты"
-                            className="coins-icon"
+                            className={`coins-icon ${showCoinAnimation ? 'coin-animation' : ''}`}
                         />
-                        <span>{userProgress.currentCoins}</span>
+                        <span
+                            className={
+                                showCoinAnimation ? 'coin-text-animation' : ''
+                            }
+                        >
+                            {userProgress.currentCoins}
+                        </span>
                     </div>
                 </div>
             </div>
