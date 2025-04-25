@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { getTasks } from '../api/tasks';
+// import { getTasks } from '../api/tasks';
 
 const Tasks = () => {
     const [tasks, setTasks] = useState([
@@ -86,6 +86,14 @@ const Tasks = () => {
     }, [tasks]);
 
     const handleTaskClick = (task) => {
+        if (task.id === 3) {
+            setTasks(prevTasks =>
+                prevTasks.map(t =>
+                    t.id === 3 ? { ...t, status: 'completed' } : t
+                )
+            );
+            return;
+        }
         if (task.status === 'active' && task.link) {
             window.open(task.link, '_blank', 'noopener,noreferrer');
         }
