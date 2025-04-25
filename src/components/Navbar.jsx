@@ -35,12 +35,7 @@ const Navbar = () => {
 
     const checkAuth = async () => {
         try {
-            const ifUserData = {
-                vkid: Number(getCookie('vkid')),
-                device_id: getCookie('device_id'),
-                state: generateState(),
-            };
-            const userData = await check(ifUserData);
+            const userData = await check();
             setUser(userData);
             setIsAuthenticated(true);
         } catch (error) {

@@ -6,8 +6,6 @@ import { Enemy } from '../utils/enemy';
 import { Platform } from '../utils/platform';
 import { Money } from '../utils/money';
 import { sendScore } from '../api/game';
-import { getCookie } from '../index';
-import { generateState } from './AuthVKID';
 import { check } from '../api/auth';
 import CharacterSelection from './CharacterSelection';
 
@@ -63,12 +61,7 @@ const GameCanvas = () => {
 
             async askForPlayerName() {
                 try {
-                    const ifUserData = {
-                        vkid: Number(getCookie('vkid')),
-                        device_id: getCookie('device_id'),
-                        state: generateState(),
-                    };
-                    const userData = await check(ifUserData);
+                    const userData = await check();
                     this.playerName = userData.vkid;
                     this.isAuthenticated = true;
                 } catch (error) {
