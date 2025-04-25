@@ -1,16 +1,16 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { getTasks } from '../api/tasks';
 // import { getTasks } from '../api/tasks';
 
 const Tasks = () => {
     const [tasks, setTasks] = useState([
         {
             id: 1,
-            name: 'Включить автозагрузку в Облаке',
-            description:
-                'Настройте автоматическую загрузку файлов в Облако Mail.ru',
+            name: 'Нажать кнопку "Выполнить"',
+            description: 'Нажмите на кнопку "Выполнить"',
             reward: 100,
             link: '#',
-            status: 'completed',
+            status: 'active',
         },
         {
             id: 2,
@@ -59,16 +59,16 @@ const Tasks = () => {
     });
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const tasksData = await getTasks();
-                setTasks(tasksData);
-            } catch (err) {
-                console.error('Ошибка при получении данных:', err);
-            }
-        };
-
-        fetchData();
+        // const fetchData = async () => {
+        //     try {
+        //         const tasksData = await getTasks();
+        //         setTasks(tasksData);
+        //     } catch (err) {
+        //         console.error('Ошибка при получении данных:', err);
+        //     }
+        // };
+        //
+        // fetchData();
     }, []);
 
     const progress = useMemo(() => {
@@ -86,10 +86,10 @@ const Tasks = () => {
     }, [tasks]);
 
     const handleTaskClick = (task) => {
-        if (task.id === 3) {
-            setTasks(prevTasks =>
-                prevTasks.map(t =>
-                    t.id === 3 ? { ...t, status: 'completed' } : t
+        if (task.id === 1) {
+            setTasks((prevTasks) =>
+                prevTasks.map((t) =>
+                    t.id === 1 ? { ...t, status: 'completed' } : t
                 )
             );
             return;
@@ -150,9 +150,12 @@ const Tasks = () => {
                             disabled={task.status === 'locked'}
                             onClick={() => handleTaskClick(task)}
                         >
-                            {/*{task.status === 'completed' ? 'Выполнено' :*/}
-                            {/*    task.status === 'active' ? 'Выполнить' : 'Заблокировано'}*/}
-                            Выполнить
+                            {task.status === 'completed'
+                                ? 'Выполнено'
+                                : task.status === 'active'
+                                  ? 'Выполнить'
+                                  : 'Заблокировано'}
+                            {/*Выполнить*/}
                         </button>
                     </div>
                 ))}
