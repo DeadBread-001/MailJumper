@@ -113,14 +113,6 @@ const Navbar = () => {
                         Задания
                     </Link>
                 </li>
-                {/*<li>*/}
-                {/*    <Link*/}
-                {/*        to="/shop"*/}
-                {/*        className={isActive('/shop') ? 'active' : ''}*/}
-                {/*    >*/}
-                {/*        Магазин*/}
-                {/*    </Link>*/}
-                {/*</li>*/}
                 {isAdmin() && (
                     <li>
                         <Link
