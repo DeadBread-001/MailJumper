@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { getTopPlayers } from '../api/rating';
-import { check } from '../api/auth';
 
 const Rating = () => {
-    const [users, setUsers] = useState([]);
+    const [usersByLeague, setUsersByLeague] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [currentUserName, setCurrentUserName] = useState(null);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchUsers = async () => {
             try {
                 const usersData = await getTopPlayers();
-                setUsers(usersData);
+                setUsersByLeague(usersData);
             } catch (error) {
                 setError(error.message);
             } finally {
@@ -20,30 +18,17 @@ const Rating = () => {
             }
         };
 
-        fetchData();
-    }, []);
-
-    useEffect(() => {
-        const getCurrentUserName = async () => {
-            try {
-                const currentUser = await check();
-                setCurrentUserName(currentUser.name);
-            } catch (error) {
-                setCurrentUserName(undefined);
-            }
-        };
-
-        getCurrentUserName();
+        fetchUsers();
     }, []);
 
     if (loading) return <p>Загрузка...</p>;
     if (error) return <p>Ошибка: {error}</p>;
 
-    return (
-        <div className="rating-container">
-            <h2 className="rating-title">РЕЙТИНГ ИГРОКОВ</h2>
+    const renderTable = (leagueName, users) => (
+        <div className="rating-container" key={leagueName}>
+            <h2 className="rating-title">{leagueName.toUpperCase()}</h2>
             {users.length === 0 ? (
-                <div>Пока никто не сыграл!</div>
+                <div>Пока никто не сыграл в этой лиге!</div> // Если в лиге нет игроков
             ) : (
                 <table className="rating-table">
                     <thead>
@@ -56,14 +41,7 @@ const Rating = () => {
                     </thead>
                     <tbody>
                         {users.map(({ name, score }, index) => (
-                            <tr
-                                key={index}
-                                className={
-                                    name === currentUserName
-                                        ? 'rating-highlighted'
-                                        : ''
-                                }
-                            >
+                            <tr key={index}>
                                 <td>{index + 1}</td>
                                 <td className="medal"></td>
                                 <td>{name}</td>
@@ -72,6 +50,14 @@ const Rating = () => {
                         ))}
                     </tbody>
                 </table>
+            )}
+        </div>
+    );
+
+    return (
+        <div>
+            {Object.entries(usersByLeague).map(([league, users]) =>
+                renderTable(league, users)
             )}
         </div>
     );

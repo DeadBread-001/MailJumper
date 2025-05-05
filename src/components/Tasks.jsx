@@ -1,20 +1,22 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { getTasks } from '../api/tasks';
-// import { getTasks } from '../api/tasks';
 
 const Tasks = () => {
     const [tasks, setTasks] = useState([
         {
             id: 1,
-            name: 'Нажать кнопку "Выполнить"',
-            description: 'Нажмите на кнопку "Выполнить"',
+            name: 'Включить автозагрузку в Облаке',
+            description:
+                'Настройте автоматическую загрузку файлов в Облако Mail.ru',
+            reward: 100,
             link: '#',
-            status: 'active',
+            status: 'completed',
         },
         {
             id: 2,
             name: 'Включить push-уведомления',
             description: 'Получайте уведомления о важных событиях',
+            reward: 50,
             link: '#',
             status: 'active',
         },
@@ -22,6 +24,7 @@ const Tasks = () => {
             id: 3,
             name: 'Скачать суперапп',
             description: 'Установите приложение Mail.ru на свой телефон',
+            reward: 200,
             link: '#',
             status: 'locked',
         },
@@ -29,6 +32,7 @@ const Tasks = () => {
             id: 4,
             name: 'Посмотреть сторис в Облаке',
             description: 'Просмотрите 3 сторис в Облаке Mail.ru',
+            reward: 75,
             link: '#',
             status: 'active',
         },
@@ -36,6 +40,7 @@ const Tasks = () => {
             id: 5,
             name: 'Посмотреть сторис в супераппе',
             description: 'Просмотрите 3 сторис в приложении Mail.ru',
+            reward: 75,
             link: '#',
             status: 'active',
         },
@@ -43,10 +48,28 @@ const Tasks = () => {
             id: 6,
             name: 'Пригласить друга',
             description: 'Пригласите друга в игру и получите бонус',
+            reward: 150,
             link: '#',
             status: 'active',
         },
     ]);
+
+    const [userProgress] = useState({
+        currentCoins: 150,
+    });
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const tasksData = await getTasks();
+                setTasks(tasksData);
+            } catch (err) {
+                console.error('Ошибка при получении данных:', err);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     const progress = useMemo(() => {
         const totalTasks = tasks.length;
@@ -63,14 +86,6 @@ const Tasks = () => {
     }, [tasks]);
 
     const handleTaskClick = (task) => {
-        if (task.id === 1) {
-            setTasks((prevTasks) =>
-                prevTasks.map((t) =>
-                    t.id === 1 ? { ...t, status: 'completed' } : t
-                )
-            );
-            return;
-        }
         if (task.status === 'active' && task.link) {
             window.open(task.link, '_blank', 'noopener,noreferrer');
         }
@@ -80,6 +95,16 @@ const Tasks = () => {
         <div className="tasks-container">
             <div className="tasks-header">
                 <h1>Задания</h1>
+                <div className="user-stats">
+                    <div className="stat-item">
+                        <img
+                            src="/images/coin.webp"
+                            alt="Монеты"
+                            className="coins-icon"
+                        />
+                        <span>{userProgress.currentCoins}</span>
+                    </div>
+                </div>
             </div>
 
             <div className="progress-bar">
@@ -102,17 +127,24 @@ const Tasks = () => {
                             <h3>{task.name}</h3>
                         </div>
                         <p className="task-description">{task.description}</p>
+                        <div className="task-rewards">
+                            <div className="reward-item">
+                                <img
+                                    src="/images/coin.webp"
+                                    alt="Монеты"
+                                    className="coins-icon"
+                                />
+                                <span>{task.reward}</span>
+                            </div>
+                        </div>
                         <button
                             className={`task-button ${task.status}`}
                             disabled={task.status === 'locked'}
                             onClick={() => handleTaskClick(task)}
                         >
-                            {task.status === 'completed'
-                                ? 'Выполнено'
-                                : task.status === 'active'
-                                  ? 'Выполнить'
-                                  : 'Заблокировано'}
-                            {/*Выполнить*/}
+                            {/*{task.status === 'completed' ? 'Выполнено' :*/}
+                            {/*    task.status === 'active' ? 'Выполнить' : 'Заблокировано'}*/}
+                            Выполнить
                         </button>
                     </div>
                 ))}
