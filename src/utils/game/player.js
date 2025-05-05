@@ -1,5 +1,4 @@
-import { Bullet } from './bullet.js';
-import { getSelectedCharacter } from './characterData';
+import { getSelectedCharacter } from '../characterData';
 
 export class Player {
     constructor(game) {
@@ -28,7 +27,6 @@ export class Player {
         this.weight = 0.5;
         this.vx = 0;
         this.max_vx = 8;
-        this.bullets = [];
 
         const { body, hat } = getSelectedCharacter();
 
@@ -39,8 +37,9 @@ export class Player {
         this.hatImage.src = `/images/${hat}`;
     }
 
-    update(inputHandler) {
-        this.x += this.vx;
+    update(inputHandler, deltaTime) {
+        this.x += this.vx * deltaTime * this.game.speedMultiplier;
+
         if (inputHandler.keys.includes('ArrowLeft')) {
             this.vx = -this.max_vx;
         } else if (inputHandler.keys.includes('ArrowRight')) {
@@ -52,16 +51,16 @@ export class Player {
 
         if (this.vy > this.weight) {
             let platformType = this.onPlatform();
-            if (
-                platformType === 'white' ||
-                platformType === 'blue' ||
-                platformType === 'green'
-            )
+            if (platformType === 'green') {
                 this.vy = this.min_vy;
+            }
         }
 
-        if (this.vy < this.max_vy) this.vy += this.weight;
-        if (this.y > this.min_y || this.vy > this.weight) this.y += this.vy;
+        if (this.vy < this.max_vy)
+            this.vy += this.weight * deltaTime * this.game.speedMultiplier;
+
+        if (this.y > this.min_y || this.vy > this.weight)
+            this.y += this.vy * deltaTime * this.game.speedMultiplier;
 
         if (this.y <= this.min_y && this.vy < this.weight)
             this.game.vy = -this.vy;
@@ -74,20 +73,9 @@ export class Player {
         if (this.y > this.game.height && !this.game.gameOver) {
             this.game.gameOver = true;
         }
-
-        if (inputHandler.bulletKeyCount > 0) {
-            inputHandler.bulletKeyCount--;
-            this.bullets.push(new Bullet(this));
-        }
-
-        this.bullets.forEach((bullet) => bullet.update());
-        this.bullets = this.bullets.filter(
-            (bullet) => !bullet.markedForDeletion
-        );
     }
 
     draw(context) {
-        this.bullets.forEach((bullet) => bullet.draw(context));
         context.drawImage(
             this.hatImage,
             this.x,
@@ -112,16 +100,6 @@ export class Player {
             width: this.width - 30,
             height: this.height,
         };
-        this.game.enemies.forEach((enemy) => {
-            if (
-                playerHitBox.x < enemy.x + enemy.width &&
-                playerHitBox.x + playerHitBox.width > enemy.x &&
-                playerHitBox.y < enemy.y + enemy.height &&
-                playerHitBox.height + playerHitBox.y > enemy.y
-            ) {
-                result = true;
-            }
-        });
         return result;
     }
 
@@ -148,8 +126,6 @@ export class Player {
 
             if (X_test && Y_test) {
                 type = platform.type;
-                platform.markedForDeletion =
-                    type === 'brown' || type === 'white';
             }
         });
 

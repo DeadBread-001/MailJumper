@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Tabs, Tab } from '@mui/material';
 import AdminTasks from './AdminTasks';
-import AdminShop from './AdminShop';
 import AdminStats from './AdminStats';
 
 const AdminPanel = () => {
@@ -16,13 +15,11 @@ const AdminPanel = () => {
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={currentTab} onChange={handleTabChange}>
                     <Tab label="Задачи" />
-                    <Tab label="Магазин" />
                     <Tab label="Статистика" />
                 </Tabs>
             </Box>
             <Box sx={{ mt: 2 }}>
                 {currentTab === 0 && <AdminTasks />}
-                {currentTab === 1 && <AdminShop />}
                 {currentTab === 2 && <AdminStats />}
             </Box>
         </Box>
