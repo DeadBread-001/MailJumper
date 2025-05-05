@@ -166,3 +166,35 @@
 .points-icon {
     font-size: 1.2rem;
 }
+
+@keyframes coinBounce {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.5);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes textPulse {
+    0% {
+        color: inherit;
+    }
+    50% {
+        color: #ffd700;
+    }
+    100% {
+        color: inherit;
+    }
+}
+
+.coin-animation {
+    animation: coinBounce 0.5s ease-in-out;
+}
+
+.coin-text-animation {
+    animation: textPulse 0.5s ease-in-out;
+}
