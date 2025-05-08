@@ -35,125 +35,161 @@ const MenuBottomSheet = ({
     ];
 
     return (
-        <div className={`menu-bottom-sheet${isOpen ? ' open' : ''}`}>
-            <div className="menu-sheet-backdrop" onClick={onClose} />
-            <div className="menu-sheet-content">
-                <div className="menu-sheet-header">
-                    <button className="menu-sheet-close" onClick={onClose}>
+        <div
+            className={`menu-bottom-sheet${isOpen ? ' menu-bottom-sheet_open' : ''}`}
+        >
+            <div className="menu-bottom-sheet__backdrop" onClick={onClose} />
+            <div className="menu-bottom-sheet__content">
+                <div className="menu-bottom-sheet__header">
+                    <button
+                        className="menu-bottom-sheet__close"
+                        onClick={onClose}
+                    >
                         &#10005;
                     </button>
                 </div>
 
-                <div className="menu-sheet-section score">
-                    <div className="score-title">Твой счёт</div>
-                    <div className="score-amount-block">
+                <div className="menu-bottom-sheet__section menu-bottom-sheet__score">
+                    <div className="menu-bottom-sheet__score-title">
+                        Твой счёт
+                    </div>
+                    <div className="menu-bottom-sheet__score-amount-block">
                         <img
-                            className="score-img"
+                            className="menu-bottom-sheet__score-img"
                             src="/images/score.svg"
                             alt="Иконка очков"
                         />
-                        <div className="score-amount">710 баллов</div>
+                        <div className="menu-bottom-sheet__score-amount">
+                            710 баллов
+                        </div>
                     </div>
                 </div>
 
                 <div
-                    className={`menu-sheet-section superpower${isSuperpowerExpanded ? ' expanded' : ''}`}
+                    className={`menu-bottom-sheet__section menu-bottom-sheet__superpower${isSuperpowerExpanded ? ' menu-bottom-sheet__superpower_expanded' : ''}`}
                 >
-                    <div className="superpower-info">
-                        <div className="superpower-title">
+                    <div className="menu-bottom-sheet__superpower-info">
+                        <div className="menu-bottom-sheet__superpower-title">
                             Активировать суперсилу
                         </div>
-                        <div className="superpower-desc">
+                        <div className="menu-bottom-sheet__superpower-desc">
                             Выполни любое задание, чтобы получить много баллов
                         </div>
-                        <div className="superpower-tasks">
-                            {tasks.map((task) => (
-                                <div key={task.id} className="task-item">
-                                    <div className="task-icon">{task.icon}</div>
-                                    <div className="task-text">{task.text}</div>
-                                    <div className="task-arrow">→</div>
-                                </div>
-                            ))}
+                        <div className="menu-bottom-sheet__superpower-tasks-wrapper">
+                            <div className="menu-bottom-sheet__superpower-tasks">
+                                {tasks.map((task, idx) => (
+                                    <div
+                                        key={task.id}
+                                        className="menu-bottom-sheet__task-item"
+                                        style={{ '--index': idx }}
+                                    >
+                                        <div className="menu-bottom-sheet__task-icon">
+                                            <img
+                                                src="/images/cloudTask.svg"
+                                                alt="task icon"
+                                            />
+                                        </div>
+                                        <div className="menu-bottom-sheet__task-content">
+                                            <div className="menu-bottom-sheet__task-text">
+                                                {task.text}
+                                            </div>
+                                            {idx === 0 && (
+                                                <div className="menu-bottom-sheet__task-label">
+                                                    ежедневное задание
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="menu-bottom-sheet__task-arrow">
+                                            &rarr;
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-
                         <button
-                            className="superpower-btn"
+                            className={`menu-bottom-sheet__superpower-btn${isSuperpowerExpanded ? ' menu-bottom-sheet__superpower-btn_expanded' : ''}`}
                             onClick={toggleSuperpower}
                         >
-                            {isSuperpowerExpanded
-                                ? 'Свернуть ▲'
-                                : 'Показать задания ▼'}
+                            <span className="menu-bottom-sheet__superpower-btn-content">
+                                {isSuperpowerExpanded
+                                    ? 'Свернуть'
+                                    : 'Показать задания'}
+                                <img
+                                    src="/images/arrow.svg"
+                                    alt="arrow"
+                                    className={`menu-bottom-sheet__superpower-arrow${isSuperpowerExpanded ? ' menu-bottom-sheet__superpower-arrow_rotated' : ''}`}
+                                />
+                            </span>
                         </button>
                     </div>
                     <img
-                        className="superpower-img"
+                        className="menu-bottom-sheet__superpower-img"
                         src="/images/superpower.svg"
                         alt="superpower"
                     />
                 </div>
 
-                <div className="menu-sheet-section prizes">
-                    <div className="prizes-info">
-                        <div className="prizes-title">Призы</div>
-                        <div className="prizes-desc">
+                <div className="menu-bottom-sheet__section menu-bottom-sheet__prizes">
+                    <div className="menu-bottom-sheet__prizes-info">
+                        <div className="menu-bottom-sheet__prizes-title">
+                            Призы
+                        </div>
+                        <div className="menu-bottom-sheet__prizes-desc">
                             Чем выше твой рейтинг, тем больше шансов на выигрыш
                             приза
                         </div>
                     </div>
-                    <div className="prizes-row">
-                        <button className="prizes-btn">Подробнее</button>
-                        <div className="prizes-score">
-                            <span>⭐</span> {userScore} баллов
-                        </div>
+                    <div className="menu-bottom-sheet__prizes-row">
+                        <button className="menu-bottom-sheet__prizes-btn">
+                            Подробнее
+                        </button>
                     </div>
                 </div>
 
-                <div className="menu-sheet-section rating">
-                    <div className="rating-title">Твой рейтинг</div>
-                    <div className="rating-list">
-                        <div className="rating-item">
-                            <span>3. Другой игрок</span>
+                <div className="menu-bottom-sheet__section menu-bottom-sheet__rating">
+                    <div className="menu-bottom-sheet__rating-title">
+                        Рейтинг
+                    </div>
+                    <div className="menu-bottom-sheet__rating-list">
+                        <div className="menu-bottom-sheet__rating-item">
+                            <span>352. Другой игрок</span>
                             <span>
-                                4612 <span className="rating-up">▲</span>
+                                710{' '}
+                                <img
+                                    src="/images/score.svg"
+                                    alt="score"
+                                    className="menu-bottom-sheet__rating-score-icon"
+                                />
                             </span>
                         </div>
-                        <div className="rating-item">
-                            <span>5. Юзер</span>
+                        <div className="menu-bottom-sheet__rating-item menu-bottom-sheet__rating-item_current">
+                            <span>353. Твой результат</span>
                             <span>
-                                4610 <span className="rating-up">▲</span>
+                                612{' '}
+                                <img
+                                    src="/images/score.svg"
+                                    alt="score"
+                                    className="menu-bottom-sheet__rating-score-icon"
+                                />
                             </span>
                         </div>
-                        <div className="rating-item">
-                            <span>6. Другой игрок</span>
+                        <div className="menu-bottom-sheet__rating-item">
+                            <span>354. Другой игрок</span>
                             <span>
-                                4602 <span className="rating-up">▲</span>
+                                598{' '}
+                                <img
+                                    src="/images/score.svg"
+                                    alt="score"
+                                    className="menu-bottom-sheet__rating-score-icon"
+                                />
                             </span>
                         </div>
                     </div>
-                    <div className="rating-row">
-                        <button className="rating-btn">Подробнее</button>
-                        <div className="rating-place">
-                            {userPlace} место из {userTotal}
-                        </div>
+                    <div className="menu-bottom-sheet__rating-row">
+                        <button className="menu-bottom-sheet__rating-btn">
+                            Подробнее
+                        </button>
                     </div>
-                </div>
-
-                <div className="menu-sheet-footer">
-                    <button
-                        className="menu-help"
-                        onClick={() => onNavigate('help')}
-                    >
-                        Помощь
-                    </button>
-                    <button
-                        className="menu-play"
-                        onClick={() => {
-                            onClose();
-                            onNavigate('play');
-                        }}
-                    >
-                        Играть ▶
-                    </button>
                 </div>
             </div>
         </div>

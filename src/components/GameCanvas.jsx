@@ -311,19 +311,41 @@ const GameCanvas = () => {
         );
     }
 
-    /*
     return (
         <div ref={containerRef} className="game-canvas-container">
             <canvas id="canvas1" className="game-canvas"></canvas>
-            {!menuOpen && (
+            <div
+                className={`game-canvas__controls${gamePaused ? ' game-canvas__controls_paused' : ''}`}
+            >
+                {!gamePaused && (
+                    <button
+                        className={`game-canvas__superpower-btn${gamePaused ? ' game-canvas__superpower-btn_hidden' : ''}`}
+                        onClick={() => {
+                            /* TODO: Здесь в общем сила активируется */
+                        }}
+                        aria-label="Активировать суперсилу"
+                    >
+                        <img src="/images/activatePower.svg" alt="Суперсила" />
+                        Активировать суперсилу
+                    </button>
+                )}
                 <button
-                    className="pause-btn"
-                    onClick={handlePause}
-                    aria-label="Пауза"
+                    className={`game-canvas__pause-btn${gamePaused ? ' game-canvas__pause-btn_paused' : ''}`}
+                    onClick={gamePaused ? handleCloseMenu : handlePause}
+                    aria-label={gamePaused ? 'Играть' : 'Пауза'}
                 >
-                    &#10073;&#10073;
+                    {gamePaused ? (
+                        <>
+                            <span className="game-canvas__pause-btn-text">
+                                Играть
+                            </span>
+                            <img src="/images/play.svg" alt="Играть" />
+                        </>
+                    ) : (
+                        <img src="/images/pause.svg" alt="Пауза" />
+                    )}
                 </button>
-            )}
+            </div>
             <MenuBottomSheet
                 isOpen={menuOpen}
                 onClose={handleCloseMenu}
@@ -334,13 +356,6 @@ const GameCanvas = () => {
                 userTasks={5}
                 userTotal={6589}
             />
-        </div>
-    );
-    */
-
-    return (
-        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-            <canvas id="canvas1"></canvas>
         </div>
     );
 };
