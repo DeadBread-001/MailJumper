@@ -1,10 +1,9 @@
 export class Background {
-    constructor(game) {
+    constructor(game, resourceLoader) {
         this.game = game;
         this.width = this.game.width;
         this.height = this.game.height;
-        this.image = new Image();
-        this.image.src = '/images/background.png';
+        this.image = resourceLoader.getImage('background');
         this.x = 0;
         this.y = 0;
     }

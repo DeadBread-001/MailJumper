@@ -10,6 +10,7 @@ import MenuBottomSheet from './MenuBottomSheet';
 import AuthVKID from './AuthVKID';
 import '../styles/menuBottomSheet.scss';
 import '../styles/gameCanvas.scss';
+import { ResourceLoader } from '../utils/game/resourceLoader';
 
 const CANVAS_WIDTH = 500;
 const CANVAS_HEIGHT = 765;
@@ -30,12 +31,15 @@ const GameCanvas = () => {
     });
     const [currentScore, setCurrentScore] = useState(0);
     const [scoreBump, setScoreBump] = useState(false);
+    const [loadingProgress, setLoadingProgress] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
     const animationRef = useRef(null);
     const gameInstance = useRef(null);
     const containerRef = useRef(null);
     const lastTimeRef = useRef(0);
     const autoPaused = useRef(false);
     const inputHandler = useRef(null);
+    const resourceLoader = useRef(new ResourceLoader());
 
     const isActuallyPaused = gamePaused || autoPaused.current;
 
@@ -55,6 +59,25 @@ const GameCanvas = () => {
 
     useEffect(() => {
         if (!isAuthenticated) return;
+
+        const loadResources = async () => {
+            const success = await resourceLoader.current.loadAll();
+            if (success) {
+                setIsLoading(false);
+            }
+        };
+
+        const progressInterval = setInterval(() => {
+            setLoadingProgress(resourceLoader.current.getProgress());
+        }, 100);
+
+        loadResources();
+
+        return () => clearInterval(progressInterval);
+    }, [isAuthenticated]);
+
+    useEffect(() => {
+        if (!isAuthenticated || isLoading) return;
         const canvas = document.querySelector('#canvas1');
         const ctx = canvas.getContext('2d');
         canvas.width = CANVAS_WIDTH;
@@ -89,8 +112,8 @@ const GameCanvas = () => {
                     this.platform_max_gap = 300;
                     this.add_platforms(0, this.height - 15);
                     this.add_platforms(-this.height, -15);
-                    this.background = new Background(this);
-                    this.player = new Player(this);
+                    this.background = new Background(this, resourceLoader.current);
+                    this.player = new Player(this, resourceLoader.current);
                     if (this.inputHandler) this.inputHandler.reset();
                     this.speedMultiplier = 60;
                     this.scoreSent = false;
@@ -150,7 +173,8 @@ const GameCanvas = () => {
                                 this,
                                 lowerY,
                                 upperY,
-                                type
+                                type,
+                                resourceLoader.current
                             );
                             this.platforms.unshift(platform);
                             isFirstPlatform = false;
@@ -219,7 +243,7 @@ const GameCanvas = () => {
             window.removeEventListener('blur', handleBlur);
             window.removeEventListener('focus', handleFocus);
         };
-    }, [gamePaused, isAuthenticated]);
+    }, [isAuthenticated, isLoading, gamePaused]);
 
     useEffect(() => {
         if (menuOpen) {
@@ -235,7 +259,10 @@ const GameCanvas = () => {
     const handlePause = () => {
         setMenuOpen(true);
         setGamePaused(true);
-        if (animationRef.current) cancelAnimationFrame(animationRef.current);
+        if (animationRef.current) {
+            cancelAnimationFrame(animationRef.current);
+            animationRef.current = null;
+        }
     };
     const handleCloseMenu = () => {
         setMenuOpen(false);
@@ -243,6 +270,10 @@ const GameCanvas = () => {
         if (gameInstance.current) {
             gameInstance.current.gameStart = true;
             gameInstance.current.gameOver = false;
+            if (!animationRef.current) {
+                lastTimeRef.current = 0;
+                animationRef.current = requestAnimationFrame(animate);
+            }
         }
     };
 
@@ -279,6 +310,56 @@ const GameCanvas = () => {
             </div>
         );
     }
+
+    if (isLoading) {
+        return (
+            <div
+                style={{
+                    width: '100vw',
+                    height: '100vh',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'linear-gradient(180deg, #eaf6ff 0%, #cbe7ff 100%)',
+                }}
+            >
+                <div
+                    style={{
+                        background: '#fff',
+                        borderRadius: 16,
+                        boxShadow: '0 2px 16px rgba(0,0,0,0.08)',
+                        padding: 32,
+                        minWidth: 320,
+                        textAlign: 'center',
+                    }}
+                >
+                    <h2 style={{ marginBottom: 24 }}>Загрузка игры</h2>
+                    <div
+                        style={{
+                            width: '100%',
+                            height: 8,
+                            background: '#eee',
+                            borderRadius: 4,
+                            overflow: 'hidden',
+                            marginBottom: 16,
+                        }}
+                    >
+                        <div
+                            style={{
+                                width: `${loadingProgress}%`,
+                                height: '100%',
+                                background: '#b8fc75',
+                                transition: 'width 0.3s ease',
+                            }}
+                        />
+                    </div>
+                    <div>{Math.round(loadingProgress)}%</div>
+                </div>
+            </div>
+        );
+    }
+
     if (!isAuthenticated) {
         return (
             <div
@@ -325,44 +406,44 @@ const GameCanvas = () => {
                         {currentScore}
                     </span>
                 </div>
-            </div>
-            {showDeathScreen && (
-                <div className="death-screen-overlay">
-                    <div className="death-screen-window">
-                        <div className="death-score-top">
+                {showDeathScreen && (
+                    <div className="death-screen-overlay">
+                        <div className="death-screen-window">
+                            <div className="death-score-top">
+                                <img
+                                    src="/images/score.svg"
+                                    alt="score"
+                                    className="death-score-icon-large"
+                                />
+                                <span className="death-score-value-large">
+                                    {lastScore}
+                                </span>
+                            </div>
                             <img
-                                src="/images/score.svg"
-                                alt="score"
-                                className="death-score-icon-large"
+                                src="/images/scoreByte.svg"
+                                alt="byte"
+                                className="death-byte-img"
                             />
-                            <span className="death-score-value-large">
-                                {lastScore}
-                            </span>
-                        </div>
-                        <img
-                            src="/images/scoreByte.svg"
-                            alt="byte"
-                            className="death-byte-img"
-                        />
-                        <div className="death-score-label-large">
-                            Попробуешь побить рекорд?
-                        </div>
-                        <div className="death-best-score-block">
-                            <span className="death-best-score-label">
-                                Твой рекорд
-                            </span>
-                            <img
-                                src="/images/score.svg"
-                                alt="score"
-                                className="death-best-score-icon"
-                            />
-                            <span className="death-best-score-value">
-                                {bestScore}
-                            </span>
+                            <div className="death-score-label-large">
+                                Попробуешь побить рекорд?
+                            </div>
+                            <div className="death-best-score-block">
+                                <span className="death-best-score-label">
+                                    Твой рекорд
+                                </span>
+                                <img
+                                    src="/images/score.svg"
+                                    alt="score"
+                                    className="death-best-score-icon"
+                                />
+                                <span className="death-best-score-value">
+                                    {bestScore}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
             <div
                 className={`game-canvas__controls${gamePaused ? ' game-canvas__controls_paused' : ''}`}
             >

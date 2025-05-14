@@ -1,5 +1,5 @@
 export class Platform {
-    constructor(game, lowerY, upperY, type) {
+    constructor(game, lowerY, upperY, type, resourceLoader) {
         this.game = game;
         this.width = 101;
         this.height = 58;
@@ -9,8 +9,7 @@ export class Platform {
         this.vx = this.type === 'blue' ? this.game.object_vx : 0;
 
         this.cloudNumber = Math.floor(Math.random() * 5) + 1;
-        this.image = new Image();
-        this.image.src = `/images/cloud${this.cloudNumber}.svg`;
+        this.image = resourceLoader.getImage(`cloud${this.cloudNumber}`);
 
         this.sizeMultiplier = 0.9 + Math.random() * 0.2;
         this.width = this.width * this.sizeMultiplier;
@@ -18,8 +17,7 @@ export class Platform {
 
         this.isFlipped = Math.random() > 0.5;
 
-        this.scoreImage = new Image();
-        this.scoreImage.src = '/images/score.svg';
+        this.scoreImage = resourceLoader.getImage('score');
         this.showScore = false;
         this.scoreOpacity = 0;
         this.scoreY = 0;

@@ -1,7 +1,7 @@
 import { getSelectedCharacter } from '../characterData';
 
 export class Player {
-    constructor(game) {
+    constructor(game, resourceLoader) {
         this.game = game;
         this.sizeModifier = 1;
         this.width = 86.8320083618164 * this.sizeModifier;
@@ -25,8 +25,7 @@ export class Player {
         this.direction = 1;
         this.isJumping = false;
 
-        this.image = new Image();
-        this.image.src = '/images/byte.svg';
+        this.image = resourceLoader.getImage('byte');
     }
 
     update(inputHandler, deltaTime) {
