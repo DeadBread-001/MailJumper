@@ -3,15 +3,9 @@ import { getSelectedCharacter } from '../characterData';
 export class Player {
     constructor(game) {
         this.game = game;
-        this.sizeModifier = 0.2;
-        this.bodyWidth = 395 * this.sizeModifier;
-        this.bodyHeight = 332 * this.sizeModifier;
-
-        this.hatWidth = 395 * this.sizeModifier;
-        this.hatHeight = 156 * this.sizeModifier;
-
-        this.width = this.bodyWidth;
-        this.height = this.bodyHeight + this.hatHeight;
+        this.sizeModifier = 1;
+        this.width = 86.8320083618164 * this.sizeModifier;
+        this.height = 92.63623046875 * this.sizeModifier;
         this.x =
             this.game.platforms
                 .filter((platform) => platform.type === 'green')
@@ -27,14 +21,12 @@ export class Player {
         this.weight = 0.5;
         this.vx = 0;
         this.max_vx = 8;
+        this.rotation = 0;
+        this.direction = 1;
+        this.isJumping = false;
 
-        const { body, hat } = getSelectedCharacter();
-
-        this.bodyImage = new Image();
-        this.bodyImage.src = `/images/${body}`;
-
-        this.hatImage = new Image();
-        this.hatImage.src = `/images/${hat}`;
+        this.image = new Image();
+        this.image.src = '/images/byte.svg';
     }
 
     update(inputHandler, deltaTime) {
@@ -42,17 +34,32 @@ export class Player {
 
         if (inputHandler.keys.includes('ArrowLeft')) {
             this.vx = -this.max_vx;
+            this.direction = -1;
         } else if (inputHandler.keys.includes('ArrowRight')) {
             this.vx = this.max_vx;
+            this.direction = 1;
         } else this.vx = 0;
 
         if (this.x < -this.width / 2) this.x = this.game.width - this.width / 2;
         if (this.x + this.width / 2 > this.game.width) this.x = -this.width / 2;
 
+        if (this.vy < 0) {
+            this.rotation = Math.max(this.rotation - 2, -30);
+        } else if (this.vy > 0) {
+            this.rotation = Math.min(this.rotation + 2, 30);
+        } else {
+            if (this.rotation > 0) {
+                this.rotation = Math.max(this.rotation - 1, 0);
+            } else if (this.rotation < 0) {
+                this.rotation = Math.min(this.rotation + 1, 0);
+            }
+        }
+
         if (this.vy > this.weight) {
             let platformType = this.onPlatform();
             if (platformType === 'green') {
                 this.vy = this.min_vy;
+                this.isJumping = true;
             }
         }
 
@@ -76,20 +83,20 @@ export class Player {
     }
 
     draw(context) {
+        context.save();
+        context.translate(this.x + this.width / 2, this.y + this.height / 2);
+        const adjustedRotation =
+            this.direction === 1 ? this.rotation : -this.rotation;
+        context.rotate((adjustedRotation * Math.PI) / 180);
+        context.scale(this.direction, 1);
         context.drawImage(
-            this.hatImage,
-            this.x,
-            this.y,
-            this.hatWidth,
-            this.hatHeight
+            this.image,
+            -this.width / 2,
+            -this.height / 2,
+            this.width,
+            this.height
         );
-        context.drawImage(
-            this.bodyImage,
-            this.x,
-            this.y + this.hatHeight,
-            this.bodyWidth,
-            this.bodyHeight
-        );
+        context.restore();
     }
 
     collision() {
@@ -122,10 +129,13 @@ export class Player {
             const Y_test =
                 platform.y - (playerHitBox.y + playerHitBox.height) <= 0 &&
                 platform.y - (playerHitBox.y + playerHitBox.height) >=
-                    -platform.height;
+                    -platform.height / 2;
 
             if (X_test && Y_test) {
                 type = platform.type;
+                if (type === 'green') {
+                    platform.triggerScoreEffect();
+                }
             }
         });
 

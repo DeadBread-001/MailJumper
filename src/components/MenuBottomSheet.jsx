@@ -1,16 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import MenuBottomSheetHeader from './MenuBottomSheetHeader';
+import ScoreSection from './ScoreSection';
+import SuperpowerSection from './SuperpowerSection';
+import PrizesSection from './PrizesSection';
+import RatingSection from './RatingSection';
+import PrizeRulesPage from './PrizeRulesPage';
+import RatingPage from './RatingPage';
+import ModalPrizeRules from './ModalPrizeRules';
 
 const MenuBottomSheet = ({
     isOpen,
     onClose,
-    onNavigate,
     userPlace,
     userScore,
     userRank,
     userTasks,
     userTotal,
+    showRatingPage,
+    setShowRatingPage,
+    isSuperpowerExpanded,
+    setIsSuperpowerExpanded,
+    wasSuperpowerJustOpened,
+    setWasSuperpowerJustOpened,
 }) => {
-    const [isSuperpowerExpanded, setIsSuperpowerExpanded] = useState(false);
+    const [showPrizeRules, setShowPrizeRules] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const superpowerRef = useRef(null);
+
+    useEffect(() => {
+        if (showModal) {
+            setIsModalVisible(true);
+        } else if (isModalVisible) {
+            const timer = setTimeout(() => setIsModalVisible(false), 300);
+            return () => clearTimeout(timer);
+        }
+    }, [showModal]);
+
+    useEffect(() => {
+        if (
+            wasSuperpowerJustOpened &&
+            isSuperpowerExpanded &&
+            superpowerRef.current
+        ) {
+            superpowerRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+            });
+            setWasSuperpowerJustOpened(false);
+        }
+    }, [
+        wasSuperpowerJustOpened,
+        isSuperpowerExpanded,
+        setWasSuperpowerJustOpened,
+    ]);
+
+    const handleOpenModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
 
     const toggleSuperpower = () => {
         setIsSuperpowerExpanded(!isSuperpowerExpanded);
@@ -36,162 +82,42 @@ const MenuBottomSheet = ({
 
     return (
         <div
-            className={`menu-bottom-sheet${isOpen ? ' menu-bottom-sheet_open' : ''}`}
+            className={`menu-bottom-sheet${isOpen ? ' menu-bottom-sheet_open' : ''}${showModal ? ' menu-bottom-sheet_modal' : ''}`}
         >
             <div className="menu-bottom-sheet__backdrop" onClick={onClose} />
             <div className="menu-bottom-sheet__content">
-                <div className="menu-bottom-sheet__header">
-                    <button
-                        className="menu-bottom-sheet__close"
-                        onClick={onClose}
-                    >
-                        &#10005;
-                    </button>
-                </div>
-
-                <div className="menu-bottom-sheet__section menu-bottom-sheet__score">
-                    <div className="menu-bottom-sheet__score-title">
-                        Твой счёт
-                    </div>
-                    <div className="menu-bottom-sheet__score-amount-block">
-                        <img
-                            className="menu-bottom-sheet__score-img"
-                            src="/images/score.svg"
-                            alt="Иконка очков"
-                        />
-                        <div className="menu-bottom-sheet__score-amount">
-                            710 баллов
-                        </div>
-                    </div>
-                </div>
-
-                <div
-                    className={`menu-bottom-sheet__section menu-bottom-sheet__superpower${isSuperpowerExpanded ? ' menu-bottom-sheet__superpower_expanded' : ''}`}
-                >
-                    <div className="menu-bottom-sheet__superpower-info">
-                        <div className="menu-bottom-sheet__superpower-title">
-                            Активировать суперсилу
-                        </div>
-                        <div className="menu-bottom-sheet__superpower-desc">
-                            Выполни любое задание, чтобы получить много баллов
-                        </div>
-                        <div className="menu-bottom-sheet__superpower-tasks-wrapper">
-                            <div className="menu-bottom-sheet__superpower-tasks">
-                                {tasks.map((task, idx) => (
-                                    <div
-                                        key={task.id}
-                                        className="menu-bottom-sheet__task-item"
-                                        style={{ '--index': idx }}
-                                    >
-                                        <div className="menu-bottom-sheet__task-icon">
-                                            <img
-                                                src="/images/cloudTask.svg"
-                                                alt="task icon"
-                                            />
-                                        </div>
-                                        <div className="menu-bottom-sheet__task-content">
-                                            <div className="menu-bottom-sheet__task-text">
-                                                {task.text}
-                                            </div>
-                                            {idx === 0 && (
-                                                <div className="menu-bottom-sheet__task-label">
-                                                    ежедневное задание
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="menu-bottom-sheet__task-arrow">
-                                            &rarr;
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <button
-                            className={`menu-bottom-sheet__superpower-btn${isSuperpowerExpanded ? ' menu-bottom-sheet__superpower-btn_expanded' : ''}`}
-                            onClick={toggleSuperpower}
-                        >
-                            <span className="menu-bottom-sheet__superpower-btn-content">
-                                {isSuperpowerExpanded
-                                    ? 'Свернуть'
-                                    : 'Показать задания'}
-                                <img
-                                    src="/images/arrow.svg"
-                                    alt="arrow"
-                                    className={`menu-bottom-sheet__superpower-arrow${isSuperpowerExpanded ? ' menu-bottom-sheet__superpower-arrow_rotated' : ''}`}
-                                />
-                            </span>
-                        </button>
-                    </div>
-                    <img
-                        className="menu-bottom-sheet__superpower-img"
-                        src="/images/superpower.svg"
-                        alt="superpower"
+                {showPrizeRules ? (
+                    <PrizeRulesPage
+                        onBack={() => setShowPrizeRules(false)}
+                        onShowModal={() => setShowModal(true)}
                     />
-                </div>
-
-                <div className="menu-bottom-sheet__section menu-bottom-sheet__prizes">
-                    <div className="menu-bottom-sheet__prizes-info">
-                        <div className="menu-bottom-sheet__prizes-title">
-                            Призы
-                        </div>
-                        <div className="menu-bottom-sheet__prizes-desc">
-                            Чем выше твой рейтинг, тем больше шансов на выигрыш
-                            приза
-                        </div>
-                    </div>
-                    <div className="menu-bottom-sheet__prizes-row">
-                        <button className="menu-bottom-sheet__prizes-btn">
-                            Подробнее
-                        </button>
-                    </div>
-                </div>
-
-                <div className="menu-bottom-sheet__section menu-bottom-sheet__rating">
-                    <div className="menu-bottom-sheet__rating-title">
-                        Рейтинг
-                    </div>
-                    <div className="menu-bottom-sheet__rating-list">
-                        <div className="menu-bottom-sheet__rating-item">
-                            <span>352. Другой игрок</span>
-                            <span>
-                                710{' '}
-                                <img
-                                    src="/images/score.svg"
-                                    alt="score"
-                                    className="menu-bottom-sheet__rating-score-icon"
-                                />
-                            </span>
-                        </div>
-                        <div className="menu-bottom-sheet__rating-item menu-bottom-sheet__rating-item_current">
-                            <span>353. Твой результат</span>
-                            <span>
-                                612{' '}
-                                <img
-                                    src="/images/score.svg"
-                                    alt="score"
-                                    className="menu-bottom-sheet__rating-score-icon"
-                                />
-                            </span>
-                        </div>
-                        <div className="menu-bottom-sheet__rating-item">
-                            <span>354. Другой игрок</span>
-                            <span>
-                                598{' '}
-                                <img
-                                    src="/images/score.svg"
-                                    alt="score"
-                                    className="menu-bottom-sheet__rating-score-icon"
-                                />
-                            </span>
-                        </div>
-                    </div>
-                    <div className="menu-bottom-sheet__rating-row">
-                        <button className="menu-bottom-sheet__rating-btn">
-                            Подробнее
-                        </button>
-                    </div>
-                </div>
+                ) : showRatingPage ? (
+                    <RatingPage onBack={() => setShowRatingPage(false)} />
+                ) : (
+                    <>
+                        <MenuBottomSheetHeader onClose={onClose} />
+                        <ScoreSection userScore={userScore} />
+                        <SuperpowerSection
+                            isSuperpowerExpanded={isSuperpowerExpanded}
+                            setIsSuperpowerExpanded={setIsSuperpowerExpanded}
+                            tasks={tasks}
+                            superpowerRef={superpowerRef}
+                        />
+                        <PrizesSection
+                            onShowPrizeRules={() => setShowPrizeRules(true)}
+                        />
+                        <RatingSection
+                            onShowRatingPage={() => setShowRatingPage(true)}
+                        />
+                    </>
+                )}
             </div>
+            {isModalVisible && (
+                <ModalPrizeRules
+                    isOpen={showModal}
+                    onClose={() => setShowModal(false)}
+                />
+            )}
         </div>
     );
 };

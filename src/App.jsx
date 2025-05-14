@@ -23,8 +23,6 @@ const App = () => {
         <>
             <Routes>
                 <Route path="/" element={<GameCanvas />} />
-                <Route path="/rating" element={<Rating />} />
-                <Route path="/tasks" element={<Tasks />} />
                 <Route
                     path="/admin"
                     element={

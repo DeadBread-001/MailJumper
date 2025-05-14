@@ -48,7 +48,10 @@ module.exports = {
             template: './src/index.html',
         }),
         new CopyWebpackPlugin({
-            patterns: [{ from: './public/images/', to: './images' }],
+            patterns: [
+                { from: './public/images/', to: './images' },
+                { from: './src/utils/', to: './' },
+            ],
         }),
     ],
     devServer: {

@@ -16,9 +16,6 @@ export class Background {
             this.game.change_difficulty();
         } else {
             this.y += this.game.vy * deltaTime * this.game.speedMultiplier;
-            this.game.score += Math.trunc(
-                this.game.vy * 0.1 * deltaTime * this.game.speedMultiplier
-            );
         }
     }
 

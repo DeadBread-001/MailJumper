@@ -19,11 +19,23 @@ const GameCanvas = () => {
     const [gamePaused, setGamePaused] = useState(false);
     const [isAuthenticated, setIsAuthenticated] = useState(null);
     const [checkingAuth, setCheckingAuth] = useState(true);
+    const [showRatingPage, setShowRatingPage] = useState(false);
+    const [isSuperpowerExpanded, setIsSuperpowerExpanded] = useState(false);
+    const [wasSuperpowerJustOpened, setWasSuperpowerJustOpened] =
+        useState(false);
+    const [showDeathScreen, setShowDeathScreen] = useState(false);
+    const [lastScore, setLastScore] = useState(0);
+    const [bestScore, setBestScore] = useState(() => {
+        return Number(localStorage.getItem('bestScore') || 0);
+    });
+    const [currentScore, setCurrentScore] = useState(0);
+    const [scoreBump, setScoreBump] = useState(false);
     const animationRef = useRef(null);
     const gameInstance = useRef(null);
     const containerRef = useRef(null);
     const lastTimeRef = useRef(0);
     const autoPaused = useRef(false);
+    const inputHandler = useRef(null);
 
     const isActuallyPaused = gamePaused || autoPaused.current;
 
@@ -48,179 +60,141 @@ const GameCanvas = () => {
         canvas.width = CANVAS_WIDTH;
         canvas.height = CANVAS_HEIGHT;
 
-        class Game {
-            constructor(width, height) {
-                this.width = width;
-                this.height = height;
-                this.vy = 0;
-                this.gameOver = false;
-                this.gameStart = false;
-                this.platforms = [];
-                this.level = 0;
-                this.score = 0;
-                this.object_vx = 3;
-                this.object_max_vx = 6;
-                this.platform_gap = 85;
-                this.platform_max_gap = 175;
-                this.add_platforms(0, this.height - 15);
-                this.add_platforms(-this.height, -15);
-                this.background = new Background(this);
-                this.player = new Player(this);
-                this.inputHandler = new InputHandler(this);
-                this.speedMultiplier = 60;
-                this.playerName = '';
-                this.askForPlayerName();
-                this.scoreSent = false;
-
-                window.addEventListener('auth_success', () => {
+        if (!gameInstance.current) {
+            class Game {
+                constructor(width, height) {
+                    this.width = width;
+                    this.height = height;
+                    this.reset();
+                    this.playerName = '';
                     this.askForPlayerName();
-                });
-
-                window.addEventListener('logout', () => {
-                    this.askForPlayerName();
-                });
-            }
-
-            async askForPlayerName() {
-                try {
-                    const userData = await check();
-                    this.playerName = userData.vkid;
-                    this.isAuthenticated = true;
-                } catch (error) {
-                    this.isAuthenticated = false;
-                } finally {
-                    this.checkingAuth = false;
+                    this.scoreSent = false;
+                    window.addEventListener('auth_success', () => {
+                        this.askForPlayerName();
+                    });
+                    window.addEventListener('logout', () => {
+                        this.askForPlayerName();
+                    });
                 }
-            }
-
-            update(deltaTime) {
-                if (!this.isAuthenticated) return;
-
-                this.background.update(deltaTime);
-                this.platforms.forEach((platform) =>
-                    platform.update(deltaTime)
-                );
-                this.player.update(this.inputHandler, deltaTime);
-
-                this.platforms = this.platforms.filter(
-                    (platform) => !platform.markedForDeletion
-                );
-            }
-
-            draw(context) {
-                this.background.draw(context);
-
-                if (!this.gameStart) {
-                    context.font = 'bold 25px Helvetica';
-                    context.fillStyle = 'black';
-                    context.textAlign = 'center';
-                    if (this.checkingAuth) {
-                        context.fillText(
-                            'ЗАГРУЗКА...',
-                            this.width * 0.5,
-                            this.height * 0.5
-                        );
-                    } else if (!this.isAuthenticated) {
-                        context.fillText(
-                            'НЕОБХОДИМА АВТОРИЗАЦИЯ',
-                            this.width * 0.5,
-                            this.height * 0.45
-                        );
-                        context.fillText(
-                            'ВОЙДИТЕ ЧЕРЕЗ VK ID',
-                            this.width * 0.5,
-                            this.height * 0.55
-                        );
-                    } else {
-                        context.fillText(
-                            'PRESS ENTER TO START',
-                            this.width * 0.5,
-                            this.height * 0.5
-                        );
+                reset() {
+                    this.vy = 0;
+                    this.gameOver = false;
+                    this.gameStart = true;
+                    this.platforms = [];
+                    this.level = 0;
+                    this.score = 0;
+                    this.object_vx = 3;
+                    this.object_max_vx = 6;
+                    this.platform_gap = 200;
+                    this.platform_max_gap = 300;
+                    this.add_platforms(0, this.height - 15);
+                    this.add_platforms(-this.height, -15);
+                    this.background = new Background(this);
+                    this.player = new Player(this);
+                    if (this.inputHandler) this.inputHandler.reset();
+                    this.speedMultiplier = 60;
+                    this.scoreSent = false;
+                }
+                async askForPlayerName() {
+                    try {
+                        const userData = await check();
+                        this.playerName = userData.vkid;
+                        this.isAuthenticated = true;
+                    } catch (error) {
+                        this.isAuthenticated = false;
+                    } finally {
+                        this.checkingAuth = false;
                     }
-                } else {
+                }
+                update(deltaTime) {
+                    if (!this.isAuthenticated) return;
+
+                    this.background.update(deltaTime);
+                    this.platforms.forEach((platform) =>
+                        platform.update(deltaTime)
+                    );
+                    this.player.update(this.inputHandler, deltaTime);
+
+                    this.platforms = this.platforms.filter(
+                        (platform) => !platform.markedForDeletion
+                    );
+                }
+                draw(context) {
+                    this.background.draw(context);
                     this.platforms.forEach((platform) => {
                         platform.draw(context);
                     });
-
                     this.player.draw(context);
-
-                    context.fillStyle = 'black';
-                    context.font = '20px Arial';
-                    context.textAlign = 'start';
-                    context.fillText(`Score: ${this.score}`, 20, 40);
-
                     if (this.gameOver) {
-                        context.font = 'bold 25px Helvetica';
-                        context.fillStyle = 'red';
-                        context.textAlign = 'center';
-                        context.fillText(
-                            `GAME OVER`,
-                            this.width * 0.5,
-                            this.height * 0.5
-                        );
                         if (!this.scoreSent) {
                             sendScore({
                                 name: this.playerName,
                                 score: this.score,
                             });
                             this.scoreSent = true;
+                            setLastScore(this.score);
+                            setShowDeathScreen(true);
+                            if (this.score > bestScore) {
+                                setBestScore(this.score);
+                                localStorage.setItem('bestScore', this.score);
+                            }
                         }
                     }
                 }
-            }
-
-            add_platforms(lowerY, upperY) {
-                do {
-                    let type = 'green';
-
-                    const platform = new Platform(this, lowerY, upperY, type);
-                    this.platforms.unshift(platform);
-                } while (this.platforms[0].y >= lowerY);
-            }
-
-            change_difficulty() {
-                this.level++;
-                if (this.platform_max_gap > this.platform_gap) {
-                    this.platform_gap += 5;
+                add_platforms(lowerY, upperY) {
+                    let isFirstPlatform = this.platforms.length === 0;
+                    do {
+                        if (isFirstPlatform || Math.random() > 0.8) {
+                            let type = 'green';
+                            const platform = new Platform(
+                                this,
+                                lowerY,
+                                upperY,
+                                type
+                            );
+                            this.platforms.unshift(platform);
+                            isFirstPlatform = false;
+                        }
+                    } while (
+                        this.platforms.length > 0 &&
+                        this.platforms[0].y >= lowerY
+                    );
                 }
-                if (
-                    this.level % 8 === 0 &&
-                    this.object_max_vx > this.object_vx
-                ) {
-                    this.object_vx++;
+                change_difficulty() {
+                    this.level++;
+                    if (this.platform_max_gap > this.platform_gap) {
+                        this.platform_gap += 5;
+                    }
+                    if (
+                        this.level % 8 === 0 &&
+                        this.object_max_vx > this.object_vx
+                    ) {
+                        this.object_vx++;
+                    }
                 }
             }
+            gameInstance.current = new Game(CANVAS_WIDTH, CANVAS_HEIGHT);
         }
-
-        let game = gameInstance.current;
-        if (!game) {
-            game = new Game(canvas.width, canvas.height);
-            gameInstance.current = game;
+        if (!inputHandler.current) {
+            inputHandler.current = new InputHandler(gameInstance.current);
+            gameInstance.current.inputHandler = inputHandler.current;
         }
 
         function animate(timestamp) {
             if (!lastTimeRef.current) lastTimeRef.current = timestamp;
             let deltaTime = (timestamp - lastTimeRef.current) / 1000;
             lastTimeRef.current = timestamp;
-
-            if (deltaTime > 0.1) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                game.draw(ctx);
-                animationRef.current = requestAnimationFrame(animate);
-                return;
-            }
-
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const isActuallyPaused = gamePaused || autoPaused.current;
-            if (game.gameStart && !isActuallyPaused) game.update(deltaTime);
-            game.draw(ctx);
+            if (gameInstance.current.gameStart && !isActuallyPaused)
+                gameInstance.current.update(deltaTime);
+            gameInstance.current.draw(ctx);
+            setCurrentScore(gameInstance.current.score);
             animationRef.current = requestAnimationFrame(animate);
         }
 
         animationRef.current = requestAnimationFrame(animate);
 
-        // --- Автопауза при потере фокуса ---
         const handleBlur = () => {
             autoPaused.current = true;
         };
@@ -234,8 +208,14 @@ const GameCanvas = () => {
         return () => {
             if (animationRef.current)
                 cancelAnimationFrame(animationRef.current);
-            window.removeEventListener('auth_success', game.askForPlayerName);
-            window.removeEventListener('logout', game.askForPlayerName);
+            window.removeEventListener(
+                'auth_success',
+                gameInstance.current.askForPlayerName
+            );
+            window.removeEventListener(
+                'logout',
+                gameInstance.current.askForPlayerName
+            );
             window.removeEventListener('blur', handleBlur);
             window.removeEventListener('focus', handleFocus);
         };
@@ -260,11 +240,29 @@ const GameCanvas = () => {
     const handleCloseMenu = () => {
         setMenuOpen(false);
         setGamePaused(false);
+        if (gameInstance.current) {
+            gameInstance.current.gameStart = true;
+            gameInstance.current.gameOver = false;
+        }
     };
-    const handleNavigate = (section) => {
-        // Здесь можно реализовать переходы по разделам меню
-        // Например, через react-router или window.location
+
+    const handleRestart = () => {
+        gameInstance.current.reset();
+        setShowDeathScreen(false);
     };
+    const handleMenu = () => {
+        if (gameInstance.current) gameInstance.current.reset();
+        setShowDeathScreen(false);
+        setMenuOpen(true);
+        setGamePaused(true);
+    };
+
+    useEffect(() => {
+        if (scoreBump) return;
+        setScoreBump(true);
+        const timeout = setTimeout(() => setScoreBump(false), 250);
+        return () => clearTimeout(timeout);
+    }, [currentScore]);
 
     if (checkingAuth) {
         return (
@@ -313,48 +311,154 @@ const GameCanvas = () => {
 
     return (
         <div ref={containerRef} className="game-canvas-container">
-            <canvas id="canvas1" className="game-canvas"></canvas>
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+                <canvas id="canvas1" className="game-canvas"></canvas>
+                <div className="game-score-block">
+                    <img
+                        src="/images/score.svg"
+                        alt="score"
+                        className="game-score-icon"
+                    />
+                    <span
+                        className={`game-score-value${scoreBump ? ' game-score-value-bump' : ''}`}
+                    >
+                        {currentScore}
+                    </span>
+                </div>
+            </div>
+            {showDeathScreen && (
+                <div className="death-screen-overlay">
+                    <div className="death-screen-window">
+                        <div className="death-score-top">
+                            <img
+                                src="/images/score.svg"
+                                alt="score"
+                                className="death-score-icon-large"
+                            />
+                            <span className="death-score-value-large">
+                                {lastScore}
+                            </span>
+                        </div>
+                        <img
+                            src="/images/scoreByte.svg"
+                            alt="byte"
+                            className="death-byte-img"
+                        />
+                        <div className="death-score-label-large">
+                            Попробуешь побить рекорд?
+                        </div>
+                        <div className="death-best-score-block">
+                            <span className="death-best-score-label">
+                                Твой рекорд
+                            </span>
+                            <img
+                                src="/images/score.svg"
+                                alt="score"
+                                className="death-best-score-icon"
+                            />
+                            <span className="death-best-score-value">
+                                {bestScore}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )}
             <div
                 className={`game-canvas__controls${gamePaused ? ' game-canvas__controls_paused' : ''}`}
             >
-                {!gamePaused && (
-                    <button
-                        className={`game-canvas__superpower-btn${gamePaused ? ' game-canvas__superpower-btn_hidden' : ''}`}
-                        onClick={() => {
-                            /* TODO: Здесь в общем сила активируется */
-                        }}
-                        aria-label="Активировать суперсилу"
-                    >
-                        <img src="/images/activatePower.svg" alt="Суперсила" />
-                        Активировать суперсилу
-                    </button>
+                {showDeathScreen ? (
+                    <>
+                        <button className="death-menu-btn" onClick={handleMenu}>
+                            В меню
+                        </button>
+                        <button
+                            className="death-restart-btn"
+                            onClick={handleRestart}
+                        >
+                            <img src="/images/restart.svg" alt="restart" />
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        {!gamePaused && !showRatingPage && (
+                            <button
+                                className={`game-canvas__superpower-btn${gamePaused ? ' game-canvas__superpower-btn_hidden' : ''}`}
+                                onClick={() => {
+                                    /* TODO: Здесь в общем сила активируется */
+                                }}
+                                aria-label="Активировать суперсилу"
+                            >
+                                <img
+                                    src="/images/activatePower.svg"
+                                    alt="Суперсила"
+                                />
+                                Активировать суперсилу
+                            </button>
+                        )}
+                        <button
+                            className={`game-canvas__pause-btn${gamePaused ? ' game-canvas__pause-btn_paused' : ''}${showRatingPage ? ' game-canvas__pause-btn_wide' : ''}`}
+                            onClick={
+                                showRatingPage
+                                    ? () => {
+                                          setShowRatingPage(false);
+                                          setMenuOpen(true);
+                                          setIsSuperpowerExpanded(false);
+                                          setWasSuperpowerJustOpened(false);
+                                          setTimeout(() => {
+                                              setIsSuperpowerExpanded(true);
+                                              setWasSuperpowerJustOpened(true);
+                                          }, 300);
+                                      }
+                                    : gamePaused
+                                      ? handleCloseMenu
+                                      : handlePause
+                            }
+                            aria-label={
+                                gamePaused
+                                    ? showRatingPage
+                                        ? 'Повысить шансы'
+                                        : 'Играть'
+                                    : 'Пауза'
+                            }
+                        >
+                            {showRatingPage ? (
+                                <>
+                                    <span className="game-canvas__pause-btn-text">
+                                        Повысить шансы
+                                    </span>
+                                    <img
+                                        src="/images/play.svg"
+                                        alt="Повысить шансы"
+                                    />
+                                </>
+                            ) : gamePaused ? (
+                                <>
+                                    <span className="game-canvas__pause-btn-text">
+                                        Играть
+                                    </span>
+                                    <img src="/images/play.svg" alt="Играть" />
+                                </>
+                            ) : (
+                                <img src="/images/pause.svg" alt="Пауза" />
+                            )}
+                        </button>
+                    </>
                 )}
-                <button
-                    className={`game-canvas__pause-btn${gamePaused ? ' game-canvas__pause-btn_paused' : ''}`}
-                    onClick={gamePaused ? handleCloseMenu : handlePause}
-                    aria-label={gamePaused ? 'Играть' : 'Пауза'}
-                >
-                    {gamePaused ? (
-                        <>
-                            <span className="game-canvas__pause-btn-text">
-                                Играть
-                            </span>
-                            <img src="/images/play.svg" alt="Играть" />
-                        </>
-                    ) : (
-                        <img src="/images/pause.svg" alt="Пауза" />
-                    )}
-                </button>
             </div>
             <MenuBottomSheet
                 isOpen={menuOpen}
                 onClose={handleCloseMenu}
-                onNavigate={handleNavigate}
                 userPlace={353}
                 userScore={710}
                 userRank={353}
                 userTasks={5}
                 userTotal={6589}
+                showRatingPage={showRatingPage}
+                setShowRatingPage={setShowRatingPage}
+                isSuperpowerExpanded={isSuperpowerExpanded}
+                setIsSuperpowerExpanded={setIsSuperpowerExpanded}
+                wasSuperpowerJustOpened={wasSuperpowerJustOpened}
+                setWasSuperpowerJustOpened={setWasSuperpowerJustOpened}
             />
         </div>
     );

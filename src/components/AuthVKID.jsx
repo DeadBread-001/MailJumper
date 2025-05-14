@@ -23,7 +23,7 @@ const AuthVKID = ({ onLoginSuccess }) => {
     useEffect(() => {
         const initVKID = async () => {
             const container = document.getElementById('VkIdSdkOneTap');
-            if (!container || oneTapRef.current) return; // уже инициализировано
+            if (!container || oneTapRef.current) return;
 
             const codeVerifier = generateCodeVerifier();
             const state = generateState();
