@@ -25,26 +25,21 @@ export class ResourceLoader {
             const img = new Image();
 
             img.onload = () => {
-                console.log(`Loaded image: ${src}`);
                 this.loadedImages[key] = img;
                 this.loadedCount++;
                 resolve(img);
             };
 
             img.onerror = (error) => {
-                console.error(`Failed to load image: ${src}`, error);
                 this.failedImages.push(src);
-                // Пробуем загрузить изображение еще раз
                 setTimeout(() => {
                     const retryImg = new Image();
                     retryImg.onload = () => {
-                        console.log(`Retry successful for: ${src}`);
                         this.loadedImages[key] = retryImg;
                         this.loadedCount++;
                         resolve(retryImg);
                     };
                     retryImg.onerror = () => {
-                        console.error(`Retry failed for: ${src}`);
                         reject(
                             new Error(
                                 `Failed to load image after retry: ${src}`
@@ -55,17 +50,14 @@ export class ResourceLoader {
                 }, 1000);
             };
 
-            // Устанавливаем таймаут на загрузку
             const timeout = setTimeout(() => {
                 if (!img.complete) {
-                    console.warn(`Loading timeout for: ${src}`);
-                    img.src = src; // Пробуем перезагрузить
+                    img.src = src;
                 }
             }, 5000);
 
             img.onload = () => {
                 clearTimeout(timeout);
-                console.log(`Loaded image: ${src}`);
                 this.loadedImages[key] = img;
                 this.loadedCount++;
                 resolve(img);
@@ -76,14 +68,12 @@ export class ResourceLoader {
     }
 
     async loadAll() {
-        console.log('Starting to load all images...');
         const promises = Object.entries(this.images).map(([key, src]) =>
             this.loadImage(key, src)
         );
 
         try {
             await Promise.all(promises);
-            console.log('All images loaded successfully');
             if (this.failedImages.length > 0) {
                 console.warn('Some images failed to load:', this.failedImages);
             }
