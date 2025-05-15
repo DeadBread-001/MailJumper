@@ -15,15 +15,15 @@ const deleteOldCaches = async () => {
     );
 };
 
-const fromCache = async (key, cacheName) => {
+const fromCache = async (request, cacheName) => {
     const cache = await caches.open(cacheName);
-    const cachedResponse = await cache.match(key);
+    const cachedResponse = await cache.match(request);
     return cachedResponse || Promise.reject('no response in cache');
 };
 
 const update = async (request) => {
     try {
-        if (request.url.indexOf('http') === 0) {
+        if (request.url.startsWith('http')) {
             const cache = await caches.open(CACHE_NAME);
             const response = await fetch(request);
             cache.put(request, response.clone());
@@ -37,16 +37,13 @@ const cacheFirstAndUpdate = (event) => {
     event.respondWith(
         (async () => {
             try {
-                const cachedResponse = await fromCache(
-                    event.request,
-                    CACHE_NAME
-                );
+                const cachedResponse = await fromCache(event.request, CACHE_NAME);
                 update(event.request);
                 return cachedResponse;
             } catch (e) {
                 const cache = await caches.open(CACHE_NAME);
                 const response = await fetch(event.request);
-                if (event.url.indexOf('http') === 0) {
+                if (event.request.url.startsWith('http')) {
                     cache.put(event.request, response.clone());
                 }
                 return response;
@@ -61,7 +58,7 @@ const networkFirst = (event) => {
             const cache = await caches.open(CACHE_NAME);
             try {
                 const response = await fetch(event.request);
-                if (request.url.indexOf('http') === 0) {
+                if (event.request.url.startsWith('http')) {
                     cache.put(event.request, response.clone());
                 }
                 return response;
@@ -78,12 +75,12 @@ const nonGetRequestNetworkFirst = (event) => {
             const cache = await caches.open(CACHE_NAME_DYNAMIC);
             try {
                 const response = await fetch(event.request);
-                if (request.url.indexOf('http') === 0) {
+                if (event.request.url.startsWith('http')) {
                     cache.put(event.request, response.clone());
                 }
                 return response;
             } catch (e) {
-                return fromCache(event.request.url, CACHE_NAME_DYNAMIC);
+                return fromCache(event.request, CACHE_NAME_DYNAMIC);
             }
         })()
     );
@@ -91,7 +88,6 @@ const nonGetRequestNetworkFirst = (event) => {
 
 self.addEventListener('install', (e) => {
     self.skipWaiting();
-
     e.waitUntil(
         caches.open(CACHE_NAME).then((cache) => cache.addAll(CACHE_URLS))
     );
@@ -102,6 +98,8 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
+    if (!e.request.url.startsWith('http')) return;
+
     if (e.request.method !== 'GET') {
         nonGetRequestNetworkFirst(e);
         return;
