@@ -1,8 +1,6 @@
 import React from 'react';
 import GameCanvas from './components/GameCanvas';
 import { Route, Routes, Navigate } from 'react-router-dom';
-import Rating from './components/Rating';
-import Tasks from './components/Tasks';
 import AdminPanel from './components/admin/AdminPanel';
 
 // Временная функция для проверки прав доступа
