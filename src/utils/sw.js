@@ -37,7 +37,10 @@ const cacheFirstAndUpdate = (event) => {
     event.respondWith(
         (async () => {
             try {
-                const cachedResponse = await fromCache(event.request, CACHE_NAME);
+                const cachedResponse = await fromCache(
+                    event.request,
+                    CACHE_NAME
+                );
                 update(event.request);
                 return cachedResponse;
             } catch (e) {
@@ -72,15 +75,20 @@ const networkFirst = (event) => {
 const nonGetRequestNetworkFirst = (event) => {
     event.respondWith(
         (async () => {
-            const cache = await caches.open(CACHE_NAME_DYNAMIC);
             try {
-                const response = await fetch(event.request);
-                if (event.request.url.startsWith('http')) {
-                    cache.put(event.request, response.clone());
-                }
-                return response;
+                return await fetch(event.request);
             } catch (e) {
-                return fromCache(event.request, CACHE_NAME_DYNAMIC);
+                if (event.request.method === 'GET') {
+                    try {
+                        return await fromCache(
+                            event.request,
+                            CACHE_NAME_DYNAMIC
+                        );
+                    } catch {
+                        return new Response('Offline', { status: 503 });
+                    }
+                }
+                return new Response('Offline', { status: 503 });
             }
         })()
     );
