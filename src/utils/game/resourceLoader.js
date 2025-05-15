@@ -12,7 +12,7 @@ export class ResourceLoader {
             cloud2: '/images/cloud2.svg',
             cloud3: '/images/cloud3.svg',
             cloud4: '/images/cloud4.svg',
-            cloud5: '/images/cloud5.svg'
+            cloud5: '/images/cloud5.svg',
         };
         this.loadedImages = {};
         this.totalImages = Object.keys(this.images).length;
@@ -23,7 +23,7 @@ export class ResourceLoader {
     loadImage(key, src) {
         return new Promise((resolve, reject) => {
             const img = new Image();
-            
+
             img.onload = () => {
                 console.log(`Loaded image: ${src}`);
                 this.loadedImages[key] = img;
@@ -45,7 +45,11 @@ export class ResourceLoader {
                     };
                     retryImg.onerror = () => {
                         console.error(`Retry failed for: ${src}`);
-                        reject(new Error(`Failed to load image after retry: ${src}`));
+                        reject(
+                            new Error(
+                                `Failed to load image after retry: ${src}`
+                            )
+                        );
                     };
                     retryImg.src = src;
                 }, 1000);
@@ -73,10 +77,10 @@ export class ResourceLoader {
 
     async loadAll() {
         console.log('Starting to load all images...');
-        const promises = Object.entries(this.images).map(([key, src]) => 
+        const promises = Object.entries(this.images).map(([key, src]) =>
             this.loadImage(key, src)
         );
-        
+
         try {
             await Promise.all(promises);
             console.log('All images loaded successfully');

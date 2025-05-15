@@ -58,7 +58,7 @@ const GameCanvas = () => {
     }, []);
 
     useEffect(() => {
-        if (!isAuthenticated) return;
+        if (!isAuthenticated || checkingAuth) return;
 
         const loadResources = async () => {
             const success = await resourceLoader.current.loadAll();
@@ -74,7 +74,7 @@ const GameCanvas = () => {
         loadResources();
 
         return () => clearInterval(progressInterval);
-    }, [isAuthenticated]);
+    }, [isAuthenticated, checkingAuth]);
 
     useEffect(() => {
         if (!isAuthenticated || isLoading) return;
@@ -313,7 +313,35 @@ const GameCanvas = () => {
             </div>
         );
     }
-
+    if (!isAuthenticated) {
+        return (
+            <div
+                style={{
+                    width: '100vw',
+                    height: '100vh',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background:
+                        'linear-gradient(180deg, #eaf6ff 0%, #cbe7ff 100%)',
+                }}
+            >
+                <div
+                    style={{
+                        background: '#fff',
+                        borderRadius: 16,
+                        boxShadow: '0 2px 16px rgba(0,0,0,0.08)',
+                        padding: 32,
+                        minWidth: 320,
+                        textAlign: 'center',
+                    }}
+                >
+                    <h2 style={{ marginBottom: 24 }}>Вход через VK ID</h2>
+                    <AuthVKID onLoginSuccess={() => window.location.reload()} />
+                </div>
+            </div>
+        );
+    }
     if (isLoading) {
         return (
             <div
@@ -359,36 +387,6 @@ const GameCanvas = () => {
                         />
                     </div>
                     <div>{Math.round(loadingProgress)}%</div>
-                </div>
-            </div>
-        );
-    }
-
-    if (!isAuthenticated) {
-        return (
-            <div
-                style={{
-                    width: '100vw',
-                    height: '100vh',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background:
-                        'linear-gradient(180deg, #eaf6ff 0%, #cbe7ff 100%)',
-                }}
-            >
-                <div
-                    style={{
-                        background: '#fff',
-                        borderRadius: 16,
-                        boxShadow: '0 2px 16px rgba(0,0,0,0.08)',
-                        padding: 32,
-                        minWidth: 320,
-                        textAlign: 'center',
-                    }}
-                >
-                    <h2 style={{ marginBottom: 24 }}>Вход через VK ID</h2>
-                    <AuthVKID onLoginSuccess={() => window.location.reload()} />
                 </div>
             </div>
         );
