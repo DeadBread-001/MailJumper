@@ -48,13 +48,16 @@ module.exports = {
             template: './src/index.html',
         }),
         new CopyWebpackPlugin({
-            patterns: [{ from: './public/images/', to: './images' }],
+            patterns: [
+                { from: './public/images/', to: './images' },
+                { from: './src/utils/', to: './' },
+            ],
         }),
     ],
     devServer: {
         static: path.join(__dirname, 'dist'),
         compress: true,
-        port: 3000,
+        port: 80,
         historyApiFallback: true,
     },
     mode: 'development',

@@ -1,18 +1,11 @@
-import { Bullet } from './bullet.js';
-import { getSelectedCharacter } from './characterData';
+import { getSelectedCharacter } from '../characterData';
 
 export class Player {
-    constructor(game) {
+    constructor(game, resourceLoader) {
         this.game = game;
-        this.sizeModifier = 0.2;
-        this.bodyWidth = 395 * this.sizeModifier;
-        this.bodyHeight = 332 * this.sizeModifier;
-
-        this.hatWidth = 395 * this.sizeModifier;
-        this.hatHeight = 156 * this.sizeModifier;
-
-        this.width = this.bodyWidth;
-        this.height = this.bodyHeight + this.hatHeight;
+        this.sizeModifier = 1;
+        this.width = 86.8320083618164 * this.sizeModifier;
+        this.height = 92.63623046875 * this.sizeModifier;
         this.x =
             this.game.platforms
                 .filter((platform) => platform.type === 'green')
@@ -28,40 +21,52 @@ export class Player {
         this.weight = 0.5;
         this.vx = 0;
         this.max_vx = 8;
-        this.bullets = [];
+        this.rotation = 0;
+        this.direction = 1;
+        this.isJumping = false;
 
-        const { body, hat } = getSelectedCharacter();
-
-        this.bodyImage = new Image();
-        this.bodyImage.src = `/images/${body}`;
-
-        this.hatImage = new Image();
-        this.hatImage.src = `/images/${hat}`;
+        this.image = resourceLoader.getImage('byte');
     }
 
-    update(inputHandler) {
-        this.x += this.vx;
+    update(inputHandler, deltaTime) {
+        this.x += this.vx * deltaTime * this.game.speedMultiplier;
+
         if (inputHandler.keys.includes('ArrowLeft')) {
             this.vx = -this.max_vx;
+            this.direction = -1;
         } else if (inputHandler.keys.includes('ArrowRight')) {
             this.vx = this.max_vx;
+            this.direction = 1;
         } else this.vx = 0;
 
         if (this.x < -this.width / 2) this.x = this.game.width - this.width / 2;
         if (this.x + this.width / 2 > this.game.width) this.x = -this.width / 2;
 
-        if (this.vy > this.weight) {
-            let platformType = this.onPlatform();
-            if (
-                platformType === 'white' ||
-                platformType === 'blue' ||
-                platformType === 'green'
-            )
-                this.vy = this.min_vy;
+        if (this.vy < 0) {
+            this.rotation = Math.max(this.rotation - 2, -30);
+        } else if (this.vy > 0) {
+            this.rotation = Math.min(this.rotation + 2, 30);
+        } else {
+            if (this.rotation > 0) {
+                this.rotation = Math.max(this.rotation - 1, 0);
+            } else if (this.rotation < 0) {
+                this.rotation = Math.min(this.rotation + 1, 0);
+            }
         }
 
-        if (this.vy < this.max_vy) this.vy += this.weight;
-        if (this.y > this.min_y || this.vy > this.weight) this.y += this.vy;
+        if (this.vy > this.weight) {
+            let platformType = this.onPlatform();
+            if (platformType === 'green') {
+                this.vy = this.min_vy;
+                this.isJumping = true;
+            }
+        }
+
+        if (this.vy < this.max_vy)
+            this.vy += this.weight * deltaTime * this.game.speedMultiplier;
+
+        if (this.y > this.min_y || this.vy > this.weight)
+            this.y += this.vy * deltaTime * this.game.speedMultiplier;
 
         if (this.y <= this.min_y && this.vy < this.weight)
             this.game.vy = -this.vy;
@@ -74,34 +79,23 @@ export class Player {
         if (this.y > this.game.height && !this.game.gameOver) {
             this.game.gameOver = true;
         }
-
-        if (inputHandler.bulletKeyCount > 0) {
-            inputHandler.bulletKeyCount--;
-            this.bullets.push(new Bullet(this));
-        }
-
-        this.bullets.forEach((bullet) => bullet.update());
-        this.bullets = this.bullets.filter(
-            (bullet) => !bullet.markedForDeletion
-        );
     }
 
     draw(context) {
-        this.bullets.forEach((bullet) => bullet.draw(context));
+        context.save();
+        context.translate(this.x + this.width / 2, this.y + this.height / 2);
+        const adjustedRotation =
+            this.direction === 1 ? this.rotation : -this.rotation;
+        context.rotate((adjustedRotation * Math.PI) / 180);
+        context.scale(this.direction, 1);
         context.drawImage(
-            this.hatImage,
-            this.x,
-            this.y,
-            this.hatWidth,
-            this.hatHeight
+            this.image,
+            -this.width / 2,
+            -this.height / 2,
+            this.width,
+            this.height
         );
-        context.drawImage(
-            this.bodyImage,
-            this.x,
-            this.y + this.hatHeight,
-            this.bodyWidth,
-            this.bodyHeight
-        );
+        context.restore();
     }
 
     collision() {
@@ -112,16 +106,6 @@ export class Player {
             width: this.width - 30,
             height: this.height,
         };
-        this.game.enemies.forEach((enemy) => {
-            if (
-                playerHitBox.x < enemy.x + enemy.width &&
-                playerHitBox.x + playerHitBox.width > enemy.x &&
-                playerHitBox.y < enemy.y + enemy.height &&
-                playerHitBox.height + playerHitBox.y > enemy.y
-            ) {
-                result = true;
-            }
-        });
         return result;
     }
 
@@ -144,12 +128,13 @@ export class Player {
             const Y_test =
                 platform.y - (playerHitBox.y + playerHitBox.height) <= 0 &&
                 platform.y - (playerHitBox.y + playerHitBox.height) >=
-                    -platform.height;
+                    -platform.height / 2;
 
             if (X_test && Y_test) {
                 type = platform.type;
-                platform.markedForDeletion =
-                    type === 'brown' || type === 'white';
+                if (type === 'green') {
+                    platform.triggerScoreEffect();
+                }
             }
         });
 

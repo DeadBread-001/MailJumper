@@ -1,290 +1,490 @@
-import { useEffect } from 'react';
-import { Background } from '../utils/background';
-import { Player } from '../utils/player';
+import React, { useEffect, useState, useRef } from 'react';
+import { Background } from '../utils/game/background';
+import { Player } from '../utils/game/player';
 import { InputHandler } from '../utils/input';
-import { Enemy } from '../utils/enemy';
-import { Platform } from '../utils/platform';
-import { Money } from '../utils/money';
+import { Platform } from '../utils/game/platform';
 import { sendScore } from '../api/game';
 import { check } from '../api/auth';
 import CharacterSelection from './CharacterSelection';
+import MenuBottomSheet from './MenuBottomSheet';
+import AuthVKID from './AuthVKID';
+import '../styles/menuBottomSheet.scss';
+import '../styles/gameCanvas.scss';
+import { ResourceLoader } from '../utils/game/resourceLoader';
+
+const CANVAS_WIDTH = 500;
+const CANVAS_HEIGHT = 765;
 
 const GameCanvas = () => {
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [gamePaused, setGamePaused] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(null);
+    const [checkingAuth, setCheckingAuth] = useState(true);
+    const [showRatingPage, setShowRatingPage] = useState(false);
+    const [isSuperpowerExpanded, setIsSuperpowerExpanded] = useState(false);
+    const [wasSuperpowerJustOpened, setWasSuperpowerJustOpened] =
+        useState(false);
+    const [showDeathScreen, setShowDeathScreen] = useState(false);
+    const [lastScore, setLastScore] = useState(0);
+    const [bestScore, setBestScore] = useState(() => {
+        return Number(localStorage.getItem('bestScore') || 0);
+    });
+    const [currentScore, setCurrentScore] = useState(0);
+    const [scoreBump, setScoreBump] = useState(false);
+    const [loadingProgress, setLoadingProgress] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const animationRef = useRef(null);
+    const gameInstance = useRef(null);
+    const containerRef = useRef(null);
+    const lastTimeRef = useRef(0);
+    const autoPaused = useRef(false);
+    const inputHandler = useRef(null);
+    const resourceLoader = useRef(new ResourceLoader());
+
+    const isActuallyPaused = gamePaused || autoPaused.current;
+
     useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                await check();
+                setIsAuthenticated(true);
+            } catch {
+                setIsAuthenticated(false);
+            } finally {
+                setCheckingAuth(false);
+            }
+        };
+        checkAuth();
+    }, []);
+
+    useEffect(() => {
+        if (!isAuthenticated || checkingAuth) return;
+
+        const loadResources = async () => {
+            const success = await resourceLoader.current.loadAll();
+            if (success) {
+                setIsLoading(false);
+            }
+        };
+
+        const progressInterval = setInterval(() => {
+            setLoadingProgress(resourceLoader.current.getProgress());
+        }, 100);
+
+        loadResources();
+
+        return () => clearInterval(progressInterval);
+    }, [isAuthenticated, checkingAuth]);
+
+    useEffect(() => {
+        if (!isAuthenticated || isLoading) return;
         const canvas = document.querySelector('#canvas1');
         const ctx = canvas.getContext('2d');
-        canvas.width = 532;
-        canvas.height = 850;
+        canvas.width = CANVAS_WIDTH;
+        canvas.height = CANVAS_HEIGHT;
 
-        class Game {
-            constructor(width, height) {
-                this.width = width;
-                this.height = height;
-                this.vy = 0;
-                this.gameOver = false;
-                this.gameStart = false;
-                this.platforms = [];
-                this.enemies = [];
-                this.money = [];
-                this.level = 0;
-                this.score = 0;
-                this.coins = 0;
-                this.enemyChance = 0;
-                this.enemyMaxChance = 50;
-                this.moneyChance = 15;
-                this.moneyMaxChance = 30;
-                this.object_vx = 3;
-                this.object_max_vx = 6;
-                this.platform_gap = 85;
-                this.platform_max_gap = 175;
-                this.blue_white_platform_chance = 0;
-                this.blue_white_platform_max_chance = 85;
-                this.add_platforms(0, this.height - 15);
-                this.add_broken_platforms(0, this.height - 15);
-                this.add_platforms(-this.height, -15);
-                this.add_broken_platforms(-this.height, -15);
-                this.background = new Background(this);
-                this.player = new Player(this);
-                this.inputHandler = new InputHandler(this);
-                this.isAuthenticated = false;
-                this.checkingAuth = true;
-                this.askForPlayerName();
-
-                window.addEventListener('auth_success', () => {
+        if (!gameInstance.current) {
+            class Game {
+                constructor(width, height) {
+                    this.width = width;
+                    this.height = height;
+                    this.reset();
+                    this.playerName = '';
                     this.askForPlayerName();
-                });
-
-                window.addEventListener('logout', () => {
-                    this.askForPlayerName();
-                });
-            }
-
-            async askForPlayerName() {
-                try {
-                    const userData = await check();
-                    this.playerName = userData.vkid;
-                    this.isAuthenticated = true;
-                } catch (error) {
-                    this.isAuthenticated = false;
-                } finally {
-                    this.checkingAuth = false;
+                    this.scoreSent = false;
+                    window.addEventListener('auth_success', () => {
+                        this.askForPlayerName();
+                    });
+                    window.addEventListener('logout', () => {
+                        this.askForPlayerName();
+                    });
                 }
-            }
-
-            update() {
-                if (!this.isAuthenticated) return;
-
-                this.background.update();
-
-                this.platforms.forEach((platform) => {
-                    platform.update();
-                });
-
-                this.player.update(this.inputHandler);
-
-                this.enemies.forEach((enemy) => {
-                    enemy.update();
-                });
-
-                this.money.forEach((coin) => {
-                    coin.update();
-                    if (
-                        this.player.x < coin.x + coin.width &&
-                        this.player.x + this.player.width > coin.x &&
-                        this.player.y < coin.y + coin.height &&
-                        this.player.y + this.player.height > coin.y
-                    ) {
-                        coin.markedForDeletion = true;
-                        this.coins++;
+                reset() {
+                    this.vy = 0;
+                    this.gameOver = false;
+                    this.gameStart = true;
+                    this.platforms = [];
+                    this.level = 0;
+                    this.score = 0;
+                    this.object_vx = 3;
+                    this.object_max_vx = 6;
+                    this.platform_gap = 200;
+                    this.platform_max_gap = 300;
+                    this.add_platforms(0, this.height - 15);
+                    this.add_platforms(-this.height, -15);
+                    this.background = new Background(
+                        this,
+                        resourceLoader.current
+                    );
+                    this.player = new Player(this, resourceLoader.current);
+                    if (this.inputHandler) this.inputHandler.reset();
+                    this.speedMultiplier = 60;
+                    this.scoreSent = false;
+                }
+                async askForPlayerName() {
+                    try {
+                        const userData = await check();
+                        this.playerName = userData.vkid;
+                        this.isAuthenticated = true;
+                    } catch (error) {
+                        this.isAuthenticated = false;
+                    } finally {
+                        this.checkingAuth = false;
                     }
-                });
+                }
+                update(deltaTime) {
+                    if (!this.isAuthenticated) return;
 
-                this.platforms = this.platforms.filter(
-                    (platform) => !platform.markedForDeletion
-                );
-                this.enemies = this.enemies.filter(
-                    (enemy) => !enemy.markedForDeletion
-                );
-                this.money = this.money.filter(
-                    (coin) => !coin.markedForDeletion
-                );
-            }
+                    this.background.update(deltaTime);
+                    this.platforms.forEach((platform) =>
+                        platform.update(deltaTime)
+                    );
+                    this.player.update(this.inputHandler, deltaTime);
 
-            draw(context) {
-                this.background.draw(context);
-
-                if (!this.gameStart) {
-                    context.font = 'bold 25px Helvetica';
-                    context.fillStyle = 'black';
-                    context.textAlign = 'center';
-                    if (this.checkingAuth) {
-                        context.fillText(
-                            'ЗАГРУЗКА...',
-                            this.width * 0.5,
-                            this.height * 0.5
-                        );
-                    } else if (!this.isAuthenticated) {
-                        context.fillText(
-                            'НЕОБХОДИМА АВТОРИЗАЦИЯ',
-                            this.width * 0.5,
-                            this.height * 0.45
-                        );
-                        context.fillText(
-                            'ВОЙДИТЕ ЧЕРЕЗ VK ID',
-                            this.width * 0.5,
-                            this.height * 0.55
-                        );
-                    } else {
-                        context.fillText(
-                            'PRESS ENTER TO START',
-                            this.width * 0.5,
-                            this.height * 0.5
-                        );
-                    }
-                } else {
+                    this.platforms = this.platforms.filter(
+                        (platform) => !platform.markedForDeletion
+                    );
+                }
+                draw(context) {
+                    this.background.draw(context);
                     this.platforms.forEach((platform) => {
                         platform.draw(context);
                     });
-
-                    this.money.forEach((coin) => {
-                        coin.draw(context);
-                    });
-
                     this.player.draw(context);
-
-                    this.enemies.forEach((enemy) => {
-                        enemy.draw(context);
-                    });
-
-                    context.fillStyle = 'black';
-                    context.font = '20px Arial';
-                    context.textAlign = 'start';
-                    context.fillText(`Score: ${this.score}`, 20, 40);
-                    context.fillText(`Coins: ${this.coins}`, 20, 70);
-
                     if (this.gameOver) {
-                        context.font = 'bold 25px Helvetica';
-                        context.fillStyle = 'red';
-                        context.textAlign = 'center';
-                        context.fillText(
-                            `GAME OVER`,
-                            this.width * 0.5,
-                            this.height * 0.5
-                        );
-                        sendScore({
-                            name: this.playerName,
-                            score: this.score,
-                            money: this.coins,
-                        });
+                        if (!this.scoreSent) {
+                            sendScore({
+                                name: this.playerName,
+                                score: this.score,
+                            });
+                            this.scoreSent = true;
+                            setLastScore(this.score);
+                            setShowDeathScreen(true);
+                            if (this.score > bestScore) {
+                                setBestScore(this.score);
+                                localStorage.setItem('bestScore', this.score);
+                            }
+                        }
                     }
                 }
-            }
-
-            add_enemy() {
-                this.enemies.push(new Enemy(this));
-            }
-
-            add_platforms(lowerY, upperY) {
-                do {
-                    let type = 'green';
-                    if (Math.random() < this.blue_white_platform_chance / 100) {
-                        type = Math.random() < 0.5 ? 'blue' : 'white';
-                    }
-
-                    const platform = new Platform(this, lowerY, upperY, type);
-                    this.platforms.unshift(platform);
-
-                    if (Math.random() < this.moneyChance / 100) {
-                        const coinX = Math.random() * (this.width - 40);
-                        const offsetY = Math.random() * 20 - 80;
-                        const coinY = platform.y + offsetY;
-                        const coin = new Money(this, coinX, coinY);
-                        this.money.push(coin);
-                    }
-                } while (this.platforms[0].y >= lowerY);
-            }
-
-            add_broken_platforms(lowerY, upperY) {
-                let num = Math.floor(Math.random() * (5 + 1));
-
-                for (let i = 0; i < num; i++) {
-                    const platform = new Platform(
-                        this,
-                        lowerY,
-                        upperY,
-                        'brown'
+                add_platforms(lowerY, upperY) {
+                    let isFirstPlatform = this.platforms.length === 0;
+                    do {
+                        if (isFirstPlatform || Math.random() > 0.8) {
+                            let type = 'green';
+                            const platform = new Platform(
+                                this,
+                                lowerY,
+                                upperY,
+                                type,
+                                resourceLoader.current
+                            );
+                            this.platforms.unshift(platform);
+                            isFirstPlatform = false;
+                        }
+                    } while (
+                        this.platforms.length > 0 &&
+                        this.platforms[0].y >= lowerY
                     );
-                    this.platforms.push(platform);
-
-                    if (Math.random() < this.moneyChance / 200) {
-                        const coinX = Math.random() * (this.width - 40);
-                        const offsetY = Math.random() * 20 - 80;
-                        const coinY = platform.y + offsetY;
-                        const coin = new Money(this, coinX, coinY);
-                        this.money.push(coin);
+                }
+                change_difficulty() {
+                    this.level++;
+                    if (this.platform_max_gap > this.platform_gap) {
+                        this.platform_gap += 5;
+                    }
+                    if (
+                        this.level % 8 === 0 &&
+                        this.object_max_vx > this.object_vx
+                    ) {
+                        this.object_vx++;
                     }
                 }
             }
-
-            change_difficulty() {
-                this.level++;
-                if (this.platform_max_gap > this.platform_gap) {
-                    this.platform_gap += 5;
-                }
-                if (
-                    this.blue_white_platform_max_chance >
-                    this.blue_white_platform_chance
-                ) {
-                    this.blue_white_platform_chance += 1;
-                }
-                if (
-                    this.level % 8 === 0 &&
-                    this.object_max_vx > this.object_vx
-                ) {
-                    this.object_vx++;
-                }
-                if (
-                    this.level % 5 === 0 &&
-                    this.enemyMaxChance > this.enemyChance
-                ) {
-                    this.enemyChance += 5;
-                }
-                if (
-                    this.level % 3 === 0 &&
-                    this.moneyMaxChance > this.moneyChance
-                ) {
-                    this.moneyChance += 2;
-                }
-            }
+            gameInstance.current = new Game(CANVAS_WIDTH, CANVAS_HEIGHT);
+        }
+        if (!inputHandler.current) {
+            inputHandler.current = new InputHandler(gameInstance.current);
+            gameInstance.current.inputHandler = inputHandler.current;
         }
 
-        const game = new Game(canvas.width, canvas.height);
-
-        function animate() {
-            const fps = 60;
+        function animate(timestamp) {
+            if (!lastTimeRef.current) lastTimeRef.current = timestamp;
+            let deltaTime = (timestamp - lastTimeRef.current) / 1000;
+            lastTimeRef.current = timestamp;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (game.gameStart) game.update();
-            game.draw(ctx);
-            if (!game.gameOver)
-                setTimeout(() => {
-                    requestAnimationFrame(animate);
-                }, 1000 / fps);
+            const isActuallyPaused = gamePaused || autoPaused.current;
+            if (gameInstance.current.gameStart && !isActuallyPaused)
+                gameInstance.current.update(deltaTime);
+            gameInstance.current.draw(ctx);
+            setCurrentScore(gameInstance.current.score);
+            animationRef.current = requestAnimationFrame(animate);
         }
 
-        animate();
+        animationRef.current = requestAnimationFrame(animate);
+
+        const handleBlur = () => {
+            autoPaused.current = true;
+        };
+        const handleFocus = () => {
+            lastTimeRef.current = 0;
+            autoPaused.current = false;
+        };
+        window.addEventListener('blur', handleBlur);
+        window.addEventListener('focus', handleFocus);
 
         return () => {
-            window.removeEventListener('auth_success', game.askForPlayerName);
-            window.removeEventListener('logout', game.askForPlayerName);
+            if (animationRef.current)
+                cancelAnimationFrame(animationRef.current);
+            window.removeEventListener(
+                'auth_success',
+                gameInstance.current.askForPlayerName
+            );
+            window.removeEventListener(
+                'logout',
+                gameInstance.current.askForPlayerName
+            );
+            window.removeEventListener('blur', handleBlur);
+            window.removeEventListener('focus', handleFocus);
         };
-    }, []);
+    }, [isAuthenticated, isLoading, gamePaused]);
+
+    useEffect(() => {
+        if (menuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [menuOpen]);
+
+    const handlePause = () => {
+        setMenuOpen(true);
+        setGamePaused(true);
+        if (animationRef.current) {
+            cancelAnimationFrame(animationRef.current);
+            animationRef.current = null;
+        }
+    };
+    const handleCloseMenu = () => {
+        setMenuOpen(false);
+        setGamePaused(false);
+        if (gameInstance.current) {
+            gameInstance.current.gameStart = true;
+            gameInstance.current.gameOver = false;
+            if (!animationRef.current) {
+                lastTimeRef.current = 0;
+                animationRef.current = requestAnimationFrame(animate);
+            }
+        }
+    };
+
+    const handleRestart = () => {
+        gameInstance.current.reset();
+        setShowDeathScreen(false);
+    };
+    const handleMenu = () => {
+        if (gameInstance.current) gameInstance.current.reset();
+        setShowDeathScreen(false);
+        setMenuOpen(true);
+        setGamePaused(true);
+    };
+
+    useEffect(() => {
+        if (scoreBump) return;
+        setScoreBump(true);
+        const timeout = setTimeout(() => setScoreBump(false), 250);
+        return () => clearTimeout(timeout);
+    }, [currentScore]);
+
+    if (checkingAuth) {
+        return <div className="auth-loading-screen">Загрузка...</div>;
+    }
+    if (!isAuthenticated) {
+        return (
+            <div
+                className="auth-loading-screen"
+                style={{
+                    background:
+                        'linear-gradient(180deg, #eaf6ff 0%, #cbe7ff 100%)',
+                }}
+            >
+                <div className="auth-window">
+                    <h2 style={{ marginBottom: 24 }}>Вход через VK ID</h2>
+                    <AuthVKID onLoginSuccess={() => window.location.reload()} />
+                </div>
+            </div>
+        );
+    }
+    if (isLoading) {
+        return (
+            <div className="resource-loading-screen">
+                <div className="resource-window">
+                    <h2 style={{ marginBottom: 24 }}>Загрузка игры</h2>
+                    <div className="resource-progress-bar">
+                        <div
+                            className="resource-progress-bar-inner"
+                            style={{ width: `${loadingProgress}%` }}
+                        />
+                    </div>
+                    <div>{Math.round(loadingProgress)}%</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-            <canvas id="canvas1"></canvas>
-            <div>
-                <CharacterSelection />
+        <div ref={containerRef} className="game-canvas-container">
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+                <canvas id="canvas1" className="game-canvas"></canvas>
+                <div className="game-score-block">
+                    <img
+                        src="/images/score.svg"
+                        alt="score"
+                        className="game-score-icon"
+                    />
+                    <span
+                        className={`game-score-value${scoreBump ? ' game-score-value-bump' : ''}`}
+                    >
+                        {currentScore}
+                    </span>
+                </div>
+                {showDeathScreen && (
+                    <div className="death-screen-overlay">
+                        <div className="death-screen-window">
+                            <div className="death-score-top">
+                                <img
+                                    src="/images/score.svg"
+                                    alt="score"
+                                    className="death-score-icon-large"
+                                />
+                                <span className="death-score-value-large">
+                                    {lastScore}
+                                </span>
+                            </div>
+                            <img
+                                src="/images/scoreByte.svg"
+                                alt="byte"
+                                className="death-byte-img"
+                            />
+                            <div className="death-score-label-large">
+                                Попробуешь побить рекорд?
+                            </div>
+                            <div className="death-best-score-block">
+                                <span className="death-best-score-label">
+                                    Твой рекорд
+                                </span>
+                                <img
+                                    src="/images/score.svg"
+                                    alt="score"
+                                    className="death-best-score-icon"
+                                />
+                                <span className="death-best-score-value">
+                                    {bestScore}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
+            <div
+                className={`game-canvas__controls${gamePaused ? ' game-canvas__controls_paused' : ''}`}
+            >
+                {showDeathScreen ? (
+                    <>
+                        <button className="death-menu-btn" onClick={handleMenu}>
+                            В меню
+                        </button>
+                        <button
+                            className="death-restart-btn"
+                            onClick={handleRestart}
+                        >
+                            <img src="/images/restart.svg" alt="restart" />
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        {!gamePaused && !showRatingPage && (
+                            <button
+                                className={`game-canvas__superpower-btn${gamePaused ? ' game-canvas__superpower-btn_hidden' : ''}`}
+                                onClick={() => {
+                                    /* TODO: Здесь в общем сила активируется */
+                                }}
+                                aria-label="Активировать суперсилу"
+                            >
+                                <img
+                                    src="/images/activatePower.svg"
+                                    alt="Суперсила"
+                                />
+                                Активировать суперсилу
+                            </button>
+                        )}
+                        <button
+                            className={`game-canvas__pause-btn${gamePaused ? ' game-canvas__pause-btn_paused' : ''}${showRatingPage ? ' game-canvas__pause-btn_wide' : ''}`}
+                            onClick={
+                                showRatingPage
+                                    ? () => {
+                                          setShowRatingPage(false);
+                                          setMenuOpen(true);
+                                          setIsSuperpowerExpanded(false);
+                                          setWasSuperpowerJustOpened(false);
+                                          setTimeout(() => {
+                                              setIsSuperpowerExpanded(true);
+                                              setWasSuperpowerJustOpened(true);
+                                          }, 300);
+                                      }
+                                    : gamePaused
+                                      ? handleCloseMenu
+                                      : handlePause
+                            }
+                            aria-label={
+                                gamePaused
+                                    ? showRatingPage
+                                        ? 'Повысить шансы'
+                                        : 'Играть'
+                                    : 'Пауза'
+                            }
+                        >
+                            {showRatingPage ? (
+                                <>
+                                    <span className="game-canvas__pause-btn-text">
+                                        Повысить шансы
+                                    </span>
+                                    <img
+                                        src="/images/play.svg"
+                                        alt="Повысить шансы"
+                                    />
+                                </>
+                            ) : gamePaused ? (
+                                <>
+                                    <span className="game-canvas__pause-btn-text">
+                                        Играть
+                                    </span>
+                                    <img src="/images/play.svg" alt="Играть" />
+                                </>
+                            ) : (
+                                <img src="/images/pause.svg" alt="Пауза" />
+                            )}
+                        </button>
+                    </>
+                )}
+            </div>
+            <MenuBottomSheet
+                isOpen={menuOpen}
+                onClose={handleCloseMenu}
+                userPlace={353}
+                userScore={710}
+                userRank={353}
+                userTasks={5}
+                userTotal={6589}
+                showRatingPage={showRatingPage}
+                setShowRatingPage={setShowRatingPage}
+                isSuperpowerExpanded={isSuperpowerExpanded}
+                setIsSuperpowerExpanded={setIsSuperpowerExpanded}
+                wasSuperpowerJustOpened={wasSuperpowerJustOpened}
+                setWasSuperpowerJustOpened={setWasSuperpowerJustOpened}
+            />
         </div>
     );
 };
