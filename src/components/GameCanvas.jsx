@@ -299,43 +299,18 @@ const GameCanvas = () => {
     }, [currentScore]);
 
     if (checkingAuth) {
-        return (
-            <div
-                style={{
-                    width: '100vw',
-                    height: '100vh',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-                Загрузка...
-            </div>
-        );
+        return <div className="auth-loading-screen">Загрузка...</div>;
     }
     if (!isAuthenticated) {
         return (
             <div
+                className="auth-loading-screen"
                 style={{
-                    width: '100vw',
-                    height: '100vh',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
                     background:
                         'linear-gradient(180deg, #eaf6ff 0%, #cbe7ff 100%)',
                 }}
             >
-                <div
-                    style={{
-                        background: '#fff',
-                        borderRadius: 16,
-                        boxShadow: '0 2px 16px rgba(0,0,0,0.08)',
-                        padding: 32,
-                        minWidth: 320,
-                        textAlign: 'center',
-                    }}
-                >
+                <div className="auth-window">
                     <h2 style={{ marginBottom: 24 }}>Вход через VK ID</h2>
                     <AuthVKID onLoginSuccess={() => window.location.reload()} />
                 </div>
@@ -344,46 +319,13 @@ const GameCanvas = () => {
     }
     if (isLoading) {
         return (
-            <div
-                style={{
-                    width: '100vw',
-                    height: '100vh',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background:
-                        'linear-gradient(180deg, #eaf6ff 0%, #cbe7ff 100%)',
-                }}
-            >
-                <div
-                    style={{
-                        background: '#fff',
-                        borderRadius: 16,
-                        boxShadow: '0 2px 16px rgba(0,0,0,0.08)',
-                        padding: 32,
-                        minWidth: 320,
-                        textAlign: 'center',
-                    }}
-                >
+            <div className="resource-loading-screen">
+                <div className="resource-window">
                     <h2 style={{ marginBottom: 24 }}>Загрузка игры</h2>
-                    <div
-                        style={{
-                            width: '100%',
-                            height: 8,
-                            background: '#eee',
-                            borderRadius: 4,
-                            overflow: 'hidden',
-                            marginBottom: 16,
-                        }}
-                    >
+                    <div className="resource-progress-bar">
                         <div
-                            style={{
-                                width: `${loadingProgress}%`,
-                                height: '100%',
-                                background: '#b8fc75',
-                                transition: 'width 0.3s ease',
-                            }}
+                            className="resource-progress-bar-inner"
+                            style={{ width: `${loadingProgress}%` }}
                         />
                     </div>
                     <div>{Math.round(loadingProgress)}%</div>
