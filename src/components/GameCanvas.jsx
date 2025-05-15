@@ -62,7 +62,6 @@ const GameCanvas = () => {
 
         const loadResources = async () => {
             const success = await resourceLoader.current.loadAll();
-            x;
             if (success) {
                 setIsLoading(false);
             }
@@ -186,7 +185,7 @@ const GameCanvas = () => {
                     } while (
                         this.platforms.length > 0 &&
                         this.platforms[0].y >= lowerY
-                    );
+                        );
                 }
                 change_difficulty() {
                     this.level++;
@@ -486,18 +485,18 @@ const GameCanvas = () => {
                             onClick={
                                 showRatingPage
                                     ? () => {
-                                          setShowRatingPage(false);
-                                          setMenuOpen(true);
-                                          setIsSuperpowerExpanded(false);
-                                          setWasSuperpowerJustOpened(false);
-                                          setTimeout(() => {
-                                              setIsSuperpowerExpanded(true);
-                                              setWasSuperpowerJustOpened(true);
-                                          }, 300);
-                                      }
+                                        setShowRatingPage(false);
+                                        setMenuOpen(true);
+                                        setIsSuperpowerExpanded(false);
+                                        setWasSuperpowerJustOpened(false);
+                                        setTimeout(() => {
+                                            setIsSuperpowerExpanded(true);
+                                            setWasSuperpowerJustOpened(true);
+                                        }, 300);
+                                    }
                                     : gamePaused
-                                      ? handleCloseMenu
-                                      : handlePause
+                                        ? handleCloseMenu
+                                        : handlePause
                             }
                             aria-label={
                                 gamePaused
