@@ -12,7 +12,7 @@ export class ResourceLoader {
             cloud2: '/images/cloud2.svg',
             cloud3: '/images/cloud3.svg',
             cloud4: '/images/cloud4.svg',
-            cloud5: '/images/cloud5.svg'
+            cloud5: '/images/cloud5.svg',
         };
         this.loadedImages = {};
         this.totalImages = Object.keys(this.images).length;
@@ -27,16 +27,17 @@ export class ResourceLoader {
                 this.loadedCount++;
                 resolve(img);
             };
-            img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+            img.onerror = () =>
+                reject(new Error(`Failed to load image: ${src}`));
             img.src = src;
         });
     }
 
     async loadAll() {
-        const promises = Object.entries(this.images).map(([key, src]) => 
+        const promises = Object.entries(this.images).map(([key, src]) =>
             this.loadImage(key, src)
         );
-        
+
         try {
             await Promise.all(promises);
             return true;
@@ -53,4 +54,4 @@ export class ResourceLoader {
     getProgress() {
         return (this.loadedCount / this.totalImages) * 100;
     }
-} 
+}

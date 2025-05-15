@@ -62,6 +62,7 @@ const GameCanvas = () => {
 
         const loadResources = async () => {
             const success = await resourceLoader.current.loadAll();
+            x;
             if (success) {
                 setIsLoading(false);
             }
@@ -112,7 +113,10 @@ const GameCanvas = () => {
                     this.platform_max_gap = 300;
                     this.add_platforms(0, this.height - 15);
                     this.add_platforms(-this.height, -15);
-                    this.background = new Background(this, resourceLoader.current);
+                    this.background = new Background(
+                        this,
+                        resourceLoader.current
+                    );
                     this.player = new Player(this, resourceLoader.current);
                     if (this.inputHandler) this.inputHandler.reset();
                     this.speedMultiplier = 60;
@@ -321,7 +325,8 @@ const GameCanvas = () => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    background: 'linear-gradient(180deg, #eaf6ff 0%, #cbe7ff 100%)',
+                    background:
+                        'linear-gradient(180deg, #eaf6ff 0%, #cbe7ff 100%)',
                 }}
             >
                 <div

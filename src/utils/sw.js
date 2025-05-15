@@ -2,7 +2,7 @@ const CACHE_NAME = 'MailJumper';
 const CACHE_NAME_DYNAMIC = 'MailJumper-dynamic';
 const CACHE_URLS = ['/'];
 const CACHE_FIRST_AND_UPDATE_REGEX =
-    /.webp|.svg|.jpg|.jpeg|.gif|.png|.css|.js|.ttf|.woff2/;
+    /\.(webp|svg|jpg|jpeg|gif|png|css|js|ttf|woff2)$/i;
 
 const deleteOldCaches = async () => {
     const keys = await caches.keys();
@@ -23,9 +23,11 @@ const fromCache = async (key, cacheName) => {
 
 const update = async (request) => {
     try {
-        const cache = await caches.open(CACHE_NAME);
-        const response = await fetch(request);
-        cache.put(request, response);
+        if (request.url.indexOf('http') === 0) {
+            const cache = await caches.open(CACHE_NAME);
+            const response = await fetch(request);
+            cache.put(request, response.clone());
+        }
     } catch (error) {
         console.error(error);
     }
@@ -44,7 +46,9 @@ const cacheFirstAndUpdate = (event) => {
             } catch (e) {
                 const cache = await caches.open(CACHE_NAME);
                 const response = await fetch(event.request);
-                cache.put(event.request, response.clone());
+                if (event.url.indexOf('http') === 0) {
+                    cache.put(event.request, response.clone());
+                }
                 return response;
             }
         })()
@@ -57,7 +61,9 @@ const networkFirst = (event) => {
             const cache = await caches.open(CACHE_NAME);
             try {
                 const response = await fetch(event.request);
-                cache.put(event.request, response.clone());
+                if (request.url.indexOf('http') === 0) {
+                    cache.put(event.request, response.clone());
+                }
                 return response;
             } catch (e) {
                 return fromCache(event.request, CACHE_NAME);
@@ -72,7 +78,9 @@ const nonGetRequestNetworkFirst = (event) => {
             const cache = await caches.open(CACHE_NAME_DYNAMIC);
             try {
                 const response = await fetch(event.request);
-                cache.put(event.request.url, response.clone());
+                if (request.url.indexOf('http') === 0) {
+                    cache.put(event.request, response.clone());
+                }
                 return response;
             } catch (e) {
                 return fromCache(event.request.url, CACHE_NAME_DYNAMIC);
