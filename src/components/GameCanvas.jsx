@@ -14,6 +14,7 @@ import '../styles/gameCanvas.scss';
 import { ResourceLoader } from '../utils/game/resourceLoader';
 import muteIcon from '../../public/images/mute.svg';
 import unmuteIcon from '../../public/images/unmute.svg';
+import { getScore } from '../api/rating';
 
 const CANVAS_WIDTH = 500;
 const CANVAS_HEIGHT = 765;
@@ -44,7 +45,9 @@ const GameCanvas = () => {
     const inputHandler = useRef(null);
     const resourceLoader = useRef(null);
     const [showOnboarding, setShowOnboarding] = useState(false);
-    const [controlType, setControlType] = useState(() => localStorage.getItem('controlType') || '');
+    const [controlType, setControlType] = useState(
+        () => localStorage.getItem('controlType') || ''
+    );
     const [superpowerActive, setSuperpowerActive] = useState(false);
     const [superpowerAvailable, setSuperpowerAvailable] = useState(true);
     const superpowerDuration = 10000; // 10 секунд
@@ -224,7 +227,10 @@ const GameCanvas = () => {
             gameInstance.current = new Game(CANVAS_WIDTH, CANVAS_HEIGHT);
         }
         if (!inputHandler.current) {
-            inputHandler.current = new InputHandler(gameInstance.current, controlType);
+            inputHandler.current = new InputHandler(
+                gameInstance.current,
+                controlType
+            );
             gameInstance.current.inputHandler = inputHandler.current;
         }
 
@@ -369,12 +375,13 @@ const GameCanvas = () => {
             if (response === 200) {
                 setSuperpowerActive(true);
                 setSuperpowerAvailable(false);
-                if (superpowerTimeoutRef.current) clearTimeout(superpowerTimeoutRef.current);
+                if (superpowerTimeoutRef.current)
+                    clearTimeout(superpowerTimeoutRef.current);
                 superpowerTimeoutRef.current = setTimeout(() => {
                     setSuperpowerActive(false);
                     setSuperpowerAvailable(true);
                 }, superpowerDuration);
-                setSuperpowerCount(prev => prev - 1);
+                setSuperpowerCount((prev) => prev - 1);
             }
         } catch (error) {
             console.error('Error activating superpower:', error);
@@ -397,6 +404,17 @@ const GameCanvas = () => {
         localStorage.setItem('soundEnabled', soundEnabled);
     }, [soundEnabled]);
 
+    const handleDeath = () => {
+        if (vkid) {
+            getScore(vkid).then((score) => {
+                if (score !== undefined) {
+                    setBestScore(score);
+                }
+            });
+        }
+        setShowDeathScreen(true);
+    };
+
     if (checkingAuth) {
         return <div className="auth-loading-screen">Загрузка...</div>;
     }
@@ -412,11 +430,13 @@ const GameCanvas = () => {
             >
                 <div className="auth-window">
                     <h2 style={{ marginBottom: 24 }}>Вход через VK ID</h2>
-                    <AuthVKID onLoginSuccess={(isFirstTime) => {
-                        setIsAuthenticated(true);
-                        setShowOnboarding(isFirstTime);
-                        setCheckingAuth(false);
-                    }} />
+                    <AuthVKID
+                        onLoginSuccess={(isFirstTime) => {
+                            setIsAuthenticated(true);
+                            setShowOnboarding(isFirstTime);
+                            setCheckingAuth(false);
+                        }}
+                    />
                 </div>
             </div>
         );
@@ -451,18 +471,19 @@ const GameCanvas = () => {
                     />
                 </button>
                 <canvas id="canvas1" className="game-canvas"></canvas>
-                {showOnboarding && <Onboarding
-                    resourceLoader={resourceLoader}
-                    onFinish={() => setShowOnboarding(false)} />}
+                {showOnboarding && (
+                    <Onboarding
+                        resourceLoader={resourceLoader}
+                        onFinish={() => setShowOnboarding(false)}
+                    />
+                )}
                 <div className="game-superpower-block">
                     <img
                         src="/images/superpower.svg"
                         alt="score"
                         className="game-superpower-icon"
                     />
-                    <span
-                        className="game-superpower-value"
-                    >
+                    <span className="game-superpower-value">
                         {superpowerCount}
                     </span>
                 </div>
@@ -533,19 +554,22 @@ const GameCanvas = () => {
                     </>
                 ) : (
                     <>
-                        {!superpowerActive && superpowerAvailable && !gamePaused && !showRatingPage && (
-                            <button
-                                className={`game-canvas__superpower-btn`}
-                                onClick={handleActivateSuperpower}
-                                aria-label="Активировать суперсилу"
-                            >
-                                <img
-                                    src="/images/activatePower.svg"
-                                    alt="Суперсила"
-                                />
-                                Активировать суперсилу
-                            </button>
-                        )}
+                        {!superpowerActive &&
+                            superpowerAvailable &&
+                            !gamePaused &&
+                            !showRatingPage && (
+                                <button
+                                    className={`game-canvas__superpower-btn`}
+                                    onClick={handleActivateSuperpower}
+                                    aria-label="Активировать суперсилу"
+                                >
+                                    <img
+                                        src="/images/activatePower.svg"
+                                        alt="Суперсила"
+                                    />
+                                    Активировать суперсилу
+                                </button>
+                            )}
                         <button
                             className={`game-canvas__pause-btn${gamePaused ? ' game-canvas__pause-btn_paused' : ''}${showRatingPage ? ' game-canvas__pause-btn_wide' : ''}`}
                             onClick={

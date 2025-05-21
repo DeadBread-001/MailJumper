@@ -106,13 +106,12 @@ const MenuBottomSheet = ({
                 ) : showRatingPage ? (
                     <RatingPage
                         vkid={vkid}
-                        onBack={() => setShowRatingPage(false)} />
+                        onBack={() => setShowRatingPage(false)}
+                    />
                 ) : (
                     <>
                         <MenuBottomSheetHeader onClose={onClose} />
-                        <ScoreSection
-                            userScore={score}
-                        />
+                        <ScoreSection userScore={score} />
                         <SuperpowerSection
                             isSuperpowerExpanded={isSuperpowerExpanded}
                             setIsSuperpowerExpanded={setIsSuperpowerExpanded}

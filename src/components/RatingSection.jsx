@@ -1,12 +1,19 @@
 import React from 'react';
 
-const RatingSection = ({ onShowRatingPage, ratingData = [], loading, currentPos }) => {
+const RatingSection = ({
+    onShowRatingPage,
+    ratingData = [],
+    loading,
+    currentPos,
+}) => {
     if (loading) {
         return (
             <div className="menu-bottom-sheet__section menu-bottom-sheet__rating">
                 <div className="menu-bottom-sheet__rating-title">Рейтинг</div>
                 <div className="menu-bottom-sheet__rating-list">
-                    <div className="menu-bottom-sheet__rating-item">Загрузка...</div>
+                    <div className="menu-bottom-sheet__rating-item">
+                        Загрузка...
+                    </div>
                 </div>
             </div>
         );
@@ -18,10 +25,12 @@ const RatingSection = ({ onShowRatingPage, ratingData = [], loading, currentPos 
             <div className="menu-bottom-sheet__rating-list">
                 {ratingData.map((player, index) => (
                     <div
-                        key={index+1}
+                        key={index + 1}
                         className={`menu-bottom-sheet__rating-item${currentPos === index ? ' menu-bottom-sheet__rating-item_current' : ''}`}
                     >
-                        <span>{index + 1}. {player.name}</span>
+                        <span>
+                            {index + 1}. {player.name}
+                        </span>
                         <span>
                             {player.score}{' '}
                             <img

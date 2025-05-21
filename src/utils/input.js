@@ -6,19 +6,25 @@ export class InputHandler {
         this.mouseX = null;
         this.handleClick = (e) => {
             if (this.controlType === 'click') {
-                const rect = game.canvasRect || document.querySelector('#canvas1').getBoundingClientRect();
+                const rect =
+                    game.canvasRect ||
+                    document.querySelector('#canvas1').getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 if (x < rect.width / 2) {
                     this.keys = ['ArrowLeft'];
                 } else {
                     this.keys = ['ArrowRight'];
                 }
-                setTimeout(() => { this.keys = []; }, 120);
+                setTimeout(() => {
+                    this.keys = [];
+                }, 120);
             }
         };
         this.handleMouseDown = (e) => {
             if (this.controlType === 'click') {
-                const rect = game.canvasRect || document.querySelector('#canvas1').getBoundingClientRect();
+                const rect =
+                    game.canvasRect ||
+                    document.querySelector('#canvas1').getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 if (x < rect.width / 2) {
                     this.keys = ['ArrowLeft'];

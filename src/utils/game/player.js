@@ -29,7 +29,10 @@ export class Player {
     }
 
     update(inputHandler, deltaTime) {
-        if (inputHandler.controlType === 'mouse' && inputHandler.mouseX !== null) {
+        if (
+            inputHandler.controlType === 'mouse' &&
+            inputHandler.mouseX !== null
+        ) {
             const targetX = inputHandler.mouseX - this.width / 2;
             const dx = targetX - this.x;
             const followSpeed = 0.03;

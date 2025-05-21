@@ -22,7 +22,7 @@ export async function useSuperpower(vkid) {
     const url = IP + `profile/${vkid}/superpower/use`;
     const data = await fetchRequest(url, 'POST');
     if (data.Status === 200) {
-        return (data.Status);
+        return data.Status;
     } else {
         throw new Error('Некорректный формат данных');
     }

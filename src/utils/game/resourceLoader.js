@@ -15,7 +15,7 @@ export class ResourceLoader {
             cloud3: '/images/cloud3.svg',
             cloud4: '/images/cloud4.svg',
             cloud5: '/images/cloud5.svg',
-            ...extraImages
+            ...extraImages,
         };
         this.loadedImages = {};
         this.totalImages = Object.keys(this.images).length;

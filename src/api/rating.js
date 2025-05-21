@@ -6,7 +6,7 @@ export async function getTopPlayersForUser(vkid, count) {
     if (data.Status === 200 && Array.isArray(data.Data?.users)) {
         return {
             users: data.Data.users,
-            current_pos: data.Data.current_pos
+            current_pos: data.Data.current_pos,
         };
     } else {
         throw new Error('Некорректный формат данных');
