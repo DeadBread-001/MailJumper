@@ -1,73 +1,110 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { completeTask } from '../api/tasks';
 
 const SuperpowerSection = ({
     isSuperpowerExpanded,
     setIsSuperpowerExpanded,
     tasks,
     superpowerRef,
-}) => (
-    <div
-        ref={superpowerRef}
-        className={`menu-bottom-sheet__section menu-bottom-sheet__superpower${isSuperpowerExpanded ? ' menu-bottom-sheet__superpower_expanded' : ''}`}
-    >
-        <div className="menu-bottom-sheet__superpower-info">
-            <div className="menu-bottom-sheet__superpower-title">
-                Активировать суперсилу
-            </div>
-            <div className="menu-bottom-sheet__superpower-desc">
-                Выполни любое задание, чтобы получить много баллов
-            </div>
-            <div className="menu-bottom-sheet__superpower-tasks-wrapper">
-                <div className="menu-bottom-sheet__superpower-tasks">
-                    {tasks.map((task, idx) => (
-                        <div
-                            key={task.id}
-                            className="menu-bottom-sheet__task-item"
-                            style={{ '--index': idx }}
-                        >
-                            <div className="menu-bottom-sheet__task-icon">
-                                <img
-                                    src="/images/cloudTask.svg"
-                                    alt="task icon"
-                                />
-                            </div>
-                            <div className="menu-bottom-sheet__task-content">
-                                <div className="menu-bottom-sheet__task-text">
-                                    {task.text}
-                                </div>
-                                {idx === 0 && (
-                                    <div className="menu-bottom-sheet__task-label">
-                                        ежедневное задание
-                                    </div>
-                                )}
-                            </div>
-                            <div className="menu-bottom-sheet__task-arrow">
-                                &rarr;
-                            </div>
-                        </div>
-                    ))}
+    vkid,
+}) => {
+    const [completedTasks, setCompletedTasks] = useState(new Set());
+
+    const handleTaskClick = async (taskToken) => {
+        try {
+            const response = await completeTask({ token: taskToken }, vkid);
+            if (response.Status === 200) {
+                setCompletedTasks((prev) => new Set([...prev, taskToken]));
+            }
+        } catch (error) {
+            console.error('Error completing task:', error);
+        }
+    };
+
+    return (
+        <div
+            ref={superpowerRef}
+            className={`menu-bottom-sheet__section menu-bottom-sheet__superpower${isSuperpowerExpanded ? ' menu-bottom-sheet__superpower_expanded' : ''}`}
+        >
+            <div className="menu-bottom-sheet__superpower-info">
+                <div className="menu-bottom-sheet__superpower-title">
+                    Активировать суперсилу
                 </div>
+                <div className="menu-bottom-sheet__superpower-desc">
+                    Выполни любое задание, чтобы получить много баллов
+                </div>
+                <div className="menu-bottom-sheet__superpower-tasks-wrapper">
+                    <div className="menu-bottom-sheet__superpower-tasks">
+                        {tasks.map((task, idx) => (
+                            <div
+                                key={task.token || idx}
+                                className={`menu-bottom-sheet__task-item${completedTasks.has(task.token) ? ' menu-bottom-sheet__task-item_completed' : ''}`}
+                                style={{ '--index': idx }}
+                                onClick={() =>
+                                    !completedTasks.has(task.token) &&
+                                    handleTaskClick(task.token)
+                                }
+                            >
+                                <div className="menu-bottom-sheet__task-icon">
+                                    <img
+                                        src={
+                                            task.icon || '/images/cloudTask.svg'
+                                        }
+                                        alt="task icon"
+                                    />
+                                </div>
+                                <div className="menu-bottom-sheet__task-content">
+                                    <div className="menu-bottom-sheet__task-text">
+                                        {task.description}
+                                    </div>
+                                    {/*{task.description && (*/}
+                                    {/*    <div className="menu-bottom-sheet__task-label">*/}
+                                    {/*        {task.description}*/}
+                                    {/*    </div>*/}
+                                    {/*)}*/}
+                                </div>
+                                <div className="menu-bottom-sheet__task-arrow">
+                                    <img
+                                        src="/images/arrow-black.svg"
+                                        alt="arrow"
+                                        className="menu-bottom-sheet__task-arrow-img"
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                <button
+                    className={`menu-bottom-sheet__superpower-btn${isSuperpowerExpanded ? ' menu-bottom-sheet__superpower-btn_expanded' : ''}`}
+                    onClick={() =>
+                        setIsSuperpowerExpanded(!isSuperpowerExpanded)
+                    }
+                >
+                    <span className="menu-bottom-sheet__superpower-btn-content">
+                        {isSuperpowerExpanded ? 'Свернуть' : 'Показать задания'}
+                        <img
+                            src={
+                                isSuperpowerExpanded
+                                    ? '/images/arrow-black.svg'
+                                    : '/images/arrow.svg'
+                            }
+                            alt="arrow"
+                            className="menu-bottom-sheet__superpower-arrow"
+                            style={{
+                                transition:
+                                    'transform 0.3s ease, opacity 0.3s ease',
+                            }}
+                        />
+                    </span>
+                </button>
             </div>
-            <button
-                className={`menu-bottom-sheet__superpower-btn${isSuperpowerExpanded ? ' menu-bottom-sheet__superpower-btn_expanded' : ''}`}
-                onClick={() => setIsSuperpowerExpanded(!isSuperpowerExpanded)}
-            >
-                <span className="menu-bottom-sheet__superpower-btn-content">
-                    {isSuperpowerExpanded ? 'Свернуть' : 'Показать задания'}
-                    <img
-                        src="/images/arrow.svg"
-                        alt="arrow"
-                        className={`menu-bottom-sheet__superpower-arrow${isSuperpowerExpanded ? ' menu-bottom-sheet__superpower-arrow_rotated' : ''}`}
-                    />
-                </span>
-            </button>
+            <img
+                className="menu-bottom-sheet__superpower-img"
+                src="/images/superpower.svg"
+                alt="superpower"
+            />
         </div>
-        <img
-            className="menu-bottom-sheet__superpower-img"
-            src="/images/superpower.svg"
-            alt="superpower"
-        />
-    </div>
-);
+    );
+};
 
 export default SuperpowerSection;

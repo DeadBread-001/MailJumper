@@ -51,6 +51,7 @@ module.exports = {
             patterns: [
                 { from: './public/images/', to: './images' },
                 { from: './src/utils/', to: './' },
+                { from: './public/sounds/', to: './sounds' }
             ],
         }),
     ],

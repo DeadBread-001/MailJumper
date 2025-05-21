@@ -3,14 +3,17 @@ import { Background } from '../utils/game/background';
 import { Player } from '../utils/game/player';
 import { InputHandler } from '../utils/input';
 import { Platform } from '../utils/game/platform';
-import { sendScore } from '../api/game';
+import { sendScore, getSuperpower, useSuperpower } from '../api/game';
 import { check } from '../api/auth';
 import CharacterSelection from './CharacterSelection';
 import MenuBottomSheet from './MenuBottomSheet';
 import AuthVKID from './AuthVKID';
+import Onboarding from './Onboarding';
 import '../styles/menuBottomSheet.scss';
 import '../styles/gameCanvas.scss';
 import { ResourceLoader } from '../utils/game/resourceLoader';
+import muteIcon from '../../public/images/mute.svg';
+import unmuteIcon from '../../public/images/unmute.svg';
 
 const CANVAS_WIDTH = 500;
 const CANVAS_HEIGHT = 765;
@@ -39,21 +42,39 @@ const GameCanvas = () => {
     const lastTimeRef = useRef(0);
     const autoPaused = useRef(false);
     const inputHandler = useRef(null);
-    const resourceLoader = useRef(new ResourceLoader());
+    const resourceLoader = useRef(null);
+    const [showOnboarding, setShowOnboarding] = useState(false);
+    const [controlType, setControlType] = useState(() => localStorage.getItem('controlType') || '');
+    const [superpowerActive, setSuperpowerActive] = useState(false);
+    const [superpowerAvailable, setSuperpowerAvailable] = useState(true);
+    const superpowerDuration = 10000; // 10 секунд
+    const superpowerTimeoutRef = useRef(null);
+    const [soundEnabled, setSoundEnabled] = useState(() => {
+        const stored = localStorage.getItem('soundEnabled');
+        return stored === null ? true : stored === 'true';
+    });
+    const [vkid, setVkid] = useState(null);
+    const [superpowerCount, setSuperpowerCount] = useState(0);
+
+    useEffect(() => {
+        resourceLoader.current = new ResourceLoader();
+    }, []);
 
     const isActuallyPaused = gamePaused || autoPaused.current;
 
+    const checkAuth = async () => {
+        try {
+            const userData = await check();
+            setIsAuthenticated(true);
+            setShowOnboarding(userData.is_first_time);
+        } catch {
+            setIsAuthenticated(false);
+        } finally {
+            setCheckingAuth(false);
+        }
+    };
+
     useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                await check();
-                setIsAuthenticated(true);
-            } catch {
-                setIsAuthenticated(false);
-            } finally {
-                setCheckingAuth(false);
-            }
-        };
         checkAuth();
     }, []);
 
@@ -74,10 +95,10 @@ const GameCanvas = () => {
         loadResources();
 
         return () => clearInterval(progressInterval);
-    }, [isAuthenticated, checkingAuth]);
+    }, [isAuthenticated, checkingAuth, showOnboarding]);
 
     useEffect(() => {
-        if (!isAuthenticated || isLoading) return;
+        if (!isAuthenticated || isLoading || showOnboarding) return;
         const canvas = document.querySelector('#canvas1');
         const ctx = canvas.getContext('2d');
         canvas.width = CANVAS_WIDTH;
@@ -203,7 +224,7 @@ const GameCanvas = () => {
             gameInstance.current = new Game(CANVAS_WIDTH, CANVAS_HEIGHT);
         }
         if (!inputHandler.current) {
-            inputHandler.current = new InputHandler(gameInstance.current);
+            inputHandler.current = new InputHandler(gameInstance.current, controlType);
             gameInstance.current.inputHandler = inputHandler.current;
         }
 
@@ -246,7 +267,13 @@ const GameCanvas = () => {
             window.removeEventListener('blur', handleBlur);
             window.removeEventListener('focus', handleFocus);
         };
-    }, [isAuthenticated, isLoading, gamePaused]);
+    }, [isAuthenticated, isLoading, gamePaused, showOnboarding, controlType]);
+
+    useEffect(() => {
+        if (inputHandler.current && controlType) {
+            inputHandler.current.setControlType(controlType);
+        }
+    }, [controlType]);
 
     useEffect(() => {
         if (menuOpen) {
@@ -298,9 +325,82 @@ const GameCanvas = () => {
         return () => clearTimeout(timeout);
     }, [currentScore]);
 
+    useEffect(() => {
+        if (!showOnboarding) {
+            setControlType(localStorage.getItem('controlType') || '');
+        }
+    }, [showOnboarding]);
+
+    useEffect(() => {
+        const fetchVkid = async () => {
+            try {
+                const userData = await check();
+                setVkid(userData.vkid);
+            } catch (error) {
+                console.error('Error fetching vkid:', error);
+            }
+        };
+
+        if (isAuthenticated && !isLoading) {
+            fetchVkid();
+        }
+    }, [isAuthenticated, isLoading]);
+
+    useEffect(() => {
+        const fetchSuperpowerCount = async () => {
+            try {
+                if (!vkid) return;
+                const count = await getSuperpower(vkid);
+                setSuperpowerCount(count);
+            } catch (error) {
+                console.error('Error fetching superpower count:', error);
+            }
+        };
+
+        if (isAuthenticated && !isLoading && vkid) {
+            fetchSuperpowerCount();
+        }
+    }, [isAuthenticated, isLoading, vkid]);
+
+    const handleActivateSuperpower = async () => {
+        try {
+            if (!vkid) return;
+            const response = await useSuperpower(vkid);
+            if (response === 200) {
+                setSuperpowerActive(true);
+                setSuperpowerAvailable(false);
+                if (superpowerTimeoutRef.current) clearTimeout(superpowerTimeoutRef.current);
+                superpowerTimeoutRef.current = setTimeout(() => {
+                    setSuperpowerActive(false);
+                    setSuperpowerAvailable(true);
+                }, superpowerDuration);
+                setSuperpowerCount(prev => prev - 1);
+            }
+        } catch (error) {
+            console.error('Error activating superpower:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (gameInstance.current) {
+            gameInstance.current.superpowerActive = superpowerActive;
+        }
+    }, [superpowerActive]);
+
+    useEffect(() => {
+        if (gameInstance.current) {
+            gameInstance.current.soundEnabled = soundEnabled;
+        }
+    }, [soundEnabled]);
+
+    useEffect(() => {
+        localStorage.setItem('soundEnabled', soundEnabled);
+    }, [soundEnabled]);
+
     if (checkingAuth) {
         return <div className="auth-loading-screen">Загрузка...</div>;
     }
+
     if (!isAuthenticated) {
         return (
             <div
@@ -312,7 +412,11 @@ const GameCanvas = () => {
             >
                 <div className="auth-window">
                     <h2 style={{ marginBottom: 24 }}>Вход через VK ID</h2>
-                    <AuthVKID onLoginSuccess={() => window.location.reload()} />
+                    <AuthVKID onLoginSuccess={(isFirstTime) => {
+                        setIsAuthenticated(true);
+                        setShowOnboarding(isFirstTime);
+                        setCheckingAuth(false);
+                    }} />
                 </div>
             </div>
         );
@@ -337,7 +441,31 @@ const GameCanvas = () => {
     return (
         <div ref={containerRef} className="game-canvas-container">
             <div style={{ position: 'relative', display: 'inline-block' }}>
+                <button
+                    className="sound-toggle-btn"
+                    onClick={() => setSoundEnabled((prev) => !prev)}
+                >
+                    <img
+                        src={soundEnabled ? unmuteIcon : muteIcon}
+                        alt={soundEnabled ? 'Звук включён' : 'Звук выключен'}
+                    />
+                </button>
                 <canvas id="canvas1" className="game-canvas"></canvas>
+                {showOnboarding && <Onboarding
+                    resourceLoader={resourceLoader}
+                    onFinish={() => setShowOnboarding(false)} />}
+                <div className="game-superpower-block">
+                    <img
+                        src="/images/superpower.svg"
+                        alt="score"
+                        className="game-superpower-icon"
+                    />
+                    <span
+                        className="game-superpower-value"
+                    >
+                        {superpowerCount}
+                    </span>
+                </div>
                 <div className="game-score-block">
                     <img
                         src="/images/score.svg"
@@ -405,12 +533,10 @@ const GameCanvas = () => {
                     </>
                 ) : (
                     <>
-                        {!gamePaused && !showRatingPage && (
+                        {!superpowerActive && superpowerAvailable && !gamePaused && !showRatingPage && (
                             <button
-                                className={`game-canvas__superpower-btn${gamePaused ? ' game-canvas__superpower-btn_hidden' : ''}`}
-                                onClick={() => {
-                                    /* TODO: Здесь в общем сила активируется */
-                                }}
+                                className={`game-canvas__superpower-btn`}
+                                onClick={handleActivateSuperpower}
                                 aria-label="Активировать суперсилу"
                             >
                                 <img
@@ -445,6 +571,7 @@ const GameCanvas = () => {
                                         : 'Играть'
                                     : 'Пауза'
                             }
+                            style={superpowerActive ? { margin: '0 auto' } : {}}
                         >
                             {showRatingPage ? (
                                 <>
@@ -473,11 +600,6 @@ const GameCanvas = () => {
             <MenuBottomSheet
                 isOpen={menuOpen}
                 onClose={handleCloseMenu}
-                userPlace={353}
-                userScore={710}
-                userRank={353}
-                userTasks={5}
-                userTotal={6589}
                 showRatingPage={showRatingPage}
                 setShowRatingPage={setShowRatingPage}
                 isSuperpowerExpanded={isSuperpowerExpanded}

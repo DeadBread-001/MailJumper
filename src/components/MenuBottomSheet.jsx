@@ -7,15 +7,13 @@ import RatingSection from './RatingSection';
 import PrizeRulesPage from './PrizeRulesPage';
 import RatingPage from './RatingPage';
 import ModalPrizeRules from './ModalPrizeRules';
+import { getTasks } from '../api/tasks';
+import { getScore, getTopPlayersForUser } from '../api/rating';
+import { check } from '../api/auth';
 
 const MenuBottomSheet = ({
     isOpen,
     onClose,
-    userPlace,
-    userScore,
-    userRank,
-    userTasks,
-    userTotal,
     showRatingPage,
     setShowRatingPage,
     isSuperpowerExpanded,
@@ -23,10 +21,42 @@ const MenuBottomSheet = ({
     wasSuperpowerJustOpened,
     setWasSuperpowerJustOpened,
 }) => {
+    const [score, setScore] = useState(0);
     const [showPrizeRules, setShowPrizeRules] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [tasks, setTasks] = useState([]);
     const superpowerRef = useRef(null);
+    const [vkid, setVkid] = useState(null);
+    const [ratingData, setRatingData] = useState([]);
+    const [ratingLoading, setRatingLoading] = useState(true);
+    const [currentPos, setCurrentPos] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setRatingLoading(true);
+                const tasksData = await getTasks();
+                const userData = await check();
+                setVkid(userData.vkid);
+                setTasks(tasksData);
+                if (userData.vkid) {
+                    const scoreData = await getScore(userData.vkid);
+                    const data = await getTopPlayersForUser(userData.vkid, 1);
+                    setRatingData(data.users);
+                    setCurrentPos(data.current_pos);
+                    setScore(scoreData);
+                }
+            } catch (err) {
+                console.error('Ошибка при получении данных:', err);
+            } finally {
+                setRatingLoading(false);
+            }
+        };
+        if (isOpen) {
+            fetchData();
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         if (showModal) {
@@ -62,24 +92,6 @@ const MenuBottomSheet = ({
         setIsSuperpowerExpanded(!isSuperpowerExpanded);
     };
 
-    const tasks = [
-        {
-            id: 1,
-            text: 'Включить автозагрузку в приложении Облака',
-            icon: '⚡',
-        },
-        {
-            id: 2,
-            text: 'Включить уведомления в приложении Почты',
-            icon: '📫',
-        },
-        {
-            id: 3,
-            text: 'Посмотреть сторис в приложении Облака',
-            icon: '👀',
-        },
-    ];
-
     return (
         <div
             className={`menu-bottom-sheet${isOpen ? ' menu-bottom-sheet_open' : ''}${showModal ? ' menu-bottom-sheet_modal' : ''}`}
@@ -92,22 +104,31 @@ const MenuBottomSheet = ({
                         onShowModal={() => setShowModal(true)}
                     />
                 ) : showRatingPage ? (
-                    <RatingPage onBack={() => setShowRatingPage(false)} />
+                    <RatingPage
+                        vkid={vkid}
+                        onBack={() => setShowRatingPage(false)} />
                 ) : (
                     <>
                         <MenuBottomSheetHeader onClose={onClose} />
-                        <ScoreSection userScore={userScore} />
+                        <ScoreSection
+                            userScore={score}
+                        />
                         <SuperpowerSection
                             isSuperpowerExpanded={isSuperpowerExpanded}
                             setIsSuperpowerExpanded={setIsSuperpowerExpanded}
                             tasks={tasks}
                             superpowerRef={superpowerRef}
+                            vkid={vkid}
                         />
                         <PrizesSection
                             onShowPrizeRules={() => setShowPrizeRules(true)}
                         />
                         <RatingSection
                             onShowRatingPage={() => setShowRatingPage(true)}
+                            vkid={vkid}
+                            ratingData={ratingData}
+                            loading={ratingLoading}
+                            currentPos={currentPos}
                         />
                     </>
                 )}
@@ -115,7 +136,7 @@ const MenuBottomSheet = ({
             {isModalVisible && (
                 <ModalPrizeRules
                     isOpen={showModal}
-                    onClose={() => setShowModal(false)}
+                    onClose={handleCloseModal}
                 />
             )}
         </div>

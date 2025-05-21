@@ -1,8 +1,10 @@
 export class ResourceLoader {
-    constructor() {
+    constructor(extraImages = {}) {
         this.images = {
             background: '/images/background.png',
+            backgroundPower: '/images/backgroundPower.png',
             byte: '/images/byte.svg',
+            byteOnboarding: '/images/byteOnboarding.svg',
             score: '/images/score.svg',
             scoreByte: '/images/scoreByte.svg',
             restart: '/images/restart.svg',
@@ -13,6 +15,7 @@ export class ResourceLoader {
             cloud3: '/images/cloud3.svg',
             cloud4: '/images/cloud4.svg',
             cloud5: '/images/cloud5.svg',
+            ...extraImages
         };
         this.loadedImages = {};
         this.totalImages = Object.keys(this.images).length;
@@ -88,6 +91,14 @@ export class ResourceLoader {
         const image = this.loadedImages[key];
         if (!image) {
             console.warn(`Image not found: ${key}`);
+        }
+        return image;
+    }
+
+    getImageUrl(key) {
+        const image = this.images[key];
+        if (!image) {
+            console.warn(`Image URL not found: ${key}`);
         }
         return image;
     }

@@ -96,7 +96,7 @@ export class Platform {
             this.scoreOpacity = 1;
             this.scoreY = -this.height / 2;
             this.hasBeenJumpedOn = true;
-            this.game.score += 5;
+            this.game.score += this.game.superpowerActive ? 10 : 5;
         }
     }
 }

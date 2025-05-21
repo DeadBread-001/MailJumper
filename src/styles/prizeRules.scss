@@ -1,3 +1,8 @@
+.prize-block {
+    margin-bottom: 90px;
+    margin-top: 20px;
+}
+
 .prize-rules-container {
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
@@ -8,16 +13,14 @@
 .prize-rules-header {
     display: flex;
     align-items: center;
-    padding: 24px 0 0 0;
+    padding: 12px 0 0 0;
     justify-content: flex-start;
     position: relative;
 }
 
 .prize-rules-back {
-    color: #1877f2;
     background: none;
     border: none;
-    font-size: 18px;
     margin-left: 16px;
     cursor: pointer;
     z-index: 2;
@@ -85,8 +88,8 @@
 .prize-block-long .prize-block-img {
     margin-left: 18px;
     opacity: 0.3;
-    width: 54px;
-    height: 54px;
+    width: 32px;
+    height: 32px;
     align-self: flex-start;
     margin-top: 0;
 }
@@ -126,8 +129,8 @@
     margin-bottom: 8px;
     margin-top: 0;
     opacity: 0.3;
-    width: 44px;
-    height: 44px;
+    width: 32px;
+    height: 32px;
 }
 
 .prize-block-mailspace {
@@ -177,8 +180,8 @@
 .prize-block-mailspace .prize-block-img {
     margin-left: 18px;
     opacity: 0.3;
-    width: 54px;
-    height: 54px;
+    width: 32px;
+    height: 32px;
     align-self: flex-start;
     margin-top: 0;
 }

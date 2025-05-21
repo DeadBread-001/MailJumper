@@ -29,15 +29,23 @@ export class Player {
     }
 
     update(inputHandler, deltaTime) {
-        this.x += this.vx * deltaTime * this.game.speedMultiplier;
-
-        if (inputHandler.keys.includes('ArrowLeft')) {
-            this.vx = -this.max_vx;
-            this.direction = -1;
-        } else if (inputHandler.keys.includes('ArrowRight')) {
-            this.vx = this.max_vx;
-            this.direction = 1;
-        } else this.vx = 0;
+        if (inputHandler.controlType === 'mouse' && inputHandler.mouseX !== null) {
+            const targetX = inputHandler.mouseX - this.width / 2;
+            const dx = targetX - this.x;
+            const followSpeed = 0.03;
+            this.x += dx * followSpeed;
+            if (dx < 0) this.direction = -1;
+            else if (dx > 0) this.direction = 1;
+        } else {
+            if (inputHandler.keys.includes('ArrowLeft')) {
+                this.vx = -this.max_vx;
+                this.direction = -1;
+            } else if (inputHandler.keys.includes('ArrowRight')) {
+                this.vx = this.max_vx;
+                this.direction = 1;
+            } else this.vx = 0;
+            this.x += this.vx * deltaTime * this.game.speedMultiplier;
+        }
 
         if (this.x < -this.width / 2) this.x = this.game.width - this.width / 2;
         if (this.x + this.width / 2 > this.game.width) this.x = -this.width / 2;
@@ -134,6 +142,12 @@ export class Player {
                 type = platform.type;
                 if (type === 'green') {
                     platform.triggerScoreEffect();
+                    const soundEnabled = localStorage.getItem('soundEnabled');
+                    if (soundEnabled === null || soundEnabled === 'true') {
+                        const audio = new Audio('/sounds/toy-button.mp3');
+                        audio.volume = 0.5;
+                        audio.play();
+                    }
                 }
             }
         });

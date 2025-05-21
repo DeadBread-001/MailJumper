@@ -70,7 +70,7 @@ const AuthVKID = ({ onLoginSuccess }) => {
                         document.cookie = `device_id=${deviceId}; max-age=${maxAge}; path=/`;
                         document.cookie = `vkid=${userData.vkid}; max-age=${maxAge}; path=/`;
 
-                        if (onLoginSuccess) onLoginSuccess();
+                        if (onLoginSuccess) onLoginSuccess(userData.is_first_time);
 
                         window.dispatchEvent(new Event('auth_success'));
                     }

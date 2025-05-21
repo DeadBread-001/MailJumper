@@ -5,7 +5,10 @@ const PrizeRulesPage = ({ onBack, onShowModal }) => (
     <div className="prize-rules-container">
         <div className="prize-rules-header">
             <button className="prize-rules-back" onClick={onBack}>
-                &#8592; Назад
+                <img
+                    src="/images/back.svg"
+                    alt="Назад"
+                />
             </button>
             <span className="prize-rules-title">Призы</span>
         </div>

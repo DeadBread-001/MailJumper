@@ -1,7 +1,7 @@
 import React from 'react';
 
 const PrizeBlocks = () => (
-    <div style={{ marginTop: 20 }}>
+    <div className='prize-block'>
         <div className="prize-block-long">
             <div className="prize-block-content">
                 <div className="prize-block-title">Название приза</div>

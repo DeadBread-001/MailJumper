@@ -3,7 +3,7 @@ export class Background {
         this.game = game;
         this.width = this.game.width;
         this.height = this.game.height;
-        this.image = resourceLoader.getImage('background');
+        this.resourceLoader = resourceLoader;
         this.x = 0;
         this.y = 0;
     }
@@ -19,11 +19,14 @@ export class Background {
     }
 
     draw(context) {
-        context.drawImage(this.image, this.x, this.y, this.width, this.height);
+        const image = this.game.superpowerActive
+            ? this.resourceLoader.getImage('backgroundPower')
+            : this.resourceLoader.getImage('background');
+        context.drawImage(image, this.x, this.y, this.width, this.height);
         context.drawImage(
-            this.image,
+            image,
             this.x,
-            this.y - this.height,
+            this.y - this.height + 1,
             this.width,
             this.height
         );
