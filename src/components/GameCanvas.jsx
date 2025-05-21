@@ -183,11 +183,18 @@ const GameCanvas = () => {
                             });
                             this.scoreSent = true;
                             setLastScore(this.score);
-                            setShowDeathScreen(true);
                             if (this.score > bestScore) {
                                 setBestScore(this.score);
                                 localStorage.setItem('bestScore', this.score);
                             }
+                            if (this.playerName) {
+                                getScore(this.playerName).then((score) => {
+                                    if (score !== undefined) {
+                                        setBestScore(score);
+                                    }
+                                });
+                            }
+                            setShowDeathScreen(true);
                         }
                     }
                 }
@@ -403,17 +410,6 @@ const GameCanvas = () => {
     useEffect(() => {
         localStorage.setItem('soundEnabled', soundEnabled);
     }, [soundEnabled]);
-
-    const handleDeath = () => {
-        if (vkid) {
-            getScore(vkid).then((score) => {
-                if (score !== undefined) {
-                    setBestScore(score);
-                }
-            });
-        }
-        setShowDeathScreen(true);
-    };
 
     if (checkingAuth) {
         return <div className="auth-loading-screen">Загрузка...</div>;
