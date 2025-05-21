@@ -509,12 +509,18 @@ const GameCanvas = () => {
                                 </span>
                             </div>
                             <img
-                                src="/images/scoreByte.svg"
+                                src={
+                                    lastScore > bestScore
+                                        ? '/images/newRecordByte.svg'
+                                        : '/images/scoreByte.svg'
+                                }
                                 alt="byte"
                                 className="death-byte-img"
                             />
                             <div className="death-score-label-large">
-                                Попробуешь побить рекорд?
+                                {lastScore > bestScore
+                                    ? 'Новый рекорд!'
+                                    : 'Попробуешь побить рекорд?'}
                             </div>
                             <div className="death-best-score-block">
                                 <span className="death-best-score-label">
