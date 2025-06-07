@@ -53,10 +53,11 @@ const AddTaskModal = ({ isOpen, onClose, taskToEdit }) => {
         const isEdit = !!taskToEdit;
 
         const dataToSend = {
+            id: 0,
             name: form.name,
             description: form.description,
-            link: form.link,
-            reward: Number(form.reward),
+            // link: form.link,
+            // reward: Number(form.reward),
         };
 
         if (isEdit && form.id) {
@@ -66,7 +67,7 @@ const AddTaskModal = ({ isOpen, onClose, taskToEdit }) => {
         try {
             await saveTask(dataToSend, isEdit);
             onClose();
-            location.reload();
+            // location.reload();
         } catch (err) {
             console.error('Ошибка при сохранении:', err.message);
         }
