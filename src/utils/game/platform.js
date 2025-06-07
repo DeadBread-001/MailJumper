@@ -1,8 +1,20 @@
 export class Platform {
     constructor(game, lowerY, upperY, type, resourceLoader) {
         this.game = game;
-        this.width = 101;
-        this.height = 58;
+        this.baseWidth = 101;
+        this.baseHeight = 58;
+
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            const scale = window.innerWidth / 500;
+            this.sizeMultiplier = scale * (0.9 + Math.random() * 0.2);
+        } else {
+            this.sizeMultiplier = 0.9 + Math.random() * 0.2;
+        }
+
+        this.width = this.baseWidth * this.sizeMultiplier;
+        this.height = this.baseHeight * this.sizeMultiplier;
+
         this.type = type;
         this.x = Math.floor(Math.random() * (this.game.width - this.width + 1));
         this.y = this.calc_Y(upperY, lowerY);
@@ -10,10 +22,6 @@ export class Platform {
 
         this.cloudNumber = Math.floor(Math.random() * 5) + 1;
         this.image = resourceLoader.getImage(`cloud${this.cloudNumber}`);
-
-        this.sizeMultiplier = 0.9 + Math.random() * 0.2;
-        this.width = this.width * this.sizeMultiplier;
-        this.height = this.height * this.sizeMultiplier;
 
         this.isFlipped = Math.random() > 0.5;
 

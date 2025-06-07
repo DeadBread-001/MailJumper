@@ -7,7 +7,7 @@ import RatingSection from './RatingSection';
 import PrizeRulesPage from './PrizeRulesPage';
 import RatingPage from './RatingPage';
 import ModalPrizeRules from './ModalPrizeRules';
-import { getTasks } from '../api/tasks';
+import { getTasks } from '../api/admin';
 import { getScore, getTopPlayersForUser } from '../api/rating';
 import { check } from '../api/auth';
 

@@ -1,15 +1,19 @@
-import { getSelectedCharacter } from '../characterData';
-
 export class Player {
     constructor(game, resourceLoader) {
         this.game = game;
         this.sizeModifier = 1;
-        this.width = 86.8320083618164 * this.sizeModifier;
-        this.height = 92.63623046875 * this.sizeModifier;
-        this.x =
-            this.game.platforms
-                .filter((platform) => platform.type === 'green')
-                .slice(-1)[0].x + 6;
+        this.baseWidth = 86.8320083618164;
+        this.baseHeight = 92.63623046875;
+
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            this.sizeModifier = window.innerWidth / 500;
+        }
+
+        this.width = this.baseWidth * this.sizeModifier;
+        this.height = this.baseHeight * this.sizeModifier;
+
+        this.x = this.game.platforms.slice(-1)[0].x + 6;
         this.y =
             this.game.platforms
                 .filter((platform) => platform.type === 'green')

@@ -95,17 +95,6 @@ export default function Onboarding({ onFinish, resourceLoader }) {
                             </span>
                         </label>
                     </div>
-                    {controlType && (
-                        <button
-                            className="onboarding-btn onboarding-btn-appear"
-                            onClick={handleNext}
-                        >
-                            Играть
-                            <span className="onboarding-btn-arrow">
-                                <img src="/images/play.svg" alt="Играть" />
-                            </span>
-                        </button>
-                    )}
                 </div>
             ),
             button: null,
@@ -119,6 +108,17 @@ export default function Onboarding({ onFinish, resourceLoader }) {
                 {step === 0 && (
                     <button className="onboarding-btn" onClick={handleNext}>
                         {onboardingSlides[0].button}
+                    </button>
+                )}
+                {step === 1 && controlType && (
+                    <button
+                        className="onboarding-btn onboarding-btn-appear"
+                        onClick={handleNext}
+                    >
+                        Играть
+                        <span className="onboarding-btn-arrow">
+                            <img src="/images/play.svg" alt="Играть" />
+                        </span>
                     </button>
                 )}
             </div>

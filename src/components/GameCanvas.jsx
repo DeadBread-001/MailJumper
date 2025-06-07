@@ -104,8 +104,16 @@ const GameCanvas = () => {
         if (!isAuthenticated || isLoading || showOnboarding) return;
         const canvas = document.querySelector('#canvas1');
         const ctx = canvas.getContext('2d');
-        canvas.width = CANVAS_WIDTH;
-        canvas.height = CANVAS_HEIGHT;
+
+        // Set canvas dimensions based on device
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        } else {
+            canvas.width = CANVAS_WIDTH;
+            canvas.height = CANVAS_HEIGHT;
+        }
 
         if (!gameInstance.current) {
             class Game {
@@ -231,7 +239,7 @@ const GameCanvas = () => {
                     }
                 }
             }
-            gameInstance.current = new Game(CANVAS_WIDTH, CANVAS_HEIGHT);
+            gameInstance.current = new Game(canvas.width, canvas.height);
         }
         if (!inputHandler.current) {
             inputHandler.current = new InputHandler(
@@ -411,6 +419,34 @@ const GameCanvas = () => {
         localStorage.setItem('soundEnabled', soundEnabled);
     }, [soundEnabled]);
 
+    // Add resize handler
+    useEffect(() => {
+        const handleResize = () => {
+            if (!gameInstance.current) return;
+
+            const canvas = document.querySelector('#canvas1');
+            const isMobile = window.innerWidth <= 768;
+
+            if (isMobile) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                gameInstance.current.width = window.innerWidth;
+                gameInstance.current.height = window.innerHeight;
+            } else {
+                canvas.width = CANVAS_WIDTH;
+                canvas.height = CANVAS_HEIGHT;
+                gameInstance.current.width = CANVAS_WIDTH;
+                gameInstance.current.height = CANVAS_HEIGHT;
+            }
+
+            // Reset game to apply new dimensions
+            gameInstance.current.reset();
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     if (checkingAuth) {
         return <div className="auth-loading-screen">Загрузка...</div>;
     }
@@ -466,13 +502,15 @@ const GameCanvas = () => {
                         alt={soundEnabled ? 'Звук включён' : 'Звук выключен'}
                     />
                 </button>
-                <canvas id="canvas1" className="game-canvas"></canvas>
-                {showOnboarding && (
-                    <Onboarding
-                        resourceLoader={resourceLoader}
-                        onFinish={() => setShowOnboarding(false)}
-                    />
-                )}
+                <div style={{ position: 'relative' }}>
+                    <canvas id="canvas1" className="game-canvas"></canvas>
+                    {showOnboarding && (
+                        <Onboarding
+                            resourceLoader={resourceLoader}
+                            onFinish={() => setShowOnboarding(false)}
+                        />
+                    )}
+                </div>
                 <div className="game-superpower-block">
                     <img
                         src="/images/superpower.svg"

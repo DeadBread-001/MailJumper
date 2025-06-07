@@ -1,5 +1,15 @@
-// export const IP = 'http://127.0.0.1:3001/api/v1/';
+//export const IP = 'http://127.0.0.1:3001/api/v1/';
 export const IP = 'https://mail-jumper.ru/api/v1/';
+
+// let csrfToken = null;
+// export function setCSRFToken(token) {
+//     csrfToken = token;
+//
+// }
+// export function getCSRFToken() {
+//     return csrfToken;
+//
+// }
 
 export const fetchRequest = async (
     url,
@@ -15,6 +25,10 @@ export const fetchRequest = async (
             credentials: 'include',
         };
 
+        // if (csrfToken) {
+        //     options.headers['X-CSRF-Token'] = csrfToken;
+        // }
+
         if (body instanceof FormData || contentType === 'multipart/form-data') {
             options.body = body;
         } else if (body !== null) {
@@ -23,6 +37,11 @@ export const fetchRequest = async (
         }
 
         const response = await fetch(url, options);
+
+        // const newToken = response.headers.get('X-CSRF-Token');
+        // if (newToken) {
+        //     setCSRFToken(newToken);
+        // }
 
         if (!response.ok) {
             throw new Error(

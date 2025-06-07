@@ -17,7 +17,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { deleteTask } from '../../api/admin';
 import AddTaskModal from '../AddTaskModal';
-import { getTasks } from '../../api/tasks';
+import { getTasks } from '../../api/admin';
 
 const AdminTasks = () => {
     const [tasks, setTasks] = useState([]);

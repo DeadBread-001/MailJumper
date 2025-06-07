@@ -20,3 +20,13 @@ export const deleteTask = async (id) => {
         throw new Error('Ошибка при отправке результата');
     }
 };
+
+export async function getTasks() {
+    const url = IP + 'admin/tasks';
+    const data = await fetchRequest(url, 'GET');
+    if (data.Status === 200) {
+        return data.Data.tasks;
+    } else {
+        throw new Error('Некорректный формат данных');
+    }
+}
