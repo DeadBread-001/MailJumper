@@ -48,7 +48,10 @@ const cacheFirstAndUpdate = (event) => {
             } catch (e) {
                 const cache = await caches.open(CACHE_NAME);
                 const response = await fetch(event.request);
-                if (event.request.url.startsWith('http') && response.status !== 206) {
+                if (
+                    event.request.url.startsWith('http') &&
+                    response.status !== 206
+                ) {
                     cache.put(event.request, response.clone());
                 }
                 return response;
@@ -63,7 +66,10 @@ const networkFirst = (event) => {
             const cache = await caches.open(CACHE_NAME);
             try {
                 const response = await fetch(event.request);
-                if (event.request.url.startsWith('http') && response.status !== 206) {
+                if (
+                    event.request.url.startsWith('http') &&
+                    response.status !== 206
+                ) {
                     cache.put(event.request, response.clone());
                 }
                 return response;

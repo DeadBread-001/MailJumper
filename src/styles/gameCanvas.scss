@@ -174,8 +174,8 @@
         min-width: 250px;
 
         @media (max-width: 768px) {
-            width: 200px;
-            min-width: 200px;
+            width: 220px;
+            min-width: 220px;
         }
     }
 
@@ -360,21 +360,17 @@
     width: 130px;
     line-height: 20px;
     background:
-            linear-gradient(
-                            0deg,
-                            rgba(156, 255, 7, 0.65),
-                            rgba(156, 255, 7, 0.65)
-            ),
-            linear-gradient(
-                            302.47deg,
-                            rgba(184, 252, 117, 0) 51.28%,
-                            rgba(2, 252, 74, 0.3) 90.92%
-            );
+        linear-gradient(0deg, rgba(156, 255, 7, 0.65), rgba(156, 255, 7, 0.65)),
+        linear-gradient(
+            302.47deg,
+            rgba(184, 252, 117, 0) 51.28%,
+            rgba(2, 252, 74, 0.3) 90.92%
+        );
     box-shadow:
-            0 2px 12px 0 rgba(63, 73, 79, 0.1607843137),
-            0 10px 20px 0 rgba(63, 73, 79, 0.0588235294),
-            0px -1px 4px 0px rgba(0, 152, 44, 0.2) inset,
-            1px 2px 2px 0px rgba(209, 255, 164, 0.6980392157) inset;
+        0 2px 12px 0 rgba(63, 73, 79, 0.1607843137),
+        0 10px 20px 0 rgba(63, 73, 79, 0.0588235294),
+        0px -1px 4px 0px rgba(0, 152, 44, 0.2) inset,
+        1px 2px 2px 0px rgba(209, 255, 164, 0.6980392157) inset;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -385,8 +381,8 @@
     visibility: visible;
     pointer-events: auto;
     transition:
-            opacity 0.4s,
-            visibility 0.4s;
+        opacity 0.4s,
+        visibility 0.4s;
     text-align: left;
 
     @media (max-width: 768px) {
@@ -740,7 +736,6 @@
         margin-top: clamp(2px, 0.5vw, 4px);
         margin-right: clamp(6px, 1.5vw, 8px);
     }
-
 }
 
 .onboarding-radio_active .onboarding-radio-custom {
@@ -894,7 +889,9 @@
     }
 }
 
-.onboarding-title, .onboarding-title-2, .onboarding-title-3 {
+.onboarding-title,
+.onboarding-title-2,
+.onboarding-title-3 {
     width: 100%;
     text-align: center;
     word-break: break-word;
@@ -904,4 +901,3 @@
         margin-bottom: clamp(12px, 3vw, 24px);
     }
 }
-
