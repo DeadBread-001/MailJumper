@@ -9,14 +9,17 @@ import CharacterSelection from './CharacterSelection';
 import MenuBottomSheet from './MenuBottomSheet';
 import AuthVKID from './AuthVKID';
 import Onboarding from './Onboarding';
-import MotionPermissionRequest from './MotionPermissionRequest';
 import '../styles/menuBottomSheet.scss';
 import '../styles/gameCanvas.scss';
 import { ResourceLoader } from '../utils/game/resourceLoader';
 import muteIcon from '../../public/images/mute.svg';
 import unmuteIcon from '../../public/images/unmute.svg';
 import { getScore } from '../api/rating';
-import { getOnboardingKey, getControlTypeKey, getDeviceType } from '../utils/deviceDetection';
+import {
+    getOnboardingKey,
+    getControlTypeKey,
+    getDeviceType,
+} from '../utils/deviceDetection';
 
 const CANVAS_WIDTH = 500;
 const CANVAS_HEIGHT = 765;
@@ -62,7 +65,6 @@ const GameCanvas = () => {
     });
     const [vkid, setVkid] = useState(null);
     const [superpowerCount, setSuperpowerCount] = useState(0);
-    const [showMotionPermission, setShowMotionPermission] = useState(false);
 
     useEffect(() => {
         resourceLoader.current = new ResourceLoader();
@@ -79,7 +81,7 @@ const GameCanvas = () => {
             const userData = await check();
             setIsAuthenticated(true);
             setVkid(userData.vkid);
-            
+
             if (userData.vkid) {
                 try {
                     const serverBestScore = await getScore(userData.vkid);
@@ -90,7 +92,7 @@ const GameCanvas = () => {
                     console.error('Error loading best score:', error);
                 }
             }
-            
+
             const hasCompletedOnboarding =
                 localStorage.getItem(getOnboardingKey()) === 'true';
             setShowOnboarding(!hasCompletedOnboarding);
@@ -236,20 +238,22 @@ const GameCanvas = () => {
                             });
                             this.scoreSent = true;
                             setLastScore(this.score);
-                            
+
                             if (this.score > bestScore) {
                                 setBestScore(this.score);
                             }
-                            
+
                             if (this.playerName) {
-                                getScore(this.playerName).then((score) => {
-                                    if (score !== undefined) {
-                                        setBestScore(score);
-                                    }
-                                    setShowDeathScreen(true);
-                                }).catch(() => {
-                                    setShowDeathScreen(true);
-                                });
+                                getScore(this.playerName)
+                                    .then((score) => {
+                                        if (score !== undefined) {
+                                            setBestScore(score);
+                                        }
+                                        setShowDeathScreen(true);
+                                    })
+                                    .catch(() => {
+                                        setShowDeathScreen(true);
+                                    });
                             } else {
                                 setShowDeathScreen(true);
                             }
@@ -518,7 +522,7 @@ const GameCanvas = () => {
 
     useEffect(() => {
         window.resetOnboarding = resetOnboarding;
-        
+
         window.getOnboardingData = () => {
             return {
                 deviceType: getDeviceType(),
@@ -590,11 +594,17 @@ const GameCanvas = () => {
                     <canvas id="canvas1" className="game-canvas"></canvas>
                     {showOnboarding && (
                         <Onboarding
-                            resourceLoader={resourceLoader}
-                            onFinish={() => setShowOnboarding(false)}
-                            onMotionPermissionRequest={() =>
-                                setShowMotionPermission(true)
-                            }
+                            onFinish={(selectedControlType) => {
+                                setShowOnboarding(false);
+                                if (selectedControlType) {
+                                    setControlType(selectedControlType);
+                                    if (inputHandler.current) {
+                                        inputHandler.current.setControlType(
+                                            selectedControlType
+                                        );
+                                    }
+                                }
+                            }}
                         />
                     )}
                 </div>
@@ -758,28 +768,6 @@ const GameCanvas = () => {
                 wasSuperpowerJustOpened={wasSuperpowerJustOpened}
                 setWasSuperpowerJustOpened={setWasSuperpowerJustOpened}
             />
-            {showMotionPermission && (
-                <MotionPermissionRequest
-                    onPermissionGranted={() => {
-                        setShowMotionPermission(false);
-                        if (inputHandler.current) {
-                            inputHandler.current.setControlType(controlType);
-                        }
-                    }}
-                    onPermissionDenied={() => {
-                        setShowMotionPermission(false);
-                        const newControlType = 'touch';
-                        setControlType(newControlType);
-                        localStorage.setItem(
-                            getControlTypeKey(),
-                            newControlType
-                        );
-                        if (inputHandler.current) {
-                            inputHandler.current.setControlType(newControlType);
-                        }
-                    }}
-                />
-            )}
         </div>
     );
 };

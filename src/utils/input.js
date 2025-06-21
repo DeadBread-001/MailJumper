@@ -190,26 +190,7 @@ export class InputHandler {
                 canvas.addEventListener('touchcancel', this.handleTouchCancel);
             }
         } else if (this.controlType === 'tilt') {
-            if (
-                window.DeviceMotionEvent &&
-                typeof window.DeviceMotionEvent.requestPermission === 'function'
-            ) {
-                window.DeviceMotionEvent.requestPermission()
-                    .then((permissionState) => {
-                        if (permissionState === 'granted') {
-                            window.addEventListener(
-                                'devicemotion',
-                                this.handleDeviceMotion
-                            );
-                        }
-                    })
-                    .catch(console.error);
-            } else {
-                window.addEventListener(
-                    'devicemotion',
-                    this.handleDeviceMotion
-                );
-            }
+            window.addEventListener('devicemotion', this.handleDeviceMotion);
         }
     }
 

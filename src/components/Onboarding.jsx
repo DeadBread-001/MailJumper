@@ -11,13 +11,11 @@ import {
  * @param {Object} props
  * @param {Function} props.onFinish - Колбэк при завершении онбординга.
  * @param {Object} props.resourceLoader - Лоадер ресурсов (опционально).
- * @param {Function} [props.onMotionPermissionRequest] - Колбэк для запроса разрешения на датчики движения.
  * @returns {JSX.Element}
  */
 export default function Onboarding({
     onFinish,
     resourceLoader,
-    onMotionPermissionRequest,
 }) {
     const [step, setStep] = useState(0);
     const deviceType = getDeviceType();
@@ -35,14 +33,18 @@ export default function Onboarding({
             setStep(1);
         } else {
             if (controlType) {
+                console.log('Onboarding: Выбран тип управления:', controlType);
                 localStorage.setItem(controlTypeKey, controlType);
                 localStorage.setItem(getOnboardingKey(), 'true');
 
-                if (controlType === 'tilt' && onMotionPermissionRequest) {
-                    onMotionPermissionRequest();
-                } else {
-                    onFinish(controlType);
-                }
+                console.log(
+                    'Onboarding: Завершаем онбординг с типом:',
+                    controlType
+                );
+                // Завершаем онбординг для всех типов управления
+                onFinish(controlType);
+            } else {
+                console.log('Onboarding: Тип управления не выбран');
             }
         }
     };
