@@ -1,9 +1,25 @@
+/**
+ * Название основного кеша приложения.
+ */
 const CACHE_NAME = 'MailJumper';
+/**
+ * Название динамического кеша.
+ */
 const CACHE_NAME_DYNAMIC = 'MailJumper-dynamic';
+/**
+ * URL для предварительного кеширования.
+ */
 const CACHE_URLS = ['/'];
+/**
+ * Регулярное выражение для статических ресурсов (кеш-первый подход).
+ */
 const CACHE_FIRST_AND_UPDATE_REGEX =
     /\.(webp|svg|jpg|jpeg|gif|png|css|js|ttf|woff2)$/i;
 
+/**
+ * Удаляет старые кеши, оставляя только текущие.
+ * @async
+ */
 const deleteOldCaches = async () => {
     const keys = await caches.keys();
     await Promise.all(
@@ -15,12 +31,23 @@ const deleteOldCaches = async () => {
     );
 };
 
+/**
+ * Получает ответ из кеша.
+ * @param {Request} request - Запрос
+ * @param {string} cacheName - Название кеша
+ * @returns {Promise<Response>} Ответ из кеша
+ */
 const fromCache = async (request, cacheName) => {
     const cache = await caches.open(cacheName);
     const cachedResponse = await cache.match(request);
     return cachedResponse || Promise.reject('no response in cache');
 };
 
+/**
+ * Обновляет кеш для указанного запроса.
+ * @param {Request} request - Запрос для обновления
+ * @async
+ */
 const update = async (request) => {
     try {
         if (request.url.startsWith('http')) {
@@ -35,6 +62,10 @@ const update = async (request) => {
     }
 };
 
+/**
+ * Стратегия "кеш-первый" с обновлением в фоне.
+ * @param {FetchEvent} event - Событие fetch
+ */
 const cacheFirstAndUpdate = (event) => {
     event.respondWith(
         (async () => {
@@ -60,6 +91,10 @@ const cacheFirstAndUpdate = (event) => {
     );
 };
 
+/**
+ * Стратегия "сеть-первый" с кешированием.
+ * @param {FetchEvent} event - Событие fetch
+ */
 const networkFirst = (event) => {
     event.respondWith(
         (async () => {
@@ -80,6 +115,10 @@ const networkFirst = (event) => {
     );
 };
 
+/**
+ * Стратегия для не-GET запросов: сеть-первый с fallback.
+ * @param {FetchEvent} event - Событие fetch
+ */
 const nonGetRequestNetworkFirst = (event) => {
     event.respondWith(
         (async () => {

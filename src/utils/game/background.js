@@ -1,4 +1,12 @@
+/**
+ * Класс для управления фоном игры.
+ */
 export class Background {
+    /**
+     * Создает новый экземпляр фона.
+     * @param {Object} game - Объект игры
+     * @param {Object} resourceLoader - Загрузчик ресурсов
+     */
     constructor(game, resourceLoader) {
         this.game = game;
         this.width = this.game.width;
@@ -8,6 +16,10 @@ export class Background {
         this.y = 0;
     }
 
+    /**
+     * Обновляет позицию фона.
+     * @param {number} deltaTime - Время с последнего обновления
+     */
     update(deltaTime) {
         if (this.y > this.height) {
             this.y = 0;
@@ -18,6 +30,10 @@ export class Background {
         }
     }
 
+    /**
+     * Отрисовывает фон на канвасе.
+     * @param {CanvasRenderingContext2D} context - Контекст канваса
+     */
     draw(context) {
         const image = this.game.superpowerActive
             ? this.resourceLoader.getImage('backgroundPower')

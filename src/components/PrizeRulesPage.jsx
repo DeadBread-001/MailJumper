@@ -1,6 +1,13 @@
 import React from 'react';
 import PrizeBlocks from './PrizeBlocks';
 
+/**
+ * Компонент страницы правил призов.
+ * @param {Object} props
+ * @param {Function} props.onBack - Функция для возврата назад
+ * @param {Function} props.onShowModal - Функция для открытия модального окна с правилами
+ * @returns {JSX.Element}
+ */
 const PrizeRulesPage = ({ onBack, onShowModal }) => (
     <div className="prize-rules-container">
         <div className="prize-rules-header">

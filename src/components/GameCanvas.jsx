@@ -9,16 +9,22 @@ import CharacterSelection from './CharacterSelection';
 import MenuBottomSheet from './MenuBottomSheet';
 import AuthVKID from './AuthVKID';
 import Onboarding from './Onboarding';
+import MotionPermissionRequest from './MotionPermissionRequest';
 import '../styles/menuBottomSheet.scss';
 import '../styles/gameCanvas.scss';
 import { ResourceLoader } from '../utils/game/resourceLoader';
 import muteIcon from '../../public/images/mute.svg';
 import unmuteIcon from '../../public/images/unmute.svg';
 import { getScore } from '../api/rating';
+import { getOnboardingKey, getControlTypeKey, getDeviceType } from '../utils/deviceDetection';
 
 const CANVAS_WIDTH = 500;
 const CANVAS_HEIGHT = 765;
 
+/**
+ * Главный компонент игрового экрана. Управляет состоянием игры, онбордингом, меню, суперсилой и т.д.
+ * @returns {JSX.Element}
+ */
 const GameCanvas = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [gamePaused, setGamePaused] = useState(false);
@@ -30,9 +36,7 @@ const GameCanvas = () => {
         useState(false);
     const [showDeathScreen, setShowDeathScreen] = useState(false);
     const [lastScore, setLastScore] = useState(0);
-    const [bestScore, setBestScore] = useState(() => {
-        return Number(localStorage.getItem('bestScore') || 0);
-    });
+    const [bestScore, setBestScore] = useState(0);
     const [currentScore, setCurrentScore] = useState(0);
     const [scoreBump, setScoreBump] = useState(false);
     const [loadingProgress, setLoadingProgress] = useState(0);
@@ -46,7 +50,7 @@ const GameCanvas = () => {
     const resourceLoader = useRef(null);
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [controlType, setControlType] = useState(
-        () => localStorage.getItem('controlType') || ''
+        () => localStorage.getItem(getControlTypeKey()) || ''
     );
     const [superpowerActive, setSuperpowerActive] = useState(false);
     const [superpowerAvailable, setSuperpowerAvailable] = useState(true);
@@ -58,6 +62,7 @@ const GameCanvas = () => {
     });
     const [vkid, setVkid] = useState(null);
     const [superpowerCount, setSuperpowerCount] = useState(0);
+    const [showMotionPermission, setShowMotionPermission] = useState(false);
 
     useEffect(() => {
         resourceLoader.current = new ResourceLoader();
@@ -65,11 +70,30 @@ const GameCanvas = () => {
 
     const isActuallyPaused = gamePaused || autoPaused.current;
 
+    /**
+     * Проверяет авторизацию пользователя и статус онбординга.
+     * @async
+     */
     const checkAuth = async () => {
         try {
             const userData = await check();
             setIsAuthenticated(true);
-            setShowOnboarding(userData.is_first_time);
+            setVkid(userData.vkid);
+            
+            if (userData.vkid) {
+                try {
+                    const serverBestScore = await getScore(userData.vkid);
+                    if (serverBestScore !== undefined) {
+                        setBestScore(serverBestScore);
+                    }
+                } catch (error) {
+                    console.error('Error loading best score:', error);
+                }
+            }
+            
+            const hasCompletedOnboarding =
+                localStorage.getItem(getOnboardingKey()) === 'true';
+            setShowOnboarding(!hasCompletedOnboarding);
         } catch {
             setIsAuthenticated(false);
         } finally {
@@ -105,7 +129,6 @@ const GameCanvas = () => {
         const canvas = document.querySelector('#canvas1');
         const ctx = canvas.getContext('2d');
 
-        // Set canvas dimensions based on device
         const isMobile = window.innerWidth <= 768;
         if (isMobile) {
             canvas.width = window.innerWidth;
@@ -116,7 +139,14 @@ const GameCanvas = () => {
         }
 
         if (!gameInstance.current) {
+            /**
+             * Класс основной игровой логики (движок).
+             */
             class Game {
+                /**
+                 * @param {number} width - Ширина канваса
+                 * @param {number} height - Высота канваса
+                 */
                 constructor(width, height) {
                     this.width = width;
                     this.height = height;
@@ -131,6 +161,9 @@ const GameCanvas = () => {
                         this.askForPlayerName();
                     });
                 }
+                /**
+                 * Сброс состояния игры.
+                 */
                 reset() {
                     this.vy = 0;
                     this.gameOver = false;
@@ -153,6 +186,10 @@ const GameCanvas = () => {
                     this.speedMultiplier = 60;
                     this.scoreSent = false;
                 }
+                /**
+                 * Запрос имени игрока (vkid).
+                 * @async
+                 */
                 async askForPlayerName() {
                     try {
                         const userData = await check();
@@ -164,6 +201,10 @@ const GameCanvas = () => {
                         this.checkingAuth = false;
                     }
                 }
+                /**
+                 * Обновление состояния игры.
+                 * @param {number} deltaTime
+                 */
                 update(deltaTime) {
                     if (!this.isAuthenticated) return;
 
@@ -177,6 +218,10 @@ const GameCanvas = () => {
                         (platform) => !platform.markedForDeletion
                     );
                 }
+                /**
+                 * Отрисовка игры.
+                 * @param {CanvasRenderingContext2D} context
+                 */
                 draw(context) {
                     this.background.draw(context);
                     this.platforms.forEach((platform) => {
@@ -191,21 +236,31 @@ const GameCanvas = () => {
                             });
                             this.scoreSent = true;
                             setLastScore(this.score);
+                            
                             if (this.score > bestScore) {
                                 setBestScore(this.score);
-                                localStorage.setItem('bestScore', this.score);
                             }
+                            
                             if (this.playerName) {
                                 getScore(this.playerName).then((score) => {
                                     if (score !== undefined) {
                                         setBestScore(score);
                                     }
+                                    setShowDeathScreen(true);
+                                }).catch(() => {
+                                    setShowDeathScreen(true);
                                 });
+                            } else {
+                                setShowDeathScreen(true);
                             }
-                            setShowDeathScreen(true);
                         }
                     }
                 }
+                /**
+                 * Добавление платформ.
+                 * @param {number} lowerY
+                 * @param {number} upperY
+                 */
                 add_platforms(lowerY, upperY) {
                     let isFirstPlatform = this.platforms.length === 0;
                     do {
@@ -226,6 +281,9 @@ const GameCanvas = () => {
                         this.platforms[0].y >= lowerY
                     );
                 }
+                /**
+                 * Изменение сложности.
+                 */
                 change_difficulty() {
                     this.level++;
                     if (this.platform_max_gap > this.platform_gap) {
@@ -249,6 +307,10 @@ const GameCanvas = () => {
             gameInstance.current.inputHandler = inputHandler.current;
         }
 
+        /**
+         * Анимация игрового цикла.
+         * @param {number} timestamp
+         */
         function animate(timestamp) {
             if (!lastTimeRef.current) lastTimeRef.current = timestamp;
             let deltaTime = (timestamp - lastTimeRef.current) / 1000;
@@ -307,6 +369,9 @@ const GameCanvas = () => {
         };
     }, [menuOpen]);
 
+    /**
+     * Обработка паузы.
+     */
     const handlePause = () => {
         setMenuOpen(true);
         setGamePaused(true);
@@ -315,6 +380,9 @@ const GameCanvas = () => {
             animationRef.current = null;
         }
     };
+    /**
+     * Закрытие меню.
+     */
     const handleCloseMenu = () => {
         setMenuOpen(false);
         setGamePaused(false);
@@ -328,10 +396,16 @@ const GameCanvas = () => {
         }
     };
 
+    /**
+     * Перезапуск игры.
+     */
     const handleRestart = () => {
         gameInstance.current.reset();
         setShowDeathScreen(false);
     };
+    /**
+     * Открытие меню.
+     */
     const handleMenu = () => {
         if (gameInstance.current) gameInstance.current.reset();
         setShowDeathScreen(false);
@@ -348,24 +422,9 @@ const GameCanvas = () => {
 
     useEffect(() => {
         if (!showOnboarding) {
-            setControlType(localStorage.getItem('controlType') || '');
+            setControlType(localStorage.getItem(getControlTypeKey()) || '');
         }
     }, [showOnboarding]);
-
-    useEffect(() => {
-        const fetchVkid = async () => {
-            try {
-                const userData = await check();
-                setVkid(userData.vkid);
-            } catch (error) {
-                console.error('Error fetching vkid:', error);
-            }
-        };
-
-        if (isAuthenticated && !isLoading) {
-            fetchVkid();
-        }
-    }, [isAuthenticated, isLoading]);
 
     useEffect(() => {
         const fetchSuperpowerCount = async () => {
@@ -383,6 +442,10 @@ const GameCanvas = () => {
         }
     }, [isAuthenticated, isLoading, vkid]);
 
+    /**
+     * Активация суперсилы.
+     * @async
+     */
     const handleActivateSuperpower = async () => {
         try {
             if (!vkid) return;
@@ -419,7 +482,6 @@ const GameCanvas = () => {
         localStorage.setItem('soundEnabled', soundEnabled);
     }, [soundEnabled]);
 
-    // Add resize handler
     useEffect(() => {
         const handleResize = () => {
             if (!gameInstance.current) return;
@@ -439,12 +501,31 @@ const GameCanvas = () => {
                 gameInstance.current.height = CANVAS_HEIGHT;
             }
 
-            // Reset game to apply new dimensions
             gameInstance.current.reset();
         };
 
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    /**
+     * Сбросить онбординг для текущего устройства.
+     */
+    const resetOnboarding = () => {
+        localStorage.removeItem(getOnboardingKey());
+        setShowOnboarding(true);
+    };
+
+    useEffect(() => {
+        window.resetOnboarding = resetOnboarding;
+        
+        window.getOnboardingData = () => {
+            return {
+                deviceType: getDeviceType(),
+                onboardingCompleted: localStorage.getItem(getOnboardingKey()),
+                controlType: localStorage.getItem(getControlTypeKey()),
+            };
+        };
     }, []);
 
     if (checkingAuth) {
@@ -463,9 +544,12 @@ const GameCanvas = () => {
                 <div className="auth-window">
                     <h2 style={{ marginBottom: 24 }}>Вход через VK ID</h2>
                     <AuthVKID
-                        onLoginSuccess={(isFirstTime) => {
+                        onLoginSuccess={() => {
                             setIsAuthenticated(true);
-                            setShowOnboarding(isFirstTime);
+                            const hasCompletedOnboarding =
+                                localStorage.getItem(getOnboardingKey()) ===
+                                'true';
+                            setShowOnboarding(!hasCompletedOnboarding);
                             setCheckingAuth(false);
                         }}
                     />
@@ -508,6 +592,9 @@ const GameCanvas = () => {
                         <Onboarding
                             resourceLoader={resourceLoader}
                             onFinish={() => setShowOnboarding(false)}
+                            onMotionPermissionRequest={() =>
+                                setShowMotionPermission(true)
+                            }
                         />
                     )}
                 </div>
@@ -671,6 +758,28 @@ const GameCanvas = () => {
                 wasSuperpowerJustOpened={wasSuperpowerJustOpened}
                 setWasSuperpowerJustOpened={setWasSuperpowerJustOpened}
             />
+            {showMotionPermission && (
+                <MotionPermissionRequest
+                    onPermissionGranted={() => {
+                        setShowMotionPermission(false);
+                        if (inputHandler.current) {
+                            inputHandler.current.setControlType(controlType);
+                        }
+                    }}
+                    onPermissionDenied={() => {
+                        setShowMotionPermission(false);
+                        const newControlType = 'touch';
+                        setControlType(newControlType);
+                        localStorage.setItem(
+                            getControlTypeKey(),
+                            newControlType
+                        );
+                        if (inputHandler.current) {
+                            inputHandler.current.setControlType(newControlType);
+                        }
+                    }}
+                />
+            )}
         </div>
     );
 };

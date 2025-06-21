@@ -1,4 +1,12 @@
+/**
+ * Класс для управления игроком в игре.
+ */
 export class Player {
+    /**
+     * Создает нового игрока.
+     * @param {Object} game - Объект игры
+     * @param {Object} resourceLoader - Загрузчик ресурсов
+     */
     constructor(game, resourceLoader) {
         this.game = game;
         this.sizeModifier = 1;
@@ -32,6 +40,11 @@ export class Player {
         this.image = resourceLoader.getImage('byte');
     }
 
+    /**
+     * Обновляет состояние игрока.
+     * @param {Object} inputHandler - Обработчик ввода
+     * @param {number} deltaTime - Время с последнего обновления
+     */
     update(inputHandler, deltaTime) {
         if (
             inputHandler.controlType === 'mouse' &&
@@ -96,6 +109,10 @@ export class Player {
         }
     }
 
+    /**
+     * Отрисовывает игрока на канвасе.
+     * @param {CanvasRenderingContext2D} context - Контекст канваса
+     */
     draw(context) {
         context.save();
         context.translate(this.x + this.width / 2, this.y + this.height / 2);
@@ -113,6 +130,10 @@ export class Player {
         context.restore();
     }
 
+    /**
+     * Проверяет столкновения игрока.
+     * @returns {boolean} true если есть столкновение
+     */
     collision() {
         let result = false;
         let playerHitBox = {
@@ -124,6 +145,10 @@ export class Player {
         return result;
     }
 
+    /**
+     * Проверяет, находится ли игрок на платформе.
+     * @returns {string|null} Тип платформы или null
+     */
     onPlatform() {
         let type = null;
         let playerHitBox = {

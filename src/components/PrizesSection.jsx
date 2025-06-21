@@ -1,5 +1,11 @@
 import React from 'react';
 
+/**
+ * Компонент раздела призов.
+ * @param {Object} props
+ * @param {Function} props.onShowPrizeRules - Функция для открытия страницы правил призов
+ * @returns {JSX.Element}
+ */
 const PrizesSection = ({ onShowPrizeRules }) => (
     <div className="menu-bottom-sheet__section menu-bottom-sheet__prizes">
         <div className="menu-bottom-sheet__prizes-info">

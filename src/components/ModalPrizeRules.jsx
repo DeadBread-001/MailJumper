@@ -1,5 +1,12 @@
 import React from 'react';
 
+/**
+ * Модальное окно с правилами розыгрыша призов.
+ * @param {Object} props
+ * @param {Function} props.onClose - Функция закрытия модального окна
+ * @param {boolean} props.isOpen - Открыто ли модальное окно
+ * @returns {JSX.Element}
+ */
 const ModalPrizeRules = ({ onClose, isOpen }) => (
     <div
         className={`bottom-modal-overlay${isOpen ? ' bottom-modal-overlay_open' : ' bottom-modal-overlay_close'}`}

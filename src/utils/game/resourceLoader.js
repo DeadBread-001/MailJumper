@@ -1,4 +1,11 @@
+/**
+ * Класс для загрузки и управления игровыми ресурсами (изображения).
+ */
 export class ResourceLoader {
+    /**
+     * Создает новый загрузчик ресурсов.
+     * @param {Object} [extraImages={}] - Дополнительные изображения для загрузки
+     */
     constructor(extraImages = {}) {
         this.images = {
             background: '/images/background.png',
@@ -23,6 +30,12 @@ export class ResourceLoader {
         this.failedImages = [];
     }
 
+    /**
+     * Загружает отдельное изображение.
+     * @param {string} key - Ключ изображения
+     * @param {string} src - URL изображения
+     * @returns {Promise<HTMLImageElement>} Загруженное изображение
+     */
     loadImage(key, src) {
         return new Promise((resolve, reject) => {
             const img = new Image();
@@ -70,6 +83,10 @@ export class ResourceLoader {
         });
     }
 
+    /**
+     * Загружает все изображения.
+     * @returns {Promise<boolean>} true если загрузка прошла успешно
+     */
     async loadAll() {
         const promises = Object.entries(this.images).map(([key, src]) =>
             this.loadImage(key, src)
@@ -87,6 +104,11 @@ export class ResourceLoader {
         }
     }
 
+    /**
+     * Получает загруженное изображение по ключу.
+     * @param {string} key - Ключ изображения
+     * @returns {HTMLImageElement|undefined} Загруженное изображение
+     */
     getImage(key) {
         const image = this.loadedImages[key];
         if (!image) {
@@ -95,6 +117,11 @@ export class ResourceLoader {
         return image;
     }
 
+    /**
+     * Получает URL изображения по ключу.
+     * @param {string} key - Ключ изображения
+     * @returns {string|undefined} URL изображения
+     */
     getImageUrl(key) {
         const image = this.images[key];
         if (!image) {
@@ -103,6 +130,10 @@ export class ResourceLoader {
         return image;
     }
 
+    /**
+     * Получает прогресс загрузки в процентах.
+     * @returns {number} Прогресс загрузки (0-100)
+     */
     getProgress() {
         return (this.loadedCount / this.totalImages) * 100;
     }

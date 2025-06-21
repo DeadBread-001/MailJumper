@@ -5,10 +5,23 @@ import {
     setSelectedCharacter,
 } from '../utils/characterData';
 
+/**
+ * Компонент для выбора персонажа (тело и головной убор).
+ * @returns {JSX.Element}
+ */
 const CharacterSelection = () => {
+    /**
+     * Выбранное тело персонажа.
+     */
     const [body, setBody] = useState(getSelectedCharacter().body);
+    /**
+     * Выбранный головной убор.
+     */
     const [hat, setHat] = useState(getSelectedCharacter().hat);
 
+    /**
+     * Сохраняет выбранные части персонажа при их изменении.
+     */
     useEffect(() => {
         setSelectedCharacter(body, hat);
     }, [body, hat]);

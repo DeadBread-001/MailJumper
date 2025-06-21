@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
 import { completeTask } from '../api/tasks';
 
+/**
+ * Компонент раздела суперспособностей с заданиями.
+ * @param {Object} props
+ * @param {boolean} props.isSuperpowerExpanded - Развернут ли раздел
+ * @param {Function} props.setIsSuperpowerExpanded - Функция для переключения состояния
+ * @param {Array} props.tasks - Список доступных заданий
+ * @param {React.RefObject} props.superpowerRef - Ссылка на элемент для прокрутки
+ * @param {string} props.vkid - VK ID пользователя
+ * @returns {JSX.Element}
+ */
 const SuperpowerSection = ({
     isSuperpowerExpanded,
     setIsSuperpowerExpanded,
@@ -8,8 +18,15 @@ const SuperpowerSection = ({
     superpowerRef,
     vkid,
 }) => {
+    /**
+     * Множество выполненных заданий.
+     */
     const [completedTasks, setCompletedTasks] = useState(new Set());
 
+    /**
+     * Обрабатывает клик по заданию для его выполнения.
+     * @param {string} taskToken - Токен задания
+     */
     const handleTaskClick = async (taskToken) => {
         try {
             const response = await completeTask({ token: taskToken }, vkid);

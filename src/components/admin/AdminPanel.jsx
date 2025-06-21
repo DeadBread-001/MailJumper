@@ -3,9 +3,21 @@ import { Box, Tabs, Tab } from '@mui/material';
 import AdminTasks from './AdminTasks';
 import AdminStats from './AdminStats';
 
+/**
+ * Главная панель администратора с вкладками.
+ * @returns {JSX.Element}
+ */
 const AdminPanel = () => {
+    /**
+     * Индекс текущей активной вкладки.
+     */
     const [currentTab, setCurrentTab] = useState(0);
 
+    /**
+     * Обрабатывает переключение вкладок.
+     * @param {Event} event - Событие изменения
+     * @param {number} newValue - Новый индекс вкладки
+     */
     const handleTabChange = (event, newValue) => {
         setCurrentTab(newValue);
     };

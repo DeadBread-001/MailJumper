@@ -1,11 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { getTopPlayersForUser, getTopPlayers } from '../api/rating';
 
+/**
+ * Компонент страницы рейтинга с подробной информацией.
+ * @param {Object} props
+ * @param {Function} props.onBack - Функция для возврата назад
+ * @param {string} props.vkid - VK ID пользователя
+ * @returns {JSX.Element}
+ */
 const RatingPage = ({ onBack, vkid }) => {
+    /**
+     * Данные рейтинга пользователя.
+     */
     const [ratingData, setRatingData] = useState([]);
+    /**
+     * Данные топ-100 игроков.
+     */
     const [topData, setTopData] = useState([]);
+    /**
+     * Позиция текущего пользователя в рейтинге.
+     */
     const [currentPos, setCurrentPos] = useState(null);
 
+    /**
+     * Загружает данные рейтинга при монтировании компонента.
+     */
     useEffect(() => {
         const fetchRating = async () => {
             try {

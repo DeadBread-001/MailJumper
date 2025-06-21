@@ -1,5 +1,14 @@
 import React from 'react';
 
+/**
+ * Компонент раздела рейтинга игроков.
+ * @param {Object} props
+ * @param {Function} props.onShowRatingPage - Функция для открытия страницы рейтинга
+ * @param {Array} [props.ratingData=[]] - Данные рейтинга игроков
+ * @param {boolean} props.loading - Состояние загрузки
+ * @param {number|null} props.currentPos - Позиция текущего игрока в рейтинге
+ * @returns {JSX.Element}
+ */
 const RatingSection = ({
     onShowRatingPage,
     ratingData = [],

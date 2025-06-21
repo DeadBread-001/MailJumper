@@ -11,6 +11,19 @@ import { getTasks } from '../api/admin';
 import { getScore, getTopPlayersForUser } from '../api/rating';
 import { check } from '../api/auth';
 
+/**
+ * Компонент нижнего меню игры с различными разделами.
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Открыто ли меню
+ * @param {Function} props.onClose - Функция закрытия меню
+ * @param {boolean} props.showRatingPage - Показать ли страницу рейтинга
+ * @param {Function} props.setShowRatingPage - Функция для переключения страницы рейтинга
+ * @param {boolean} props.isSuperpowerExpanded - Развернут ли раздел суперспособностей
+ * @param {Function} props.setIsSuperpowerExpanded - Функция для переключения раздела суперспособностей
+ * @param {boolean} props.wasSuperpowerJustOpened - Была ли только что открыта суперспособность
+ * @param {Function} props.setWasSuperpowerJustOpened - Функция для сброса флага открытия суперспособности
+ * @returns {JSX.Element}
+ */
 const MenuBottomSheet = ({
     isOpen,
     onClose,
@@ -32,6 +45,9 @@ const MenuBottomSheet = ({
     const [ratingLoading, setRatingLoading] = useState(true);
     const [currentPos, setCurrentPos] = useState(null);
 
+    /**
+     * Загружает данные при открытии меню.
+     */
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -58,6 +74,9 @@ const MenuBottomSheet = ({
         }
     }, [isOpen]);
 
+    /**
+     * Управляет видимостью модального окна.
+     */
     useEffect(() => {
         if (showModal) {
             setIsModalVisible(true);
@@ -67,6 +86,9 @@ const MenuBottomSheet = ({
         }
     }, [showModal]);
 
+    /**
+     * Прокручивает к разделу суперспособностей при его открытии.
+     */
     useEffect(() => {
         if (
             wasSuperpowerJustOpened &&
@@ -85,9 +107,19 @@ const MenuBottomSheet = ({
         setWasSuperpowerJustOpened,
     ]);
 
+    /**
+     * Открывает модальное окно.
+     */
     const handleOpenModal = () => setShowModal(true);
+
+    /**
+     * Закрывает модальное окно.
+     */
     const handleCloseModal = () => setShowModal(false);
 
+    /**
+     * Переключает состояние раздела суперспособностей.
+     */
     const toggleSuperpower = () => {
         setIsSuperpowerExpanded(!isSuperpowerExpanded);
     };

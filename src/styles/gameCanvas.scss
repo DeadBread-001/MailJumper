@@ -590,6 +590,46 @@
     }
 }
 
+.onboarding-main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 0;
+    @media (max-width: 768px) {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        min-height: 0;
+    }
+}
+
+.onboarding-button-area {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 80px;
+    padding: 0 16px;
+    box-sizing: border-box;
+    @media (max-width: 768px) {
+        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        min-height: 80px;
+        padding: 0 16px;
+        box-sizing: border-box;
+    }
+}
+
 .onboarding-slide-1 {
     width: 100%;
     margin-top: 60px;
@@ -695,11 +735,8 @@
     width: auto;
     max-width: 280px;
     box-sizing: border-box;
-    margin: auto auto 0;
 
     @media (max-width: 768px) {
-        margin-top: auto;
-        margin-bottom: 4vh;
         padding: clamp(14px, 3vw, 20px) clamp(18px, 6vw, 32px);
         font-size: clamp(19px, 6vw, 20px);
         min-width: 160px;
@@ -739,23 +776,14 @@
 }
 
 .onboarding-btn-appear {
-    opacity: 0;
-    transform: translateY(30px);
-    animation: onboardingBtnFadeIn 0.4s 0.1s forwards;
-    margin-top: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    justify-self: center;
-    @media (max-width: 768px) {
-        transform: translateY(clamp(10px, 5vw, 30px));
-        margin-top: clamp(18px, 8vw, 48px);
-        gap: clamp(6px, 2vw, 12px);
-    }
+    animation: buttonAppear 0.3s ease-out;
 }
 
-@keyframes onboardingBtnFadeIn {
+@keyframes buttonAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
     to {
         opacity: 1;
         transform: translateY(0);
@@ -767,7 +795,17 @@
     margin-left: 10px;
     vertical-align: middle;
     @media (max-width: 768px) {
-        margin-left: clamp(6px, 1.5vw, 10px);
+        margin-left: clamp(8px, 2vw, 12px);
+    }
+
+    img {
+        width: 20px;
+        height: 20px;
+
+        @media (max-width: 768px) {
+            width: clamp(16px, 4vw, 20px);
+            height: clamp(16px, 4vw, 20px);
+        }
     }
 }
 
@@ -930,7 +968,6 @@
 }
 
 .onboarding-slide-2 {
-    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -953,5 +990,107 @@
     @media (max-width: 768px) {
         max-width: 90vw;
         padding: 0 clamp(16px, 5vw, 24px);
+    }
+}
+
+.motion-permission-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.motion-permission-window {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.motion-permission-window h3 {
+    margin: 0 0 16px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.motion-permission-window p {
+    margin: 0 0 24px 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #666;
+}
+
+.motion-permission-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.motion-permission-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 100px;
+}
+
+.motion-permission-btn--allow {
+    background: #b8fc75;
+    color: #181818;
+}
+
+.motion-permission-btn--allow:hover:not(:disabled) {
+    background: #a8ec65;
+}
+
+.motion-permission-btn--deny {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.motion-permission-btn--deny:hover:not(:disabled) {
+    background: #e5e5e5;
+}
+
+.motion-permission-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .motion-permission-window {
+        padding: 20px;
+        margin: 20px;
+    }
+
+    .motion-permission-window h3 {
+        font-size: 18px;
+    }
+
+    .motion-permission-window p {
+        font-size: 14px;
+    }
+
+    .motion-permission-buttons {
+        flex-direction: column;
+    }
+
+    .motion-permission-btn {
+        width: 100%;
     }
 }

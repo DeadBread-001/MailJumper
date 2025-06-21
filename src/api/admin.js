@@ -1,5 +1,12 @@
 import { fetchRequest, IP } from './fetch';
 
+/**
+ * Сохраняет или обновляет задачу.
+ * @param {Object} taskData - Данные задачи
+ * @param {boolean} isEdit - Режим редактирования (true) или создания (false)
+ * @returns {Promise<void>}
+ * @throws {Error} Если произошла ошибка при отправке результата
+ */
 export const saveTask = async (taskData, isEdit) => {
     let endpoint = isEdit ? 'task/update' : 'task/add';
     let body = { task: taskData };
@@ -12,6 +19,12 @@ export const saveTask = async (taskData, isEdit) => {
     }
 };
 
+/**
+ * Удаляет задачу по ID.
+ * @param {string|number} id - ID задачи
+ * @returns {Promise<void>}
+ * @throws {Error} Если произошла ошибка при отправке результата
+ */
 export const deleteTask = async (id) => {
     const url = IP + `admin/task/delete`;
     const data = await fetchRequest(url, 'POST', { id: id });
@@ -21,6 +34,11 @@ export const deleteTask = async (id) => {
     }
 };
 
+/**
+ * Получает список всех задач для администратора.
+ * @returns {Promise<Array>} Список задач
+ * @throws {Error} Если произошла ошибка или некорректный формат данных
+ */
 export async function getTasks() {
     const url = IP + 'admin/tasks';
     const data = await fetchRequest(url, 'GET');

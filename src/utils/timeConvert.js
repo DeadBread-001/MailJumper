@@ -1,52 +1,62 @@
+/**
+ * Утилиты для конвертации и форматирования времени.
+ */
 export const timeConvert = {
     /**
      * Конвертирует время из секунд в часы.
-     * @function
-     * @private
-     * @param {number} durationInSec - Длительность времени в секундах.
-     * @return {number} - Длительность времени в часах.
+     * @param {number} durationInSec - Длительность времени в секундах
+     * @returns {number} Длительность времени в часах
      */
     intoHours: (durationInSec) => intoHours(durationInSec),
     /**
      * Конвертирует время из секунд в минуты.
-     * @function
-     * @private
-     * @param {number} durationInSec - Длительность времени в секундах.
-     * @return {number} - Длительность времени в минутах.
+     * @param {number} durationInSec - Длительность времени в секундах
+     * @returns {number} Длительность времени в минутах
      */
     intoMinutes: (durationInSec) => intoMinutes(durationInSec),
     /**
      * Форматирует время в текстовый формат (часы и минуты).
-     * @function
-     * @private
-     * @param {number} durationInSec - Длительность времени в секундах.
-     * @return {string} - Текстовое представление времени в формате "часы минуты".
+     * @param {number} durationInSec - Длительность времени в секундах
+     * @returns {string} Текстовое представление времени в формате "часы минуты"
      */
     timeIntoText: (durationInSec) => timeIntoText(durationInSec),
     /**
-     * Форматирует полную дату в год
-     * @private
+     * Извлекает год из полной даты.
      * @param {string} rawDate - Полная дата в виде строки
-     * @return {string} - значение года
+     * @returns {string} Значение года
      */
     dateIntoYear: (rawDate) => dateIntoYear(rawDate),
     /**
-     * Форматирует полную дату в День Месяц Год
-     * @private
+     * Форматирует полную дату в формат "День Месяц Год".
      * @param {string} rawDate - Полная дата в виде строки
-     * @return {string} - значение года
+     * @returns {string} Отформатированная дата
      */
     dateIntoDayMonthYear: (rawDate) => dateIntoDayMonthYear(rawDate),
 };
 
+/**
+ * Конвертирует секунды в часы.
+ * @param {number} durationInSec - Длительность в секундах
+ * @returns {number} Длительность в часах
+ */
 const intoHours = (durationInSec) => {
     return Math.floor(durationInSec / 3600);
 };
 
+/**
+ * Конвертирует секунды в минуты (остаток от часов).
+ * @param {number} durationInSec - Длительность в секундах
+ * @returns {number} Длительность в минутах
+ */
 const intoMinutes = (durationInSec) => {
     return Math.floor((durationInSec % 3600) / 60);
 };
 
+/**
+ * Форматирует время в текстовый формат.
+ * @param {number} durationInMin - Длительность в минутах
+ * @returns {string} Отформатированное время
+ */
 const timeIntoText = (durationInMin) => {
     const hours = Math.floor(durationInMin / 60);
     const minutes = durationInMin % 60;
@@ -62,6 +72,11 @@ const timeIntoText = (durationInMin) => {
     return `${hours}ч ${minutes}мин`;
 };
 
+/**
+ * Форматирует время в формат MM:SS или HH:MM:SS.
+ * @param {number} time - Время в секундах
+ * @returns {string} Отформатированное время
+ */
 export const formatTime = (time) => {
     let seconds = Math.floor(time % 60);
     let minutes = Math.floor(time / 60) % 60;
@@ -77,10 +92,20 @@ export const formatTime = (time) => {
     return `${hours}:${minutes}:${seconds}`;
 };
 
+/**
+ * Извлекает год из строки даты.
+ * @param {string} rawDate - Строка даты
+ * @returns {string} Год
+ */
 const dateIntoYear = (rawDate) => {
     return rawDate.substring(0, 4);
 };
 
+/**
+ * Форматирует дату в русский формат "День Месяц Год".
+ * @param {string} rawDate - Строка даты
+ * @returns {string} Отформатированная дата на русском языке
+ */
 const dateIntoDayMonthYear = (rawDate) => {
     const date = new Date(rawDate);
 

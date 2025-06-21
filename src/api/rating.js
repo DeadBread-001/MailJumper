@@ -1,5 +1,12 @@
 import { fetchRequest, IP } from './fetch';
 
+/**
+ * Получает топ игроков для конкретного пользователя с его позицией.
+ * @param {string} vkid - VK ID пользователя
+ * @param {number} count - Количество игроков для получения
+ * @returns {Promise<{users: Array, current_pos: number}>} Данные рейтинга
+ * @throws {Error} Если произошла ошибка или некорректный формат данных
+ */
 export async function getTopPlayersForUser(vkid, count) {
     const url = IP + `profile/${vkid}/rating?count=${count}`;
     const data = await fetchRequest(url, 'GET');
@@ -13,6 +20,12 @@ export async function getTopPlayersForUser(vkid, count) {
     }
 }
 
+/**
+ * Получает общий топ игроков.
+ * @param {number} count - Количество игроков для получения
+ * @returns {Promise<{users: Array}>} Данные рейтинга
+ * @throws {Error} Если произошла ошибка или некорректный формат данных
+ */
 export async function getTopPlayers(count) {
     const url = IP + `game/rating/top?count=${count}`;
     const data = await fetchRequest(url, 'GET');
@@ -25,6 +38,11 @@ export async function getTopPlayers(count) {
     }
 }
 
+/**
+ * Получает лучший счет пользователя.
+ * @param {string} vkid - VK ID пользователя
+ * @returns {Promise<number|undefined>} Лучший счет пользователя
+ */
 export async function getScore(vkid) {
     const url = IP + `profile/${vkid}/score`;
     const data = await fetchRequest(url, 'GET');

@@ -1,5 +1,11 @@
 import React from 'react';
 
+/**
+ * Компонент для отображения счета пользователя.
+ * @param {Object} props
+ * @param {number} props.userScore - Счет пользователя
+ * @returns {JSX.Element}
+ */
 const ScoreSection = ({ userScore }) => (
     <div className="menu-bottom-sheet__section menu-bottom-sheet__score">
         <div className="menu-bottom-sheet__score-title">Твой счёт</div>

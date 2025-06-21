@@ -1,4 +1,15 @@
+/**
+ * Класс для управления платформами в игре.
+ */
 export class Platform {
+    /**
+     * Создает новую платформу.
+     * @param {Object} game - Объект игры
+     * @param {number} lowerY - Нижняя граница Y для размещения
+     * @param {number} upperY - Верхняя граница Y для размещения
+     * @param {string} type - Тип платформы ('blue' для движущихся)
+     * @param {Object} resourceLoader - Загрузчик ресурсов
+     */
     constructor(game, lowerY, upperY, type, resourceLoader) {
         this.game = game;
         this.baseWidth = 101;
@@ -34,6 +45,10 @@ export class Platform {
         this.markedForDeletion = false;
     }
 
+    /**
+     * Обновляет состояние платформы.
+     * @param {number} deltaTime - Время с последнего обновления
+     */
     update(deltaTime) {
         if (this.type === 'blue') {
             if (this.x < 0 || this.x > this.game.width - this.width)
@@ -56,6 +71,10 @@ export class Platform {
         }
     }
 
+    /**
+     * Отрисовывает платформу на канвасе.
+     * @param {CanvasRenderingContext2D} context - Контекст канваса
+     */
     draw(context) {
         context.save();
         context.translate(this.x + this.width / 2, this.y + this.height / 2);
@@ -78,6 +97,12 @@ export class Platform {
         context.restore();
     }
 
+    /**
+     * Вычисляет Y-координату для размещения платформы.
+     * @param {number} upperY - Верхняя граница
+     * @param {number} lowerY - Нижняя граница
+     * @returns {number} Y-координата платформы
+     */
     calc_Y(upperY, lowerY) {
         if (!this.game.platforms.length) {
             return (
@@ -98,6 +123,9 @@ export class Platform {
         }
     }
 
+    /**
+     * Запускает эффект начисления очков при прыжке на платформу.
+     */
     triggerScoreEffect() {
         if (!this.hasBeenJumpedOn) {
             this.showScore = true;

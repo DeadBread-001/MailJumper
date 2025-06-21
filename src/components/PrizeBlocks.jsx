@@ -1,5 +1,9 @@
 import React from 'react';
 
+/**
+ * Компонент для отображения блоков с призами.
+ * @returns {JSX.Element}
+ */
 const PrizeBlocks = () => (
     <div className="prize-block">
         <div className="prize-block-long">
