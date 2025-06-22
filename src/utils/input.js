@@ -126,7 +126,8 @@ export class InputHandler {
 
         this.handleDeviceOrientation = (e) => {
             if (this.controlType === 'tilt') {
-                const tilt = e.gamma;
+                const tilt = -e.gamma;
+                this.tiltX = tilt;
                 if (tilt > 20) {
                     this.keys = ['ArrowLeft'];
                 } else if (tilt < -20) {
