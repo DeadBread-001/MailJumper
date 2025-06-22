@@ -534,7 +534,16 @@ const GameCanvas = () => {
         };
     }, []);
 
-    // Проверка и запрос разрешения на motion для iOS/Android
+    const recreateInputHandler = (type) => {
+        if (inputHandler.current) {
+            inputHandler.current.destroy();
+        }
+        inputHandler.current = new InputHandler(gameInstance.current, type);
+        if (gameInstance.current) {
+            gameInstance.current.inputHandler = inputHandler.current;
+        }
+    };
+
     const requestMotionPermission = async () => {
         setMotionPermissionError('');
         if (
@@ -546,9 +555,7 @@ const GameCanvas = () => {
                 if (response === 'granted') {
                     setShowMotionPermission(false);
                     setControlType('tilt');
-                    if (inputHandler.current) {
-                        inputHandler.current.setControlType('tilt');
-                    }
+                    recreateInputHandler('tilt');
                 } else {
                     setMotionPermissionError(
                         'Доступ к датчикам движения не разрешён.'
@@ -560,27 +567,27 @@ const GameCanvas = () => {
                 );
             }
         } else {
-            // Android/другие браузеры — разрешение не требуется
             setShowMotionPermission(false);
             setControlType('tilt');
-            if (inputHandler.current) {
-                inputHandler.current.setControlType('tilt');
-            }
+            recreateInputHandler('tilt');
         }
     };
 
-    // Обработка выбора типа управления из онбординга
     const handleOnboardingFinish = (selectedControlType) => {
         setShowOnboarding(false);
         if (selectedControlType === 'tilt') {
             setShowMotionPermission(true);
         } else if (selectedControlType) {
             setControlType(selectedControlType);
-            if (inputHandler.current) {
-                inputHandler.current.setControlType(selectedControlType);
-            }
+            recreateInputHandler(selectedControlType);
         }
     };
+
+    useEffect(() => {
+        if (inputHandler.current && controlType && inputHandler.current.controlType !== controlType) {
+            recreateInputHandler(controlType);
+        }
+    }, [controlType]);
 
     if (checkingAuth) {
         return <div className="auth-loading-screen">Загрузка...</div>;
