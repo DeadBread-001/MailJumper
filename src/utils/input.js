@@ -24,7 +24,8 @@ export class InputHandler {
             if (this.controlType === 'click' || this.controlType === 'touch') {
                 const rect =
                     game.canvasRect ||
-                    document.querySelector('#canvas1').getBoundingClientRect();
+                    document.querySelector('#canvas1')?.getBoundingClientRect();
+                if (!rect) return;
                 const x = e.clientX - rect.left;
                 if (x < rect.width / 2) {
                     this.keys = ['ArrowLeft'];
@@ -45,7 +46,8 @@ export class InputHandler {
 
                 const rect =
                     game.canvasRect ||
-                    document.querySelector('#canvas1').getBoundingClientRect();
+                    document.querySelector('#canvas1')?.getBoundingClientRect();
+                if (!rect) return;
                 const touch = e.touches[0];
                 const x = touch.clientX - rect.left;
 
@@ -68,7 +70,8 @@ export class InputHandler {
                 e.preventDefault();
                 const rect =
                     game.canvasRect ||
-                    document.querySelector('#canvas1').getBoundingClientRect();
+                    document.querySelector('#canvas1')?.getBoundingClientRect();
+                if (!rect) return;
                 const touch = e.touches[0];
                 const x = touch.clientX - rect.left;
 
@@ -102,7 +105,8 @@ export class InputHandler {
             if (this.controlType === 'click') {
                 const rect =
                     game.canvasRect ||
-                    document.querySelector('#canvas1').getBoundingClientRect();
+                    document.querySelector('#canvas1')?.getBoundingClientRect();
+                if (!rect) return;
                 const x = e.clientX - rect.left;
                 if (x < rect.width / 2) {
                     this.keys = ['ArrowLeft'];

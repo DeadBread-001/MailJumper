@@ -46,6 +46,7 @@ export class Player {
      * @param {number} deltaTime - Время с последнего обновления
      */
     update(inputHandler, deltaTime) {
+        if (!inputHandler || !inputHandler.controlType) return;
         if (
             inputHandler.controlType === 'mouse' &&
             inputHandler.mouseX !== null

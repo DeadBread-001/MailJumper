@@ -50,6 +50,7 @@
     }
 
     &__content {
+        padding-bottom: 100px;
         position: absolute;
         left: 0;
         top: 0;
@@ -58,7 +59,6 @@
         background: #0077ff1a;
         backdrop-filter: blur(24px);
         -webkit-backdrop-filter: blur(24px);
-        padding: 0;
         overflow-y: auto;
 
         &::-webkit-scrollbar {
@@ -882,4 +882,106 @@
 .rating-boost-btn:hover {
     background: linear-gradient(90deg, #a0e95c 0%, #6be94a 100%);
     color: #181818;
+}
+
+.menu-bottom-sheet__controltype {
+    margin-top: 32px;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+    padding: 24px 20px 24px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+}
+.menu-bottom-sheet__controltype-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #4a6fa1;
+    margin-bottom: 4px;
+}
+.menu-bottom-sheet__controltype-desc {
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 8px;
+}
+.menu-bottom-sheet__controltype-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+.menu-bottom-sheet__controltype-radio {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 0;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.menu-bottom-sheet__controltype-radio.active {
+    background: #eaf6ff;
+    color: #0077ff;
+}
+
+.menu-bottom-sheet__controltype-radio input[type='radio'] {
+    accent-color: #0077ff;
+    margin-right: 8px;
+}
+
+.menu-bottom-sheet__onboarding {
+    background: #fff;
+}
+
+.menu-bottom-sheet__onboarding-title {
+    margin-bottom: 4px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #222;
+
+    @media (max-width: 768px) {
+        font-size: clamp(16px, 4vw, 18px);
+    }
+}
+
+.menu-bottom-sheet__onboarding-info {
+    margin-bottom: 12px;
+}
+
+.menu-bottom-sheet__onboarding-desc {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.7);
+    line-height: 1.4;
+
+    @media (max-width: 768px) {
+        font-size: clamp(12px, 3vw, 14px);
+    }
+}
+
+.menu-bottom-sheet__onboarding-btn {
+    width: 198px;
+    height: 61px;
+    background: #b8fc75;
+    color: #222;
+    border: none;
+    border-radius: 100px;
+    padding: 8px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+
+    @media (max-width: 768px) {
+        width: clamp(171px, 22vw, 198px);
+        height: clamp(50px, 9vw, 61px);
+        padding: clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 16px);
+        font-size: clamp(13px, 3vw, 15px);
+    }
+}
+.menu-bottom-sheet__onboarding-btn:active {
+    background: #b8fc75;
 }

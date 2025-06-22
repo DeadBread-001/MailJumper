@@ -10,6 +10,7 @@ import ModalPrizeRules from './ModalPrizeRules';
 import { getTasks } from '../api/admin';
 import { getScore, getTopPlayersForUser } from '../api/rating';
 import { check } from '../api/auth';
+import { getControlTypeKey, getOnboardingKey } from '../utils/deviceDetection';
 
 /**
  * Компонент нижнего меню игры с различными разделами.
@@ -44,6 +45,9 @@ const MenuBottomSheet = ({
     const [ratingData, setRatingData] = useState([]);
     const [ratingLoading, setRatingLoading] = useState(true);
     const [currentPos, setCurrentPos] = useState(null);
+    const [selectedControlType, setSelectedControlType] = useState(
+        () => localStorage.getItem(getControlTypeKey()) || ''
+    );
 
     /**
      * Загружает данные при открытии меню.
@@ -124,6 +128,17 @@ const MenuBottomSheet = ({
         setIsSuperpowerExpanded(!isSuperpowerExpanded);
     };
 
+    const handleControlTypeChange = (e) => {
+        setSelectedControlType(e.target.value);
+        localStorage.setItem(getControlTypeKey(), e.target.value);
+        window.location.reload();
+    };
+
+    const handleRestartOnboarding = () => {
+        localStorage.removeItem(getOnboardingKey());
+        window.location.reload();
+    };
+
     return (
         <div
             className={`menu-bottom-sheet${isOpen ? ' menu-bottom-sheet_open' : ''}${showModal ? ' menu-bottom-sheet_modal' : ''}`}
@@ -161,6 +176,23 @@ const MenuBottomSheet = ({
                             loading={ratingLoading}
                             currentPos={currentPos}
                         />
+                        <div className="menu-bottom-sheet__section menu-bottom-sheet__onboarding">
+                            <div className="menu-bottom-sheet__onboarding-info">
+                                <div className="menu-bottom-sheet__onboarding-title">
+                                    Онбординг
+                                </div>
+                                <div className="menu-bottom-sheet__onboarding-desc">
+                                    Если хочешь выбрать другой тип управления —
+                                    запусти онбординг заново.
+                                </div>
+                            </div>
+                            <button
+                                className="menu-bottom-sheet__onboarding-btn"
+                                onClick={handleRestartOnboarding}
+                            >
+                                Запустить онбординг заново
+                            </button>
+                        </div>
                     </>
                 )}
             </div>

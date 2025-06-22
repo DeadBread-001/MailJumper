@@ -567,19 +567,16 @@ const GameCanvas = () => {
             setShowMotionPermission(true);
         } else if (selectedControlType) {
             setControlType(selectedControlType);
-            recreateInputHandler(selectedControlType);
         }
     };
 
     useEffect(() => {
-        if (
-            inputHandler.current &&
-            controlType &&
-            inputHandler.current.controlType !== controlType
-        ) {
-            recreateInputHandler(controlType);
-        }
-    }, [controlType]);
+        const canvas = document.querySelector('#canvas1');
+        if (!canvas || !controlType || showOnboarding) return;
+        recreateInputHandler(controlType);
+        if (gameInstance.current)
+            gameInstance.current.inputHandler = inputHandler.current;
+    }, [controlType, showOnboarding, isLoading]);
 
     if (checkingAuth) {
         return <div className="auth-loading-screen">Загрузка...</div>;
