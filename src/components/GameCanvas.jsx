@@ -72,7 +72,7 @@ const GameCanvas = () => {
         resourceLoader.current = new ResourceLoader();
     }, []);
 
-    const isActuallyPaused = gamePaused || autoPaused.current;
+    const isActuallyPaused = gamePaused;
 
     /**
      * Проверяет авторизацию пользователя и статус онбординга.
@@ -322,7 +322,7 @@ const GameCanvas = () => {
             let deltaTime = (timestamp - lastTimeRef.current) / 1000;
             lastTimeRef.current = timestamp;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const isActuallyPaused = gamePaused || autoPaused.current;
+            const isActuallyPaused = gamePaused;
             if (gameInstance.current.gameStart && !isActuallyPaused)
                 gameInstance.current.update(deltaTime);
             gameInstance.current.draw(ctx);
@@ -331,16 +331,6 @@ const GameCanvas = () => {
         }
 
         animationRef.current = requestAnimationFrame(animate);
-
-        const handleBlur = () => {
-            autoPaused.current = true;
-        };
-        const handleFocus = () => {
-            lastTimeRef.current = 0;
-            autoPaused.current = false;
-        };
-        window.addEventListener('blur', handleBlur);
-        window.addEventListener('focus', handleFocus);
 
         return () => {
             if (animationRef.current)
@@ -353,8 +343,6 @@ const GameCanvas = () => {
                 'logout',
                 gameInstance.current.askForPlayerName
             );
-            window.removeEventListener('blur', handleBlur);
-            window.removeEventListener('focus', handleFocus);
         };
     }, [isAuthenticated, isLoading, gamePaused, showOnboarding, controlType]);
 
@@ -584,7 +572,11 @@ const GameCanvas = () => {
     };
 
     useEffect(() => {
-        if (inputHandler.current && controlType && inputHandler.current.controlType !== controlType) {
+        if (
+            inputHandler.current &&
+            controlType &&
+            inputHandler.current.controlType !== controlType
+        ) {
             recreateInputHandler(controlType);
         }
     }, [controlType]);

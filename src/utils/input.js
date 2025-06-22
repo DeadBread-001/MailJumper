@@ -17,6 +17,8 @@ export class InputHandler {
         this.touchStartTime = 0;
         this.touchHoldThreshold = 150;
         this.isTouchHolding = false;
+        this.gyro = null;
+        this.gyroListener = null;
 
         this.handleClick = (e) => {
             if (this.controlType === 'click' || this.controlType === 'touch') {
@@ -122,19 +124,15 @@ export class InputHandler {
             }
         };
 
-        this.handleDeviceMotion = (e) => {
+        this.handleDeviceOrientation = (e) => {
             if (this.controlType === 'tilt') {
-                const acceleration = e.accelerationIncludingGravity;
-                if (acceleration) {
-                    this.tiltX = acceleration.x;
-
-                    if (this.tiltX > this.tiltThreshold) {
-                        this.keys = ['ArrowRight'];
-                    } else if (this.tiltX < -this.tiltThreshold) {
-                        this.keys = ['ArrowLeft'];
-                    } else {
-                        this.keys = [];
-                    }
+                const tilt = e.gamma;
+                if (tilt > 20) {
+                    this.keys = ['ArrowLeft'];
+                } else if (tilt < -20) {
+                    this.keys = ['ArrowRight'];
+                } else {
+                    this.keys = [];
                 }
             }
         };
@@ -190,7 +188,10 @@ export class InputHandler {
                 canvas.addEventListener('touchcancel', this.handleTouchCancel);
             }
         } else if (this.controlType === 'tilt') {
-            window.addEventListener('devicemotion', this.handleDeviceMotion);
+            window.addEventListener(
+                'deviceorientation',
+                this.handleDeviceOrientation
+            );
         }
     }
 
@@ -212,8 +213,10 @@ export class InputHandler {
     destroy() {
         window.removeEventListener('keydown', this.keyDownHandler);
         window.removeEventListener('keyup', this.keyUpHandler);
-        window.removeEventListener('devicemotion', this.handleDeviceMotion);
-
+        window.removeEventListener(
+            'deviceorientation',
+            this.handleDeviceOrientation
+        );
         const canvas = document.querySelector('#canvas1');
         if (canvas) {
             canvas.removeEventListener('click', this.handleClick);
