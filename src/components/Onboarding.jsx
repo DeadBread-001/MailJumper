@@ -13,10 +13,7 @@ import {
  * @param {Object} props.resourceLoader - Лоадер ресурсов (опционально).
  * @returns {JSX.Element}
  */
-export default function Onboarding({
-    onFinish,
-    resourceLoader,
-}) {
+export default function Onboarding({ onFinish, resourceLoader }) {
     const [step, setStep] = useState(0);
     const deviceType = getDeviceType();
     const controlTypeKey = getControlTypeKey();
@@ -41,7 +38,6 @@ export default function Onboarding({
                     'Onboarding: Завершаем онбординг с типом:',
                     controlType
                 );
-                // Завершаем онбординг для всех типов управления
                 onFinish(controlType);
             } else {
                 console.log('Onboarding: Тип управления не выбран');

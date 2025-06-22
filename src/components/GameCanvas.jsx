@@ -65,6 +65,8 @@ const GameCanvas = () => {
     });
     const [vkid, setVkid] = useState(null);
     const [superpowerCount, setSuperpowerCount] = useState(0);
+    const [showMotionPermission, setShowMotionPermission] = useState(false);
+    const [motionPermissionError, setMotionPermissionError] = useState('');
 
     useEffect(() => {
         resourceLoader.current = new ResourceLoader();
@@ -532,6 +534,54 @@ const GameCanvas = () => {
         };
     }, []);
 
+    // Проверка и запрос разрешения на motion для iOS/Android
+    const requestMotionPermission = async () => {
+        setMotionPermissionError('');
+        if (
+            typeof DeviceMotionEvent !== 'undefined' &&
+            typeof DeviceMotionEvent.requestPermission === 'function'
+        ) {
+            try {
+                const response = await DeviceMotionEvent.requestPermission();
+                if (response === 'granted') {
+                    setShowMotionPermission(false);
+                    setControlType('tilt');
+                    if (inputHandler.current) {
+                        inputHandler.current.setControlType('tilt');
+                    }
+                } else {
+                    setMotionPermissionError(
+                        'Доступ к датчикам движения не разрешён.'
+                    );
+                }
+            } catch (e) {
+                setMotionPermissionError(
+                    'Ошибка при запросе разрешения на доступ к датчикам движения.'
+                );
+            }
+        } else {
+            // Android/другие браузеры — разрешение не требуется
+            setShowMotionPermission(false);
+            setControlType('tilt');
+            if (inputHandler.current) {
+                inputHandler.current.setControlType('tilt');
+            }
+        }
+    };
+
+    // Обработка выбора типа управления из онбординга
+    const handleOnboardingFinish = (selectedControlType) => {
+        setShowOnboarding(false);
+        if (selectedControlType === 'tilt') {
+            setShowMotionPermission(true);
+        } else if (selectedControlType) {
+            setControlType(selectedControlType);
+            if (inputHandler.current) {
+                inputHandler.current.setControlType(selectedControlType);
+            }
+        }
+    };
+
     if (checkingAuth) {
         return <div className="auth-loading-screen">Загрузка...</div>;
     }
@@ -593,19 +643,44 @@ const GameCanvas = () => {
                 <div style={{ position: 'relative' }}>
                     <canvas id="canvas1" className="game-canvas"></canvas>
                     {showOnboarding && (
-                        <Onboarding
-                            onFinish={(selectedControlType) => {
-                                setShowOnboarding(false);
-                                if (selectedControlType) {
-                                    setControlType(selectedControlType);
-                                    if (inputHandler.current) {
-                                        inputHandler.current.setControlType(
-                                            selectedControlType
-                                        );
-                                    }
-                                }
-                            }}
-                        />
+                        <Onboarding onFinish={handleOnboardingFinish} />
+                    )}
+                    {showMotionPermission && (
+                        <div className="motion-permission-overlay">
+                            <div className="motion-permission-window">
+                                <h3>Доступ к датчикам движения</h3>
+                                <p>
+                                    Для управления наклоном разрешите доступ к
+                                    датчикам движения вашего устройства.
+                                </p>
+                                {motionPermissionError && (
+                                    <p
+                                        style={{
+                                            color: 'red',
+                                            fontWeight: 600,
+                                        }}
+                                    >
+                                        {motionPermissionError}
+                                    </p>
+                                )}
+                                <div className="motion-permission-buttons">
+                                    <button
+                                        className="motion-permission-btn motion-permission-btn--allow"
+                                        onClick={requestMotionPermission}
+                                    >
+                                        Разрешить
+                                    </button>
+                                    <button
+                                        className="motion-permission-btn motion-permission-btn--deny"
+                                        onClick={() =>
+                                            setShowMotionPermission(false)
+                                        }
+                                    >
+                                        Отмена
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     )}
                 </div>
                 <div className="game-superpower-block">
