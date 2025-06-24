@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Tabs, Tab } from '@mui/material';
 import AdminTasks from './AdminTasks';
 import AdminStats from './AdminStats';
+import AdminGifts from "./AdminGifts";
 
 /**
  * Главная панель администратора с вкладками.
@@ -27,12 +28,12 @@ const AdminPanel = () => {
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={currentTab} onChange={handleTabChange}>
                     <Tab label="Задачи" />
-                    <Tab label="Статистика" />
+                    <Tab label="Призы" />
                 </Tabs>
             </Box>
             <Box sx={{ mt: 2 }}>
-                {currentTab === 0 && <AdminTasks />}
-                {currentTab === 2 && <AdminStats />}
+              {currentTab === 0 && <AdminTasks />}
+              {currentTab === 1 && <AdminGifts />}
             </Box>
         </Box>
     );

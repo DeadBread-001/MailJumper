@@ -48,3 +48,36 @@ export async function getTasks() {
         throw new Error('Некорректный формат данных');
     }
 }
+
+
+export const getGifts = async () => {
+    const url = IP + 'admin/gifts';
+    const data = await fetchRequest(url, 'GET');
+    if (data.Status === 200) {
+        return data.Data.giftaway.gifts;
+    } else {
+        throw new Error('Некорректный формат данных');
+    }
+};
+
+export const deleteGift = async (id) => {
+    const url = IP + `admin/gifts/delete`;
+    const data = await fetchRequest(url, 'POST', { id: id });
+
+    if (data.Status !== 200) {
+        throw new Error('Ошибка при отправке результата');
+    }
+};
+
+
+export const saveGift = async (giftData, isEdit) => {
+    let endpoint = isEdit ? 'gifts/update' : 'gifts/add';
+    let body = { gift: giftData };
+
+    const url = IP + `admin/${endpoint}`;
+    const data = await fetchRequest(url, 'POST', body);
+
+    if (data.Status !== 200) {
+        throw new Error('Ошибка при отправке результата');
+    }
+};
