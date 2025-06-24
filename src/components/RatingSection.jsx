@@ -34,11 +34,11 @@ const RatingSection = ({
             <div className="menu-bottom-sheet__rating-list">
                 {ratingData.map((player, index) => (
                     <div
-                        key={index + 1}
+                        key={player.pos}
                         className={`menu-bottom-sheet__rating-item${currentPos === index ? ' menu-bottom-sheet__rating-item_current' : ''}`}
                     >
                         <span>
-                            {index + 1}. {player.name}
+                            {player.pos}. {player.name}
                         </span>
                         <span>
                             {player.score}{' '}

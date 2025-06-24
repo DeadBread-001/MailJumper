@@ -132,9 +132,9 @@ export class InputHandler {
             if (this.controlType === 'tilt') {
                 const tilt = -e.gamma;
                 this.tiltX = tilt;
-                if (tilt > 20) {
+                if (tilt > 10) {
                     this.keys = ['ArrowLeft'];
-                } else if (tilt < -20) {
+                } else if (tilt < 10) {
                     this.keys = ['ArrowRight'];
                 } else {
                     this.keys = [];

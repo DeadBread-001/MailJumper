@@ -30,17 +30,10 @@ export default function Onboarding({ onFinish, resourceLoader }) {
             setStep(1);
         } else {
             if (controlType) {
-                console.log('Onboarding: Выбран тип управления:', controlType);
                 localStorage.setItem(controlTypeKey, controlType);
                 localStorage.setItem(getOnboardingKey(), 'true');
 
-                console.log(
-                    'Onboarding: Завершаем онбординг с типом:',
-                    controlType
-                );
                 onFinish(controlType);
-            } else {
-                console.log('Onboarding: Тип управления не выбран');
             }
         }
     };

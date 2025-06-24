@@ -57,6 +57,19 @@ export class Player {
             this.x += dx * followSpeed;
             if (dx < 0) this.direction = -1;
             else if (dx > 0) this.direction = 1;
+        } else if (inputHandler.controlType === 'tilt') {
+            const tilt = inputHandler.tiltX || 0;
+            const deadZone = 3;
+            const maxTilt = 30;
+            let normTilt = Math.max(-maxTilt, Math.min(maxTilt, tilt));
+            if (Math.abs(normTilt) < deadZone) normTilt = 0;
+            this.vx = (normTilt / maxTilt) * this.max_vx;
+            if (normTilt !== 0 && Math.abs(this.vx) < 1.5) {
+                this.vx = 1.5 * Math.sign(this.vx);
+            }
+            if (this.vx < 0) this.direction = -1;
+            else if (this.vx > 0) this.direction = 1;
+            this.x += this.vx * deltaTime * this.game.speedMultiplier;
         } else {
             if (inputHandler.keys.includes('ArrowLeft')) {
                 this.vx = -this.max_vx;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Background } from '../utils/game/background';
 import { Player } from '../utils/game/player';
-import { InputHandler } from '../utils/input';
+import { InputHandler } from '../utils/game/input';
 import { Platform } from '../utils/game/platform';
 import { sendScore, getSuperpower, useSuperpower } from '../api/game';
 import { check } from '../api/auth';

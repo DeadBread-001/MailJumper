@@ -9,22 +9,10 @@ import { getTopPlayersForUser, getTopPlayers } from '../api/rating';
  * @returns {JSX.Element}
  */
 const RatingPage = ({ onBack, vkid }) => {
-    /**
-     * Данные рейтинга пользователя.
-     */
     const [ratingData, setRatingData] = useState([]);
-    /**
-     * Данные топ-100 игроков.
-     */
     const [topData, setTopData] = useState([]);
-    /**
-     * Позиция текущего пользователя в рейтинге.
-     */
     const [currentPos, setCurrentPos] = useState(null);
 
-    /**
-     * Загружает данные рейтинга при монтировании компонента.
-     */
     useEffect(() => {
         const fetchRating = async () => {
             try {
@@ -55,11 +43,11 @@ const RatingPage = ({ onBack, vkid }) => {
                 <div className="rating-main-list">
                     {ratingData.map((player, index) => (
                         <div
-                            key={index + 1}
+                            key={player.pos}
                             className={`rating-main-item${currentPos === index ? ' rating-main-item_current' : ''}`}
                         >
                             <span>
-                                {index + 1}. {player.name}
+                                {player.pos}. {player.name}
                             </span>
                             <span>
                                 {player.score}{' '}
@@ -76,7 +64,7 @@ const RatingPage = ({ onBack, vkid }) => {
             <div className="rating-top100-block">
                 <div className="rating-top100-title">Топ-100 игроков</div>
                 <div className="rating-top100-list">
-                    {ratingData.map((player, index) => (
+                    {topData.map((player, index) => (
                         <div key={index + 1} className={'rating-top100-item'}>
                             <span>
                                 {index + 1}. {player.name}

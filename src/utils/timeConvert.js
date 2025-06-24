@@ -32,6 +32,12 @@ export const timeConvert = {
      * @returns {string} Отформатированная дата
      */
     dateIntoDayMonthYear: (rawDate) => dateIntoDayMonthYear(rawDate),
+    /**
+     * Форматирует дату в формат "дд/мм/гг".
+     * @param {string} rawDate - Полная дата в виде строки
+     * @returns {string} Отформатированная дата
+     */
+    dateIntoDDMMYY: (rawDate) => dateIntoDDMMYY(rawDate),
 };
 
 /**
@@ -131,4 +137,17 @@ const dateIntoDayMonthYear = (rawDate) => {
     const monthName = months[monthIndex];
 
     return `${day} ${monthName} ${year}`;
+};
+
+/**
+ * Форматирует дату в формат дд/мм/гг.
+ * @param {string} rawDate
+ * @returns {string}
+ */
+const dateIntoDDMMYY = (rawDate) => {
+    const date = new Date(rawDate);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = String(date.getFullYear()).slice(-2);
+    return `${day}/${month}/${year}`;
 };

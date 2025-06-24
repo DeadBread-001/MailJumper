@@ -2,14 +2,33 @@ import React from 'react';
 import GameCanvas from './components/GameCanvas';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import AdminPanel from './components/admin/AdminPanel';
+import { getTasks } from './api/admin';
+import { useState, useEffect } from 'react';
 
-/**
- * Временная функция для проверки прав доступа администратора.
- * @returns {boolean} true если пользователь является администратором
- */
-const isAdmin = () => {
-    // TODO: Реализовать реальную проверку прав доступа
-    return true;
+const useAdminCheck = () => {
+    const [checked, setChecked] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        let ignore = false;
+        getTasks()
+            .then(() => {
+                if (!ignore) {
+                    setIsAdmin(true);
+                    setChecked(true);
+                }
+            })
+            .catch((err) => {
+                if (!ignore) {
+                    setIsAdmin(false);
+                    setChecked(true);
+                }
+            });
+        return () => {
+            ignore = true;
+        };
+    }, []);
+    return { checked, isAdmin };
 };
 
 /**
@@ -19,9 +38,9 @@ const isAdmin = () => {
  * @returns {JSX.Element}
  */
 const ProtectedRoute = ({ children }) => {
-    if (!isAdmin()) {
-        return <Navigate to="/" replace />;
-    }
+    const { checked, isAdmin } = useAdminCheck();
+    if (!checked) return <div>Загрузка...</div>;
+    if (!isAdmin) return <Navigate to="/" replace />;
     return children;
 };
 

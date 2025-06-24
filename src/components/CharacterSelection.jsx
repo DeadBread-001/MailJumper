@@ -3,7 +3,7 @@ import {
     characterParts,
     getSelectedCharacter,
     setSelectedCharacter,
-} from '../utils/characterData';
+} from '../utils/game/characterData';
 
 /**
  * Компонент для выбора персонажа (тело и головной убор).

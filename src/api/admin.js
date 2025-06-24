@@ -41,14 +41,20 @@ export const deleteTask = async (id) => {
  */
 export async function getTasks() {
     const url = IP + 'admin/tasks';
-    const data = await fetchRequest(url, 'GET');
-    if (data.Status === 200) {
-        return data.Data.tasks;
-    } else {
-        throw new Error('Некорректный формат данных');
+    try {
+        const data = await fetchRequest(url, 'GET');
+        if (data.Status === 200) {
+            return data.Data.tasks;
+        } else {
+            throw new Error('Некорректный формат данных');
+        }
+    } catch (error) {
+        if (error.message && error.message.includes('401')) {
+            throw { unauthorized: true };
+        }
+        throw error;
     }
 }
-
 
 export const getGifts = async () => {
     const url = IP + 'admin/gifts';
@@ -68,7 +74,6 @@ export const deleteGift = async (id) => {
         throw new Error('Ошибка при отправке результата');
     }
 };
-
 
 export const saveGift = async (giftData, isEdit) => {
     let endpoint = isEdit ? 'gifts/update' : 'gifts/add';

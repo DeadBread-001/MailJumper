@@ -48,6 +48,7 @@ const MenuBottomSheet = ({
     const [selectedControlType, setSelectedControlType] = useState(
         () => localStorage.getItem(getControlTypeKey()) || ''
     );
+    const [prizeRulesInfo, setPrizeRulesInfo] = useState(null);
 
     /**
      * Загружает данные при открытии меню.
@@ -148,7 +149,10 @@ const MenuBottomSheet = ({
                 {showPrizeRules ? (
                     <PrizeRulesPage
                         onBack={() => setShowPrizeRules(false)}
-                        onShowModal={() => setShowModal(true)}
+                        onShowModal={(rules) => {
+                            setPrizeRulesInfo(rules);
+                            setShowModal(true);
+                        }}
                     />
                 ) : showRatingPage ? (
                     <RatingPage
@@ -200,6 +204,7 @@ const MenuBottomSheet = ({
                 <ModalPrizeRules
                     isOpen={showModal}
                     onClose={handleCloseModal}
+                    rules={prizeRulesInfo}
                 />
             )}
         </div>

@@ -1,13 +1,15 @@
 import React from 'react';
+import { timeConvert } from '../utils/timeConvert';
 
 /**
  * Модальное окно с правилами розыгрыша призов.
  * @param {Object} props
  * @param {Function} props.onClose - Функция закрытия модального окна
  * @param {boolean} props.isOpen - Открыто ли модальное окно
+ * @param {Object} [props.rules] - Информация о розыгрыше (details, from, to)
  * @returns {JSX.Element}
  */
-const ModalPrizeRules = ({ onClose, isOpen }) => (
+const ModalPrizeRules = ({ onClose, isOpen, rules }) => (
     <div
         className={`bottom-modal-overlay${isOpen ? ' bottom-modal-overlay_open' : ' bottom-modal-overlay_close'}`}
         onClick={onClose}
@@ -23,24 +25,17 @@ const ModalPrizeRules = ({ onClose, isOpen }) => (
                 </button>
             </div>
             <div className="bottom-modal-content">
-                <div>
-                    Описание того как происходит розыгрыш и как повысить шансы
-                    на выигрыш
+                <div style={{ marginBottom: 16 }}>
+                    {rules?.details ||
+                        'Подробная информация о розыгрыше будет доступна позже.'}
                 </div>
-                <div>
-                    Описание того как происходит розыгрыш и как повысить шансы
-                    на выигрыш
-                </div>
-                <div>
-                    Описание того как происходит розыгрыш и как повысить шансы
-                    на выигрыш
-                </div>
-                <div>
-                    Акция с XXX по XXX.{' '}
-                    <span style={{ color: '#1877F2', cursor: 'pointer' }}>
-                        Подробные условия
-                    </span>
-                </div>
+                {rules?.from && rules?.to && (
+                    <div style={{ color: '#666', fontSize: 15 }}>
+                        Период проведения:{' '}
+                        {timeConvert.dateIntoDDMMYY(rules.from)} —{' '}
+                        {timeConvert.dateIntoDDMMYY(rules.to)}
+                    </div>
+                )}
             </div>
         </div>
     </div>
