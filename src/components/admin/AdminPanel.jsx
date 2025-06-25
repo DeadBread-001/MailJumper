@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Tabs, Tab } from '@mui/material';
 import AdminTasks from './AdminTasks';
 import AdminStats from './AdminStats';
 import AdminGifts from './AdminGifts';
+import { getPrizes } from '../../api/prizes';
+import { check } from '../../api/auth';
 
 /**
  * Главная панель администратора с вкладками.
@@ -13,6 +15,17 @@ const AdminPanel = () => {
      * Индекс текущей активной вкладки.
      */
     const [currentTab, setCurrentTab] = useState(0);
+
+    useEffect(() => {
+        const fetchCheck = async () => {
+            try {
+                await check();
+            } catch (err) {
+                console.error('Ошибка при получении данных:', err);
+            }
+        };
+        fetchCheck();
+    }, []);
 
     /**
      * Обрабатывает переключение вкладок.

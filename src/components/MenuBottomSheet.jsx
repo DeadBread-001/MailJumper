@@ -7,7 +7,7 @@ import RatingSection from './RatingSection';
 import PrizeRulesPage from './PrizeRulesPage';
 import RatingPage from './RatingPage';
 import ModalPrizeRules from './ModalPrizeRules';
-import { getTasks } from '../api/admin';
+import { getTasks } from '../api/tasks';
 import { getScore, getTopPlayersForUser } from '../api/rating';
 import { check } from '../api/auth';
 import { getControlTypeKey, getOnboardingKey } from '../utils/deviceDetection';
