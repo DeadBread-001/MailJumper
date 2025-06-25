@@ -3,12 +3,16 @@ import './styles/index.scss';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 
-export const getCookie = (name) => {
-    const match = document.cookie.match(
-        new RegExp('(^| )' + name + '=([^;]+)')
-    );
-    return match ? decodeURIComponent(match[2]) : '';
-};
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+        .register('./sw.js', { scope: '/' })
+        .then((reg) => {
+            //console.log("SW register", reg);
+        })
+        .catch((e) => {
+            //console.log("SW Error", e);
+        });
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <BrowserRouter>

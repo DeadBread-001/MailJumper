@@ -5,13 +5,23 @@ import {
     ShoppingCart as ShoppingCartIcon,
 } from '@mui/icons-material';
 
+/**
+ * Компонент для отображения статистики в админ-панели.
+ * @returns {JSX.Element}
+ */
 const AdminStats = () => {
+    /**
+     * Статистические данные.
+     */
     const [stats, setStats] = useState({
         // totalUsers: 0,
         totalTasks: 0,
         totalItems: 0,
     });
 
+    /**
+     * Загружает статистические данные при монтировании компонента.
+     */
     useEffect(() => {
         // TODO: Загрузка статистики с сервера
         // Пример данных
@@ -22,6 +32,14 @@ const AdminStats = () => {
         });
     }, []);
 
+    /**
+     * Компонент карточки статистики.
+     * @param {Object} props
+     * @param {string} props.title - Заголовок карточки
+     * @param {number} props.value - Значение статистики
+     * @param {React.Component} props.icon - Иконка для карточки
+     * @returns {JSX.Element}
+     */
     const StatCard = ({ title, value, icon: Icon }) => (
         <Card>
             <CardContent>

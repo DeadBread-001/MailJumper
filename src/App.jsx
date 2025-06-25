@@ -1,34 +1,58 @@
 import React from 'react';
 import GameCanvas from './components/GameCanvas';
-import Navbar from './components/Navbar';
 import { Route, Routes, Navigate } from 'react-router-dom';
-import Rating from './components/Rating';
-import Tasks from './components/Tasks';
-import Shop from './components/Shop';
 import AdminPanel from './components/admin/AdminPanel';
+import { getTasks } from './api/admin';
+import { useState, useEffect } from 'react';
 
-// Временная функция для проверки прав доступа
-const isAdmin = () => {
-    // TODO: Реализовать реальную проверку прав доступа
-    return true;
+const useAdminCheck = () => {
+    const [checked, setChecked] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        let ignore = false;
+        getTasks()
+            .then(() => {
+                if (!ignore) {
+                    setIsAdmin(true);
+                    setChecked(true);
+                }
+            })
+            .catch((err) => {
+                if (!ignore) {
+                    setIsAdmin(false);
+                    setChecked(true);
+                }
+            });
+        return () => {
+            ignore = true;
+        };
+    }, []);
+    return { checked, isAdmin };
 };
 
+/**
+ * Компонент защищенного маршрута для администраторов.
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Дочерние компоненты
+ * @returns {JSX.Element}
+ */
 const ProtectedRoute = ({ children }) => {
-    if (!isAdmin()) {
-        return <Navigate to="/" replace />;
-    }
+    const { checked, isAdmin } = useAdminCheck();
+    if (!checked) return <div>Загрузка...</div>;
+    if (!isAdmin) return <Navigate to="/" replace />;
     return children;
 };
 
+/**
+ * Главный компонент приложения с маршрутизацией.
+ * @returns {JSX.Element}
+ */
 const App = () => {
     return (
         <>
-            <Navbar />
             <Routes>
                 <Route path="/" element={<GameCanvas />} />
-                <Route path="/rating" element={<Rating />} />
-                <Route path="/tasks" element={<Tasks />} />
-                <Route path="/shop" element={<Shop />} />
                 <Route
                     path="/admin"
                     element={

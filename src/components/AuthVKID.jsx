@@ -1,6 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { signin } from '../api/auth';
 
+/**
+ * Генерирует случайный code verifier для OAuth 2.0 PKCE.
+ * @param {number} [length=64] - Длина строки
+ * @returns {string} Сгенерированный code verifier
+ */
 const generateCodeVerifier = (length = 64) => {
     const possible =
         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
@@ -9,6 +14,11 @@ const generateCodeVerifier = (length = 64) => {
         .join('');
 };
 
+/**
+ * Генерирует случайное состояние для OAuth 2.0.
+ * @param {number} [length=32] - Длина строки
+ * @returns {string} Сгенерированное состояние
+ */
 export function generateState(length = 32) {
     const possible =
         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
@@ -17,13 +27,23 @@ export function generateState(length = 32) {
         .join('');
 }
 
+/**
+ * Компонент для авторизации через VK ID.
+ * @param {Object} props
+ * @param {Function} props.onLoginSuccess - Колбэк при успешной авторизации
+ * @returns {JSX.Element}
+ */
 const AuthVKID = ({ onLoginSuccess }) => {
     const oneTapRef = useRef(null);
 
+    /**
+     * Инициализирует VK ID SDK и настраивает авторизацию.
+     * @async
+     */
     useEffect(() => {
         const initVKID = async () => {
             const container = document.getElementById('VkIdSdkOneTap');
-            if (!container || oneTapRef.current) return; // уже инициализировано
+            if (!container || oneTapRef.current) return;
 
             const codeVerifier = generateCodeVerifier();
             const state = generateState();
@@ -65,10 +85,7 @@ const AuthVKID = ({ onLoginSuccess }) => {
                             state: state,
                         };
 
-                        const userData = await signin(loginData);
-                        const maxAge = 60 * 60 * 24 * 7;
-                        document.cookie = `device_id=${deviceId}; max-age=${maxAge}; path=/`;
-                        document.cookie = `vkid=${userData.vkid}; max-age=${maxAge}; path=/`;
+                        await signin(loginData);
 
                         if (onLoginSuccess) onLoginSuccess();
 

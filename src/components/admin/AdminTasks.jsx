@@ -17,13 +17,29 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { deleteTask } from '../../api/admin';
 import AddTaskModal from '../AddTaskModal';
-import { getTasks } from '../../api/tasks';
+import { getTasks } from '../../api/admin';
 
+/**
+ * Компонент для управления заданиями в админ-панели.
+ * @returns {JSX.Element}
+ */
 const AdminTasks = () => {
+    /**
+     * Список всех заданий.
+     */
     const [tasks, setTasks] = useState([]);
+    /**
+     * Показать ли модальное окно.
+     */
     const [showModal, setShowModal] = useState(false);
+    /**
+     * Задание для редактирования.
+     */
     const [taskToEdit, setTaskToEdit] = useState(null);
 
+    /**
+     * Загружает список заданий при монтировании компонента.
+     */
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -37,6 +53,10 @@ const AdminTasks = () => {
         fetchData();
     }, []);
 
+    /**
+     * Обрабатывает редактирование задания.
+     * @param {number} taskId - ID задания
+     */
     const handleEdit = (taskId) => {
         const task = tasks.find((i) => i.id === taskId);
         if (task) {
@@ -45,6 +65,10 @@ const AdminTasks = () => {
         }
     };
 
+    /**
+     * Обрабатывает удаление задания.
+     * @param {number} taskId - ID задания
+     */
     const handleDelete = (taskId) => {
         const task = tasks.find((i) => i.id === taskId);
         const confirmed = window.confirm(
@@ -55,6 +79,9 @@ const AdminTasks = () => {
         }
     };
 
+    /**
+     * Обрабатывает добавление нового задания.
+     */
     const handleAdd = () => {
         setTaskToEdit(null);
         setShowModal(true);

@@ -1,8 +1,21 @@
-@use 'navbar';
-@use 'shop';
-@use 'rating';
-@use 'tasks';
 @use 'addProductModal';
+@use 'menuBottomSheet';
+@use 'prizeRules';
+@use 'gameCanvas';
+@use 'ratingPage';
+@use '../../public/fonts/VkSansDisplay-Bold/vksansdisplay-bold';
+@use '../../public/fonts/VkSansDisplay-Regular/vksansdisplay-regular';
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: fixed;
+    -webkit-overflow-scrolling: touch;
+}
 
 * {
     margin: 0;
@@ -15,12 +28,16 @@
         'Helvetica Neue',
         Roboto,
         sans-serif;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
-#canvas1 {
-    display: block;
-    justify-self: center;
-    border: 5px solid black;
-    width: 500px;
-    height: 765px;
+#root {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: fixed;
 }
