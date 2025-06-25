@@ -18,26 +18,6 @@ const SuperpowerSection = ({
     superpowerRef,
     vkid,
 }) => {
-    /**
-     * Множество выполненных заданий.
-     */
-    const [completedTasks, setCompletedTasks] = useState(new Set());
-
-    /**
-     * Обрабатывает клик по заданию для его выполнения.
-     * @param {string} taskToken - Токен задания
-     */
-    const handleTaskClick = async (taskToken) => {
-        try {
-            const response = await completeTask({ token: taskToken }, vkid);
-            if (response.Status === 200) {
-                setCompletedTasks((prev) => new Set([...prev, taskToken]));
-            }
-        } catch (error) {
-            console.error('Error completing task:', error);
-        }
-    };
-
     return (
         <div
             ref={superpowerRef}
@@ -54,13 +34,10 @@ const SuperpowerSection = ({
                     <div className="menu-bottom-sheet__superpower-tasks">
                         {tasks.map((task, idx) => (
                             <div
-                                key={task.token || idx}
-                                className={`menu-bottom-sheet__task-item${completedTasks.has(task.token) ? ' menu-bottom-sheet__task-item_completed' : ''}`}
+                                key={idx}
+                                className={`menu-bottom-sheet__task-item${task.completed ? ' menu-bottom-sheet__task-item_completed' : ''}`}
                                 style={{ '--index': idx }}
-                                onClick={() =>
-                                    !completedTasks.has(task.token) &&
-                                    handleTaskClick(task.token)
-                                }
+                                /* переход на страницу задания onClick */
                             >
                                 <div className="menu-bottom-sheet__task-icon">
                                     <img
@@ -74,11 +51,6 @@ const SuperpowerSection = ({
                                     <div className="menu-bottom-sheet__task-text">
                                         {task.description}
                                     </div>
-                                    {/*{task.description && (*/}
-                                    {/*    <div className="menu-bottom-sheet__task-label">*/}
-                                    {/*        {task.description}*/}
-                                    {/*    </div>*/}
-                                    {/*)}*/}
                                 </div>
                                 <div className="menu-bottom-sheet__task-arrow">
                                     <img
