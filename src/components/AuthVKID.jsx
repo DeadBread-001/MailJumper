@@ -85,10 +85,7 @@ const AuthVKID = ({ onLoginSuccess }) => {
                             state: state,
                         };
 
-                        const userData = await signin(loginData);
-                        const maxAge = 60 * 60 * 24 * 7;
-                        document.cookie = `device_id=${deviceId}; max-age=${maxAge}; path=/`;
-                        document.cookie = `vkid=${userData.vkid}; max-age=${maxAge}; path=/`;
+                        await signin(loginData);
 
                         if (onLoginSuccess) onLoginSuccess();
 

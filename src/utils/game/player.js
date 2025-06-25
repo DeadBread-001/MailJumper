@@ -192,7 +192,13 @@ export class Player {
                     if (soundEnabled === null || soundEnabled === 'true') {
                         const audio = new Audio('/sounds/toy-button.mp3');
                         audio.volume = 0.5;
-                        audio.play();
+                        const resp = audio.play();
+
+                        if (resp !== undefined) {
+                            resp.then(_ => {
+                            }).catch(_ => {
+                            });
+                        }
                     }
                 }
             }
