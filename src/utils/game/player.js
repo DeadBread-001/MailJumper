@@ -195,9 +195,7 @@ export class Player {
                         const resp = audio.play();
 
                         if (resp !== undefined) {
-                            resp.then(_ => {
-                            }).catch(_ => {
-                            });
+                            resp.then((_) => {}).catch((_) => {});
                         }
                     }
                 }
