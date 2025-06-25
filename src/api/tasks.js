@@ -23,7 +23,7 @@ export async function getTasks() {
  * @throws {Error} Если произошла ошибка или некорректный формат данных
  */
 export async function completeTask(token, vkid) {
-    const url = IP + `shop/${vkid}/task`;
+    const url = IP + `admin/${vkid}/task`;
     const data = await fetchRequest(url, 'POST', token);
     if (data.Status === 200) {
         return data;
