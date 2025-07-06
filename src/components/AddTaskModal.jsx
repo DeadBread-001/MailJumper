@@ -1,7 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { saveTask } from '../api/admin';
 
+/**
+ * Модальное окно для добавления или редактирования заданий.
+ * @param {Object} props
+ * @param {boolean} props.isOpen - Открыто ли модальное окно
+ * @param {Function} props.onClose - Функция закрытия модального окна
+ * @param {Object|null} props.taskToEdit - Данные задания для редактирования
+ * @returns {JSX.Element|null}
+ */
 const AddTaskModal = ({ isOpen, onClose, taskToEdit }) => {
+    /**
+     * Состояние формы с данными задания.
+     */
     const [form, setForm] = useState({
         id: '',
         name: '',
@@ -10,8 +21,14 @@ const AddTaskModal = ({ isOpen, onClose, taskToEdit }) => {
         reward: '',
     });
 
+    /**
+     * Ссылка на поле ввода названия.
+     */
     const nameRef = useRef(null);
 
+    /**
+     * Сбрасывает форму к начальным значениям.
+     */
     const resetForm = () => {
         setForm({
             id: '',
@@ -22,6 +39,9 @@ const AddTaskModal = ({ isOpen, onClose, taskToEdit }) => {
         });
     };
 
+    /**
+     * Инициализирует форму данными для редактирования.
+     */
     useEffect(() => {
         if (taskToEdit) {
             setForm({
@@ -37,11 +57,19 @@ const AddTaskModal = ({ isOpen, onClose, taskToEdit }) => {
         }
     }, [isOpen, taskToEdit]);
 
+    /**
+     * Обрабатывает изменения в полях формы.
+     * @param {Event} e - Событие изменения
+     */
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
+    /**
+     * Обрабатывает отправку формы.
+     * @param {Event} e - Событие отправки формы
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -53,10 +81,11 @@ const AddTaskModal = ({ isOpen, onClose, taskToEdit }) => {
         const isEdit = !!taskToEdit;
 
         const dataToSend = {
+            id: 0,
             name: form.name,
             description: form.description,
-            link: form.link,
-            reward: Number(form.reward),
+            // link: form.link,
+            // reward: Number(form.reward),
         };
 
         if (isEdit && form.id) {
@@ -66,7 +95,7 @@ const AddTaskModal = ({ isOpen, onClose, taskToEdit }) => {
         try {
             await saveTask(dataToSend, isEdit);
             onClose();
-            location.reload();
+            // location.reload();
         } catch (err) {
             console.error('Ошибка при сохранении:', err.message);
         }
